@@ -145,3 +145,4 @@ Visit:
 |-------|-----|-------|
 | `school-blue` | `#1e3a8a` | Primary brand, navbar, buttons |
 | `school-gold` | `#f59e0b` | Accent, highlights, featured |
+
