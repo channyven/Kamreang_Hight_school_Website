@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
-import { Eye, EyeOff, LogIn, School, AlertCircle, Loader2 } from "lucide-react";
+import { Eye, EyeOff, LogIn, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 function GoogleIcon() {
@@ -119,11 +119,12 @@ function LoginForm() {
         >
           {/* Logo + header */}
           <div className="text-center mb-8">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "#00376f" }}
-            >
-              <School className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden" style={{ background: "#00376f" }}>
+              <img
+                src="/images/kamrieng-logo.png"
+                alt="Kamrieng High School"
+                className="w-10 h-10 object-cover rounded-full"
+              />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: "#0d1c2f" }}>
               Admin Portal

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -42,25 +42,35 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const allNavItems: NavItem[] = [
-    { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4.5 h-4.5" /> },
-    { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4.5 h-4.5" /> },
-    { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4.5 h-4.5" /> },
-    { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4.5 h-4.5" /> },
-    { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4.5 h-4.5" /> },
-    { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4.5 h-4.5" /> },
-    { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4.5 h-4.5" />, permission: "canManageUsers" },
-    { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4.5 h-4.5" />, permission: "canManageSettings" },
-  ];
-
-  const visibleItems = allNavItems.filter(
-    (item) => !item.permission || hasPermission(item.permission as Parameters<typeof hasPermission>[0])
+  const allNavItems: NavItem[] = useMemo(
+    () => [
+      { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4.5 h-4.5" /> },
+      { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4.5 h-4.5" /> },
+      { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4.5 h-4.5" /> },
+      { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4.5 h-4.5" /> },
+      { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4.5 h-4.5" /> },
+      { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4.5 h-4.5" /> },
+      { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4.5 h-4.5" />, permission: "canManageUsers" },
+      { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4.5 h-4.5" />, permission: "canManageSettings" },
+    ],
+    [locale]
   );
 
-  const isActive = (href: string) => {
-    if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
-    return pathname.startsWith(href);
-  };
+  const visibleItems = useMemo(
+    () =>
+      allNavItems.filter(
+        (item) => !item.permission || hasPermission(item.permission as Parameters<typeof hasPermission>[0])
+      ),
+    [allNavItems, hasPermission]
+  );
+
+  const isActive = useCallback(
+    (href: string) => {
+      if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
+      return pathname.startsWith(href);
+    },
+    [locale, pathname]
+  );
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full relative">

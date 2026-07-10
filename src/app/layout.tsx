@@ -19,13 +19,19 @@ const battambang = Battambang({
 
 export const metadata: Metadata = {
   title: {
-    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School",
-    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School"}`,
+    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School",
+    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}`,
   },
-  description: "Official website of the high school.",
+  description: "Official website of Kamrieng High School — news, achievements, academics, and more.",
+  keywords: ["Kamrieng High School", "វិទ្យាល័យកំរៀង", "school", "education", "Cambodia", "high school"],
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   ),
+  icons: {
+    icon: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    shortcut: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    apple: { url: "/images/kamrieng-logo.png", type: "image/png" },
+  },
 };
 
 export default async function RootLayout({
