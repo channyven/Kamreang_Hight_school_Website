@@ -155,7 +155,7 @@ function LoginForm() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ color: "#434750" }}
               >
-                Email address
+                Email address <span style={{ color: "#dc2626" }}>*</span>
               </label>
               <input
                 id="email"
@@ -182,7 +182,7 @@ function LoginForm() {
                 className="block text-sm font-medium mb-1.5"
                 style={{ color: "#434750" }}
               >
-                Password
+                Password <span style={{ color: "#dc2626" }}>*</span>
               </label>
               <div className="relative">
                 <input
