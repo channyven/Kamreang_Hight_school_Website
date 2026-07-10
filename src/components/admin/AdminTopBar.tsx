@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Bell, ExternalLink, Menu, Search, LogOut } from "lucide-react";
+import { Bell, ExternalLink, LogOut, Menu, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -85,6 +85,24 @@ export default function AdminTopBar() {
             className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-white"
             style={{ background: "#ef4444" }}
           />
+        </button>
+
+        {/* Logout */}
+        <button
+          onClick={logout}
+          title={t("logout")}
+          className="flex items-center justify-center w-9 h-9 rounded-xl transition-colors"
+          style={{ color: "#8892a0" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#fef2f2";
+            e.currentTarget.style.color = "#dc2626";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "#8892a0";
+          }}
+        >
+          <LogOut className="w-5 h-5" />
         </button>
 
         {/* User dropdown */}
