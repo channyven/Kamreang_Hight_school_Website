@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { getLocale } from "next-intl/server";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatShortDate, getLocalizedText, truncate } from "@/lib/utils";
-import { Calendar, ArrowRight, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { formatShortDate, formatNumber, getLocalizedText, truncate } from "@/lib/utils";
+import { Calendar, ArrowRight, Search, X } from "lucide-react";
 import { getPublishedNews, getNewsCategories } from "@/lib/queries";
+import type { News } from "@/types";
 
 async function getNewsData() {
   const [news, categories] = await Promise.all([
@@ -15,6 +16,39 @@ async function getNewsData() {
     getNewsCategories(),
   ]);
   return { news, categories };
+}
+
+/**
+ * Search across all localised text fields of a news item.
+ * Matches against KM + EN titles, excerpts, and content.
+ */
+function matchesSearch(item: News, query: string): boolean {
+  const q = query.toLowerCase().trim();
+  if (!q) return true;
+  const haystack = [
+    item.title_km,
+    item.title_en,
+    item.excerpt_km,
+    item.excerpt_en,
+    item.content_km,
+    item.content_en,
+  ].filter(Boolean).join(" ").toLowerCase();
+  return haystack.includes(q);
+}
+
+/** Build a query-string fragment preserving category + search + page. */
+function buildQuery(params: {
+  locale: string;
+  page?: number;
+  category?: string;
+  q?: string;
+}): string {
+  const sp = new URLSearchParams();
+  if (params.category) sp.set("category", params.category);
+  if (params.q) sp.set("q", params.q);
+  if (params.page && params.page > 1) sp.set("page", String(params.page));
+  const qs = sp.toString();
+  return `/${params.locale}/news${qs ? `?${qs}` : ""}`;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,20 +65,26 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
   const t = await getTranslations("news");
   const params = await searchParams;
   const categorySlug = params.category ?? "";
-  const page = parseInt(params.page ?? "1");
+  const query = params.q ?? "";
+  const page = Math.max(1, parseInt(params.page ?? "1"));
   const pageSize = 9;
 
   const { news: allNews, categories } = await getNewsData();
 
+  // Apply filters: category + search
   let filtered = allNews;
   if (categorySlug) {
     const cat = categories.find((c) => c.slug === categorySlug);
     if (cat) filtered = filtered.filter((n) => n.category_id === cat.id);
   }
+  if (query) {
+    filtered = filtered.filter((n) => matchesSearch(n, query));
+  }
 
   const count = filtered.length;
   const totalPages = Math.ceil(count / pageSize);
-  const news = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const safePage = Math.min(page, totalPages || 1);
+  const news = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -61,33 +101,88 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
       </div>
 
       <div className="container mx-auto px-4 py-10">
-        {/* Category filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <Link href={`/${locale}/news`}>
-            <Badge
-              variant={!categorySlug ? "default" : "outline"}
-              className="cursor-pointer hover:bg-school-blue-800 hover:text-white transition-colors py-1.5 px-3"
-            >
-              {t("categories")} ({count ?? 0})
-            </Badge>
-          </Link>
-          {categories.map((cat) => (
-            <Link key={cat.id} href={`/${locale}/news?category=${cat.slug}`}>
+        {/* Controls row: search + category filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+          {/* Category filter */}
+          <div className="flex flex-wrap gap-2 flex-1">
+            <Link href={buildQuery({ locale, q: query })}>
               <Badge
-                variant={categorySlug === cat.slug ? "default" : "outline"}
+                variant={!categorySlug ? "default" : "outline"}
                 className="cursor-pointer hover:bg-school-blue-800 hover:text-white transition-colors py-1.5 px-3"
               >
-                {getLocalizedText(cat.name_km, cat.name_en, locale)}
+                {t("categories")} ({count})
               </Badge>
             </Link>
-          ))}
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={buildQuery({ locale, category: cat.slug, q: query })}
+              >
+                <Badge
+                  variant={categorySlug === cat.slug ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-school-blue-800 hover:text-white transition-colors py-1.5 px-3"
+                >
+                  {getLocalizedText(cat.name_km, cat.name_en, locale)}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+
+          {/* Search form */}
+          <form
+            action={`/${locale}/news`}
+            method="GET"
+            role="search"
+            className="relative flex items-center shrink-0 w-full sm:w-64"
+          >
+            {/* Preserve category when searching */}
+            {categorySlug && (
+              <input type="hidden" name="category" value={categorySlug} />
+            )}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <Input
+              name="q"
+              type="search"
+              defaultValue={query}
+              placeholder={t("search")}
+              aria-label={locale === "km" ? "ស្វែងរកព័ត៌មាន" : "Search news"}
+              className="pl-9 pr-9 h-10 rounded-xl bg-white border-gray-200 text-sm"
+            />
+            {query && (
+              <Link
+                href={buildQuery({ locale, category: categorySlug })}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </Link>
+            )}
+          </form>
         </div>
 
-        {/* Grid */}
+        {/* Search summary */}
+        {query && (
+          <p className="text-sm text-gray-500 mb-6">
+            {locale === "km"
+              ? `បានរកឃើញ ${formatNumber(count, locale)} លទ្ធផល សម្រាប់ "${query}"`
+              : `Found ${count} result${count === 1 ? "" : "s"} for "${query}"`}
+          </p>
+        )}
+
+        {/* Grid / No results */}
         {news.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className={locale === "km" ? "font-khmer" : ""}>{t("no_results")}</p>
+            <Search className="w-16 h-16 mx-auto mb-4 opacity-30" />
+            <p className={`text-lg font-medium mb-1 ${locale === "km" ? "font-khmer" : ""}`}>
+              {t("no_results")}
+            </p>
+            {query && (
+              <p className={`text-sm ${locale === "km" ? "font-khmer" : ""}`}>
+                {locale === "km"
+                  ? `សូមព្យាយាមស្វែងរកពាក្យផ្សេងទៀត`
+                  : `Try searching with different keywords`}
+              </p>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -157,12 +252,12 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <Link
                 key={p}
-                href={`/${locale}/news?page=${p}${categorySlug ? `&category=${categorySlug}` : ""}`}
+                href={buildQuery({ locale, page: p, category: categorySlug, q: query })}
               >
                 <Button
-                  variant={p === page ? "default" : "outline"}
+                  variant={p === safePage ? "default" : "outline"}
                   size="sm"
-                  className={p === page ? "bg-school-blue-800" : ""}
+                  className={p === safePage ? "bg-school-blue-800" : ""}
                 >
                   {p}
                 </Button>

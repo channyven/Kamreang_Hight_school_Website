@@ -6,6 +6,7 @@
     "news": "News",
     "achievements": "Achievements",
     "contact": "Contact",
+    "research": "Research",
     "donate": "Donate",
     "admin": "Dashboard"
   },
@@ -72,6 +73,14 @@
   },
   "governance": {
     "title": "School Governance"
+  },
+  "research": {
+    "title": "Research",
+    "subtitle": "Academic research and publications from our school community",
+    "featured_title": "Featured Research",
+    "featured_desc": "Highlighted research papers, studies, and academic projects by our students and faculty.",
+    "categories_title": "Research Areas",
+    "categories_desc": "Our research spans multiple disciplines, fostering innovation and critical thinking."
   },
   "donate": {
     "title": "Support Our School",

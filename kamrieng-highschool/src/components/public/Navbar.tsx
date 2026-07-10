@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, School, Globe, Heart, LogIn } from "lucide-react";
+import { Menu, X, School, Globe, Heart, LogIn, Search, ArrowRight, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
@@ -22,6 +22,8 @@ export default function Navbar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
   const isTransparent = isHome && !scrolled;
@@ -99,6 +101,21 @@ export default function Navbar() {
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
+            {/* Research icon */}
+            <Link
+              href={`/${locale}/research`}
+              aria-label={t("research")}
+              title={t("research")}
+              className={cn(
+                "inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors",
+                isTransparent
+                  ? "text-white/80 hover:text-white hover:bg-white/10"
+                  : "text-gray-600 hover:text-school-blue-800 hover:bg-gray-100"
+              )}
+            >
+              <FlaskConical className="w-[18px] h-[18px]" />
+            </Link>
+
             {/* Donate CTA */}
             <Link
               href={`/${locale}/donate`}
@@ -133,6 +150,69 @@ export default function Navbar() {
                   {localeFlags[loc]}
                 </button>
               ))}
+            </div>
+
+            {/* Search icon */}
+            <div className="relative">
+              {searchOpen ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) {
+                      router.push(`/${locale}/news?q=${encodeURIComponent(searchQuery.trim())}`);
+                    }
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={locale === "km" ? "ស្វែងរកព័ត៌មាន..." : "Search news..."}
+                    autoFocus
+                    className={cn(
+                      "w-44 h-9 px-3 rounded-xl text-sm border outline-none transition-all",
+                      isTransparent
+                        ? "bg-white/15 text-white border-white/20 placeholder:text-white/50"
+                        : "bg-gray-100 text-gray-700 border-gray-200 placeholder:text-gray-400"
+                    )}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') {
+                        setSearchOpen(false);
+                        setSearchQuery("");
+                      }
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    className={cn(
+                      "flex items-center justify-center w-9 h-9 rounded-full shrink-0 transition-colors",
+                      isTransparent
+                        ? "text-white/80 hover:text-white hover:bg-white/10"
+                        : "text-gray-500 hover:text-school-blue-800 hover:bg-gray-100"
+                    )}
+                    aria-label="Search"
+                  >
+                    <ArrowRight className="w-[18px] h-[18px]" />
+                  </button>
+                </form>
+              ) : (
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className={cn(
+                    "flex items-center justify-center w-9 h-9 rounded-full transition-colors",
+                    isTransparent
+                      ? "text-white/80 hover:text-white hover:bg-white/10"
+                      : "text-gray-600 hover:text-school-blue-800 hover:bg-gray-100"
+                  )}
+                  aria-label={locale === "km" ? "ស្វែងរក" : "Search"}
+                  title={locale === "km" ? "ស្វែងរក" : "Search"}
+                >
+                  <Search className="w-[18px] h-[18px]" />
+                </button>
+              )}
             </div>
 
             {/* Admin sign-in */}
@@ -176,6 +256,36 @@ export default function Navbar() {
             className="lg:hidden bg-white border-t shadow-lg"
           >
             <div className="container mx-auto px-4 py-4 space-y-1">
+              {/* Mobile search */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const q = formData.get("mobile-q") as string;
+                  if (q?.trim()) {
+                    router.push(`/${locale}/news?q=${encodeURIComponent(q.trim())}`);
+                  }
+                  setMobileOpen(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2"
+              >
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <input
+                    name="mobile-q"
+                    type="search"
+                    placeholder={locale === "km" ? "ស្វែងរកព័ត៌មាន..." : "Search news..."}
+                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-gray-100 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-school-blue-800/30"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="shrink-0 h-10 px-3 rounded-xl bg-school-blue-800 text-white text-sm font-medium transition-colors hover:bg-school-blue-900"
+                >
+                  {locale === "km" ? "ស្វែងរក" : "Go"}
+                </button>
+              </form>
+
               {navLinks.map((link) => (
                 <Link
                   key={link.key}
