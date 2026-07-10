@@ -12,11 +12,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "School Website",
-    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "School"}`,
+    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School",
+    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}`,
   },
   description: `Official website of ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "our school"} — news, achievements, and more.`,
-  keywords: ["school", "education", "Cambodia", "high school"],
+  keywords: ["Kamrieng High School", "វិទ្យាល័យកំរៀង", "school", "education", "Cambodia", "Battambang", "high school", "secondary education"],
   openGraph: {
     type: "website",
     siteName: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN,

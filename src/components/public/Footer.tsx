@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
-import { School, Phone, Mail, MapPin, Facebook, Youtube } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Youtube } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 import { getSiteSettings } from "@/lib/queries";
 
@@ -45,9 +45,11 @@ export default async function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-school-gold-500 flex items-center justify-center shrink-0">
-                <School className="w-6 h-6 text-white" />
-              </div>
+              <img
+                src="/images/kamrieng-logo.png"
+                alt="Kamrieng High School"
+                className="w-12 h-12 rounded-full object-cover shadow-sm shrink-0"
+              />
               <div>
                 <h3 className="font-bold text-lg leading-tight">{schoolName}</h3>
                 <p className="text-school-blue-200 text-xs">
