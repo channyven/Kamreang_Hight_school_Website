@@ -66,24 +66,24 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
   }, [gradeTeachers, searchQuery]);
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-8 bg-white">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className={cn("text-4xl md:text-5xl font-extrabold mb-2 tracking-tight", km && "font-khmer")} style={{ color: "#0d1c2f" }}>
+        <div className="text-center mb-8">
+          <h2 className={cn("text-3xl md:text-4xl font-extrabold mb-2 tracking-tight", km && "font-khmer")} style={{ color: "#0d1c2f" }}>
             {km ? "រចនាសម្ព័ន្ធ និងគ្រូបង្រៀន" : "Organization & Teachers"}
           </h2>
-          <p className="text-[10px] md:text-xs tracking-[0.4em] uppercase font-bold opacity-60" style={{ color: "#737781" }}>
+          <p className="text-[10px] md:text-[11px] tracking-[0.4em] uppercase font-bold opacity-60" style={{ color: "#737781" }}>
             ORGANIZATION &amp; TEACHERS
           </p>
         </div>
 
         <Tabs defaultValue="org-chart">
           <div className="flex justify-center mb-8">
-            <TabsList className="bg-[#eff4ff] p-1 h-auto">
+            <TabsList className="bg-[#eff4ff] p-1.5 h-auto rounded-xl">
               <TabsTrigger
                 value="org-chart"
                 className={cn(
-                  "rounded-lg px-4 py-2 data-[state=active]:bg-school-blue-800 data-[state=active]:text-white",
+                  "rounded-lg px-6 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
                   km && "font-khmer"
                 )}
               >
@@ -92,7 +92,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
               <TabsTrigger
                 value="by-grade"
                 className={cn(
-                  "rounded-lg px-4 py-2 data-[state=active]:bg-school-blue-800 data-[state=active]:text-white",
+                  "rounded-lg px-6 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
                   km && "font-khmer"
                 )}
               >
@@ -101,12 +101,14 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
             </TabsList>
           </div>
 
-          <TabsContent value="org-chart" className="mt-0">
-            <OrgChart data={orgChartData} km={km} />
+          <TabsContent value="org-chart" className="mt-0 outline-none">
+            <div className="bg-white rounded-3xl border border-[#e6eeff]/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+              <OrgChart data={orgChartData} km={km} />
+            </div>
           </TabsContent>
 
           <TabsContent value="by-grade" className="mt-0">
-            <div className="flex flex-wrap justify-center gap-2 mb-10">
+            <div className="flex flex-wrap justify-center gap-1.5 mb-4">
               {GRADES.map((grade) => {
                 const count = active.filter((t) => (t.grade_levels ?? []).includes(grade)).length;
                 return (
@@ -115,22 +117,22 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
                     type="button"
                     onClick={() => setSelectedGrade(grade)}
                     className={cn(
-                      "px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer",
+                      "px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer",
                       selectedGrade === grade
                         ? "bg-school-blue-800 text-white"
                         : "bg-[#eff4ff] text-school-blue-800 hover:bg-school-blue-100"
                     )}
                   >
                     {km ? `ថ្នាក់ទី ${grade}` : `Grade ${grade}`}
-                    <span className="ml-1.5 opacity-70">({count})</span>
+                    <span className="ml-1 opacity-70">({count})</span>
                   </button>
                 );
               })}
             </div>
 
             {/* Search bar */}
-            <div className="relative max-w-md mx-auto mb-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <div className="relative max-w-xs mx-auto mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
@@ -138,7 +140,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
                 placeholder={km ? "ស្វែងរកតាមឈ្មោះ ឬមុខវិជ្ជា..." : "Search by name or subject..."}
                 aria-label={km ? "ស្វែងរកគ្រូបង្រៀន" : "Search teachers"}
                 className={cn(
-                  "w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm transition-all duration-200 outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400",
+                  "w-full pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 bg-white text-xs transition-all duration-200 outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400",
                   km && "font-khmer"
                 )}
               />
@@ -146,7 +148,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
 
             {/* Teacher grid */}
             {filteredTeachers.length === 0 ? (
-              <p className={cn("text-center text-sm py-10", km && "font-khmer")} style={{ color: "#737781" }}>
+              <p className={cn("text-center text-xs py-6", km && "font-khmer")} style={{ color: "#737781" }}>
                 {searchQuery.trim()
                   ? km
                     ? "មិនមានគ្រូបង្រៀនត្រូវនឹងការស្វែងរកទេ"
@@ -159,13 +161,13 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
               <>
                 {/* Result count */}
                 {searchQuery.trim() && (
-                  <p className={cn("text-xs text-center mb-4 text-gray-400", km && "font-khmer")}>
+                  <p className={cn("text-[10px] text-center mb-3 text-gray-400", km && "font-khmer")}>
                     {km
                       ? `បានរកឃើញ ${filteredTeachers.length} នាក់`
                       : `Found ${filteredTeachers.length} teacher${filteredTeachers.length !== 1 ? "s" : ""}`}
                   </p>
                 )}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
                   {filteredTeachers.map((teacher) => (
                     <TeacherCard key={teacher.id} teacher={teacher} km={km} />
                   ))}
@@ -187,52 +189,58 @@ function TeacherCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group bg-white rounded-2xl p-5 text-center border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg w-full cursor-pointer text-left"
-        style={{ borderColor: "#e6eeff", boxShadow: "0px 2px 12px rgba(30,78,140,0.05)" }}
+        className="group bg-white rounded-xl p-2.5 text-center border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md w-full cursor-pointer"
+        style={{ borderColor: "#e6eeff", boxShadow: "0px 1px 6px rgba(30,78,140,0.04)" }}
       >
-        <div className="relative w-16 h-16 mx-auto rounded-full mb-3 overflow-hidden ring-2 ring-[#eff4ff] transition-all duration-300 group-hover:ring-[#fdbc13]/40">
+        <div className="relative w-10 h-10 mx-auto rounded-full mb-1.5 overflow-hidden ring-1.5 ring-[#eff4ff] transition-all duration-200 group-hover:ring-[#fdbc13]/30">
           {teacher.photo_url ? (
             <Image
               src={teacher.photo_url}
               alt={km ? teacher.name_km : teacher.name_en}
               fill
               className="object-cover"
-              sizes="64px"
+              sizes="40px"
             />
           ) : (
             <Image
-              src={getAvatarUrl(km ? teacher.name_km : teacher.name_en, 64)}
+              src={getAvatarUrl(km ? teacher.name_km : teacher.name_en, 40)}
               alt={km ? teacher.name_km : teacher.name_en}
               fill
               className="object-cover"
-              sizes="64px"
+              sizes="40px"
             />
           )}
         </div>
         <h4
           className={cn(
-            "font-semibold text-sm mb-1 leading-tight transition-colors group-hover:text-[#00376f] text-center",
+            "font-semibold text-[11px] leading-tight truncate transition-colors group-hover:text-[#00376f]",
             km && "font-khmer"
           )}
           style={{ color: "#0d1c2f" }}
         >
           {km ? teacher.name_km : teacher.name_en}
         </h4>
-        <p className={cn("text-xs mb-2 leading-snug text-center", km && "font-khmer")} style={{ color: "#434750" }}>
+        <p className={cn("text-[10px] leading-snug truncate", km && "font-khmer")} style={{ color: "#434750" }}>
           {km ? teacher.subject_km : teacher.subject_en}
         </p>
         {teacher.years_experience ? (
           <span
-            className="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
+            className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded-full mt-0.5"
             style={{ background: "#eff4ff", color: "#00376f" }}
           >
-            {teacher.years_experience}y exp
+            {teacher.years_experience}y
           </span>
         ) : null}
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-0 gap-0 border-none bg-school-navy text-white rounded-[2.5rem] shadow-2xl scrollbar-none">
+          <DialogTitle className="sr-only">
+            {km ? teacher.name_km : teacher.name_en}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {km ? teacher.subject_km : teacher.subject_en}
+          </DialogDescription>
           {/* Top Photo Section */}
           <div className="relative aspect-[4/5] w-full group/photo">
             {teacher.photo_url ? (

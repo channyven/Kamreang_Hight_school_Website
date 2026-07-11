@@ -125,117 +125,6 @@ const STAT_HEADERS: Record<string, StatConfig> = {
   },
 };
 
-function MilestoneSchoolIcon() {
-  return (
-    <svg viewBox="0 0 200 160" fill="none" className="w-full h-full">
-      {/* Sky gradient */}
-      <rect width="200" height="160" rx="12" fill="url(#sky-school)" />
-      <defs>
-        <linearGradient id="sky-school" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e8f0fe" />
-          <stop offset="100%" stopColor="#fef3c7" />
-        </linearGradient>
-      </defs>
-      {/* Sun */}
-      <circle cx="160" cy="40" r="22" fill="#fde68a" opacity="0.8" />
-      <circle cx="160" cy="40" r="16" fill="#fcd34d" />
-      {/* School building */}
-      <rect x="55" y="60" width="90" height="80" rx="3" fill="#1e3a8a" />
-      <rect x="70" y="35" width="60" height="30" rx="2" fill="#2563eb" />
-      <polygon points="70,35 100,18 130,35" fill="#1e40af" />
-      {/* Door */}
-      <rect x="90" y="105" width="22" height="35" rx="2" fill="#f59e0b" />
-      {/* Windows */}
-      <rect x="65" y="75" width="14" height="16" rx="1" fill="#93c5fd" />
-      <rect x="85" y="75" width="14" height="16" rx="1" fill="#93c5fd" />
-      <rect x="105" y="75" width="14" height="16" rx="1" fill="#93c5fd" />
-      <rect x="122" y="75" width="14" height="16" rx="1" fill="#93c5fd" />
-      {/* Ground */}
-      <rect x="0" y="140" width="200" height="20" fill="#86efac" opacity="0.5" />
-      {/* Trees */}
-      <circle cx="38" cy="105" r="18" fill="#22c55e" opacity="0.6" />
-      <rect x="36" y="115" width="4" height="28" fill="#854d0e" />
-      <circle cx="162" cy="110" r="14" fill="#22c55e" opacity="0.6" />
-      <rect x="160" y="118" width="4" height="25" fill="#854d0e" />
-      {/* Flag */}
-      <rect x="98" y="18" width="2" height="18" fill="#78350f" />
-      <polygon points="100,18 118,24 100,30" fill="#ef4444" />
-    </svg>
-  );
-}
-
-function MilestoneAwardIcon() {
-  return (
-    <svg viewBox="0 0 200 160" fill="none" className="w-full h-full">
-      {/* Gold gradient bg */}
-      <rect width="200" height="160" rx="12" fill="url(#gold-bg)" />
-      <defs>
-        <radialGradient id="gold-bg" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stopColor="#fef3c7" />
-          <stop offset="100%" stopColor="#fde68a" />
-        </radialGradient>
-      </defs>
-      {/* Trophy */}
-      <rect x="76" y="52" width="48" height="42" rx="6" fill="#d97706" />
-      <rect x="80" y="56" width="40" height="34" rx="4" fill="#f59e0b" />
-      {/* Trophy handles */}
-      <path d="M76 62C62 58 58 70 64 78" stroke="#d97706" strokeWidth="3" strokeLinecap="round" fill="none" />
-      <path d="M124 62C138 58 142 70 136 78" stroke="#d97706" strokeWidth="3" strokeLinecap="round" fill="none" />
-      {/* Star on trophy */}
-      <polygon points="100,66 104,76 114,76 106,82 109,92 100,86 91,92 94,82 86,76 96,76" fill="#92400e" />
-      {/* Trophy base */}
-      <rect x="86" y="94" width="28" height="6" rx="2" fill="#d97706" />
-      <rect x="92" y="100" width="16" height="22" rx="2" fill="#b45309" />
-      {/* Ribbon left */}
-      <path d="M76 52L60 30L76 40Z" fill="#ef4444" opacity="0.8" />
-      <path d="M76 52L60 36L72 46Z" fill="#dc2626" opacity="0.6" />
-      {/* Ribbon right */}
-      <path d="M124 52L140 30L124 40Z" fill="#ef4444" opacity="0.8" />
-      <path d="M124 52L140 36L128 46Z" fill="#dc2626" opacity="0.6" />
-      {/* Confetti dots */}
-      <circle cx="38" cy="38" r="3" fill="#f59e0b" opacity="0.7" />
-      <circle cx="52" cy="120" r="3" fill="#3b82f6" opacity="0.7" />
-      <circle cx="148" cy="44" r="3" fill="#22c55e" opacity="0.7" />
-      <circle cx="162" cy="106" r="3" fill="#ef4444" opacity="0.7" />
-      <circle cx="30" cy="78" r="2" fill="#a855f7" opacity="0.6" />
-      <circle cx="170" cy="74" r="2" fill="#f59e0b" opacity="0.6" />
-    </svg>
-  );
-}
-
-function MilestoneGrowthIcon() {
-  return (
-    <svg viewBox="0 0 200 160" fill="none" className="w-full h-full">
-      {/* Blue gradient bg */}
-      <rect width="200" height="160" rx="12" fill="url(#growth-bg)" />
-      <defs>
-        <linearGradient id="growth-bg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#dbeafe" />
-          <stop offset="100%" stopColor="#e0f2fe" />
-        </linearGradient>
-      </defs>
-      {/* Growing bar chart */}
-      <rect x="40" y="100" width="28" height="40" rx="3" fill="#93c5fd" />
-      <rect x="74" y="78" width="28" height="62" rx="3" fill="#60a5fa" />
-      <rect x="108" y="54" width="28" height="86" rx="3" fill="#3b82f6" />
-      <rect x="142" y="36" width="28" height="104" rx="3" fill="#1e3a8a" />
-      {/* Arrow trend line */}
-      <polyline points="44,100 88,78 122,54 156,36" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      {/* Arrow head */}
-      <polygon points="156,36 150,44 162,44" fill="#f59e0b" />
-      {/* Students icon */}
-      <circle cx="55" cy="38" r="8" fill="#f59e0b" opacity="0.3" />
-      <circle cx="55" cy="38" r="5" fill="#f59e0b" opacity="0.6" />
-      <circle cx="145" cy="18" r="8" fill="#f59e0b" opacity="0.3" />
-      <circle cx="145" cy="18" r="5" fill="#f59e0b" opacity="0.6" />
-      <circle cx="100" cy="26" r="6" fill="#f59e0b" opacity="0.25" />
-      <circle cx="100" cy="26" r="4" fill="#f59e0b" opacity="0.5" />
-      {/* Baseline */}
-      <rect x="30" y="140" width="150" height="3" rx="1" fill="#bfdbfe" />
-    </svg>
-  );
-}
-
 const MILESTONES = [
   {
     year: "2000",
@@ -246,7 +135,7 @@ const MILESTONES = [
     desc_km:
       "វិទ្យាល័យកំរៀង ត្រូវបានបង្កើតឡើងតាមគំនិតផ្ដួចផ្ដើមរបស់លោក សុខ គង់ អភិបាលស្រុកកំរៀង និងលោក នូប ធឿន ប្រធានការិយាល័យអប់រំ យុវជន និងកីឡាស្រុកកំរៀង រួមជាមួយអាជ្ញាធរមូលដ្ឋាន។",
     color: "#1e3a8a",
-    image: MilestoneSchoolIcon,
+    image: "/images/about/school%20founding.jpg",
     caption_km: "ការបង្កើតសាលា",
     caption_en: "School Founding",
   },
@@ -259,7 +148,7 @@ const MILESTONES = [
     desc_km:
       'ក្រសួងអប់រំ យុវជន និងកីឡា បានទទួលស្គាល់វិទ្យាល័យកំរៀងជា "សាលាល្អ" ។',
     color: "#f59e0b",
-    image: MilestoneAwardIcon,
+    image: "/images/about/Best%20School%20Award.png",
     caption_km: "ពានរង្វាន់សាលាល្អ",
     caption_en: "Best School Award",
   },
@@ -272,7 +161,7 @@ const MILESTONES = [
     desc_km:
       "បច្ចុប្បន្នសាលាមានសិស្សចំនួន ២,១២៦ នាក់ ក្នុង ៤២ ថ្នាក់ ចាប់ពីថ្នាក់ទី ៧ ដល់ទី ១២ ដឹកនាំដោយគ្រូចំនួន ៥១ នាក់។",
     color: "#1e3a8a",
-    image: MilestoneGrowthIcon,
+    image: "/images/about/Enrollment%20Growth.png",
     caption_km: "កំណើនសិស្ស",
     caption_en: "Enrollment Growth",
   },
@@ -894,7 +783,6 @@ export default function AboutPageClient({
 
             {MILESTONES.map((m, i) => {
               const isLeft = i % 2 === 0;
-              const SvgImage = m.image;
               return (
                 <ScrollReveal
                   key={m.year}
@@ -973,15 +861,21 @@ export default function AboutPageClient({
                         isLeft ? "md:pl-16" : "md:pr-16"
                       )}
                     >
-                      {SvgImage && (
+                      {m.image && (
                         <motion.div
-                          className="relative rounded-2xl overflow-hidden shadow-lg border"
+                          className="relative rounded-2xl overflow-hidden shadow-lg border group/img"
                           style={{ borderColor: `${m.color}20` }}
                           whileHover={{ scale: 1.02, y: -4 }}
                           transition={{ type: "spring", stiffness: 200 }}
                         >
-                          <div className="w-full h-48 md:h-52">
-                            <SvgImage />
+                          <div className="relative w-full h-48 md:h-52 overflow-hidden">
+                            <Image
+                              src={m.image}
+                              alt={km ? m.caption_km : m.caption_en}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover/img:scale-105"
+                              sizes="(max-width: 768px) 100vw, 50vw"
+                            />
                           </div>
                           {/* Image caption */}
                           <div

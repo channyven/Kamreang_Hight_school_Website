@@ -52,12 +52,17 @@ export const getAboutPageData = unstable_cache(
           row.content_en?.includes("established in 1960")
       );
 
+      // Check if teachers have grade_levels — Supabase data likely doesn't
+      const hasGradeLevels = teacherRows?.some((t: any) => t.grade_levels && t.grade_levels.length > 0);
+
       return {
         schoolInfo: info && info.length > 0 && !hasPlaceholderData
           ? (info as SchoolInfo[])
           : mockSchoolInfo,
         leadership: leaders && leaders.length > 0 ? (leaders as Leadership[]) : mockLeadership,
-        teachers: teacherRows && teacherRows.length > 0 ? (teacherRows as Teacher[]) : mockTeachers,
+        teachers: teacherRows && teacherRows.length > 0 && hasGradeLevels
+          ? (teacherRows as Teacher[])
+          : mockTeachers,
       };
     } catch {
       return {
