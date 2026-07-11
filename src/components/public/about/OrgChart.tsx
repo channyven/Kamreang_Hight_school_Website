@@ -3,143 +3,116 @@
 import { Tree, TreeNode } from "react-organizational-chart";
 import {
   ShieldCheck,
-  Users,
-  UserCog,
   GraduationCap,
+  UserCog,
+  Calculator,
+  Users,
   Landmark,
+  UserCheck,
   Wrench,
   BookOpen,
-  UserCheck,
-  Calculator,
-  ClipboardList,
-  Briefcase,
-  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { OrgNodeData } from "@/types";
 
-type Tier = "root" | "lead" | "head" | "member";
+const getIcon = (name?: string) => {
+  switch (name) {
+    case "ShieldCheck": return ShieldCheck;
+    case "GraduationCap": return GraduationCap;
+    case "UserCog": return UserCog;
+    case "Calculator": return Calculator;
+    case "Users": return Users;
+    case "Landmark": return Landmark;
+    case "UserCheck": return UserCheck;
+    case "Wrench": return Wrench;
+    case "BookOpen": return BookOpen;
+    default: return Users;
+  }
+};
 
-interface OrgNodeData {
-  km: string;
-  en: string;
-  icon: LucideIcon;
-  tier: Tier;
-  children?: OrgNodeData[];
-}
-
-const TIER_STYLES: Record<Tier, { box: string; iconWrap: string; icon: string }> = {
+const TIER_STYLES: Record<OrgNodeData["tier"], { box: string; icon: string; text: string; sub: string }> = {
   root: {
-    box: "bg-school-blue-800 text-white border-transparent shadow-lg",
-    iconWrap: "bg-white/15",
-    icon: "text-school-gold-400",
+    box: "bg-[#1e3a8a] text-white border-transparent shadow-lg py-3",
+    icon: "bg-white/20 text-white",
+    text: "text-sm",
+    sub: "text-white/80",
   },
-  lead: {
-    box: "bg-white text-school-blue-800 border-2 border-school-blue-800 border-dashed shadow-sm",
-    iconWrap: "bg-school-blue-50",
-    icon: "text-school-blue-800",
+  vice: {
+    box: "bg-[#f59e0b] text-white border-transparent shadow-md py-2.5",
+    icon: "bg-white/20 text-white",
+    text: "text-[13px]",
+    sub: "text-white/90",
   },
   head: {
-    box: "bg-school-gold-500 text-white border-transparent shadow-md",
-    iconWrap: "bg-white/20",
-    icon: "text-white",
+    box: "bg-[#f59e0b] text-white border-transparent shadow-md py-2.5",
+    icon: "bg-white/20 text-white",
+    text: "text-[13px]",
+    sub: "text-white/90",
   },
-  member: {
-    box: "bg-white text-[#0d1c2f] border border-[#e6eeff] shadow-sm",
-    iconWrap: "bg-[#eff4ff]",
-    icon: "text-school-blue-800",
+  leaf: {
+    box: "bg-white text-[#0d1c2f] border border-[#e6eeff] shadow-sm py-2",
+    icon: "bg-[#eff4ff] text-[#1e3a8a]",
+    text: "text-[12px]",
+    sub: "text-gray-400",
   },
 };
 
 function OrgNode({ data, km }: { data: OrgNodeData; km: boolean }) {
-  const Icon = data.icon;
-  const style = TIER_STYLES[data.tier];
+  const Icon = getIcon(data.icon);
+  const styles = TIER_STYLES[data.tier];
+  
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded-xl px-3 py-2.5 w-[168px] transition-transform duration-200 hover:-translate-y-0.5",
-        style.box
+        "inline-flex items-center gap-2.5 rounded-xl px-4 min-w-[190px] max-w-[240px] transition-transform duration-200 hover:-translate-y-0.5 text-left",
+        styles.box
       )}
     >
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", style.iconWrap)}>
-        <Icon className={cn("w-3.5 h-3.5", style.icon)} />
+      <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", styles.icon)}>
+        <Icon className="w-4 h-4" />
       </div>
-      <span className={cn("text-xs font-semibold text-left leading-snug", km && "font-khmer")}>
-        {km ? data.km : data.en}
-      </span>
+      <div className="flex flex-col min-w-0">
+        <span className={cn("font-bold leading-tight truncate", styles.text, km && "font-khmer")}>
+          {km ? data.name_km : data.name_en}
+        </span>
+        {(data.description_km || data.description_en) && (
+          <span className={cn("text-[10px] font-medium mt-0.5", styles.sub, km && "font-khmer")}>
+            {km ? data.description_km : data.description_en}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
 
-const CHART: OrgNodeData = {
-  km: "នាយក",
-  en: "Director",
-  icon: ShieldCheck,
-  tier: "root",
-  children: [
-    {
-      km: "គណៈកម្មការប្រឹក្សា",
-      en: "Advisor Committee",
-      icon: Users,
-      tier: "lead",
-    },
-    {
-      km: "អនុនាយក",
-      en: "Deputy Director",
-      icon: UserCog,
-      tier: "head",
-      children: [
-        {
-          km: "ប្រធានក្រុមអប់រំ",
-          en: "Head of Education Team",
-          icon: GraduationCap,
-          tier: "head",
-          children: [
-            { km: "ក្រុមសាស្ត្រាចារ្យ", en: "Lectures Team", icon: BookOpen, tier: "member" },
-            { km: "សម្របសម្រួលសិស្ស", en: "Student Coordinator", icon: UserCheck, tier: "member" },
-          ],
-        },
-        {
-          km: "ប្រធានការិយាល័យ និងគណនេយ្យ",
-          en: "Head of Office & Accounting",
-          icon: Landmark,
-          tier: "head",
-          children: [
-            { km: "គណនេយ្យ", en: "Accounting", icon: Calculator, tier: "member" },
-            { km: "បុគ្គលិកប្រតិបត្តិការ", en: "Operational Staff", icon: ClipboardList, tier: "member" },
-            { km: "អ្នកគ្រប់គ្រងជាន់ខ្ពស់", en: "Senior Manager", icon: Briefcase, tier: "member" },
-          ],
-        },
-        {
-          km: "ជាងបច្ចេកទេស",
-          en: "Technicians",
-          icon: Wrench,
-          tier: "head",
-        },
-      ],
-    },
-  ],
-};
-
 function renderNodes(nodes: OrgNodeData[], km: boolean) {
   return nodes.map((node) => (
-    <TreeNode key={node.en} label={<OrgNode data={node} km={km} />}>
+    <TreeNode 
+      key={node.id} 
+      label={<OrgNode data={node} km={km} />}
+    >
       {node.children ? renderNodes(node.children, km) : null}
     </TreeNode>
   ));
 }
 
-export default function OrgChart({ km }: { km: boolean }) {
+interface OrgChartProps {
+  data: OrgNodeData;
+  km: boolean;
+}
+
+export default function OrgChart({ data, km }: OrgChartProps) {
   return (
-    <div className="overflow-x-auto py-4">
-      <div className="w-fit mx-auto">
+    <div className="overflow-x-auto py-8 scrollbar-none">
+      <div className="w-fit mx-auto min-w-full md:min-w-0 flex justify-center">
         <Tree
-          label={<OrgNode data={CHART} km={km} />}
+          label={<OrgNode data={data} km={km} />}
           lineWidth="2px"
           lineColor="#c3d0e8"
-          lineBorderRadius="8px"
-          nodePadding="6px"
+          lineBorderRadius="12px"
+          nodePadding="12px"
         >
-          {renderNodes(CHART.children ?? [], km)}
+          {data.children ? renderNodes(data.children, km) : null}
         </Tree>
       </div>
     </div>

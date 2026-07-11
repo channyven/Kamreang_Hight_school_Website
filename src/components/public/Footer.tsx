@@ -30,7 +30,7 @@ export default async function Footer() {
   const schoolName =
     locale === "km"
       ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
-      : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng Hight School");
+      : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School");
 
   const quickLinks = [
     { label: t("nav.home"), href: `/${locale}` },
@@ -51,8 +51,8 @@ export default async function Footer() {
             <div className="flex items-center gap-3 mb-3">
               <div className="relative w-14 h-14 rounded-xl overflow-hidden ring-2 ring-school-gold-500/30 shrink-0 bg-white">
                 <Image
-                  src="/images/about/kamrieng%20hight%20school.jpg"
-                  alt="Kamrieng Hight School"
+                  src="/images/about/kamrieng%20high%20school.jpg"
+                  alt="Kamrieng High School"
                   fill
                   className="object-contain p-1"
                   sizes="56px"
@@ -63,7 +63,7 @@ export default async function Footer() {
                 <p className="text-school-blue-200 text-xs">
                   {km
                     ? "ផ្តល់ការអប់រំប្រកបដោយគុណភាពតាំងពីឆ្នាំ ១៩៦០"
-                    : "Quality Education Since 1960"}
+                    : "Since 2000"}
                 </p>
               </div>
             </div>
@@ -147,7 +147,7 @@ export default async function Footer() {
       <div className="border-t border-school-blue-800">
         <div className="container mx-auto px-6 py-4 text-center">
           <p className="text-xs text-school-blue-300">
-            © {2026} {schoolName}. {t("footer.rights")}.
+            © 2026 Kamrieng High School. All rights reserved.
           </p>
         </div>
       </div>

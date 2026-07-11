@@ -147,6 +147,8 @@ export interface Leadership {
   bio_km?: string;
   bio_en?: string;
   photo_url?: string;
+  phone?: string;
+  gender?: string;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -176,6 +178,8 @@ export interface Teacher {
   qualification_km?: string;
   qualification_en?: string;
   photo_url?: string;
+  phone?: string;
+  gender?: string;
   years_experience?: number;
   grade_levels?: number[];
   is_active: boolean;
@@ -200,6 +204,17 @@ export interface HeroSlide {
   cta_secondary_href?: string;
   sort_order: number;
   is_active: boolean;
+}
+
+export interface OrgNodeData {
+  id: string;
+  name_km: string;
+  name_en: string;
+  description_km?: string;
+  description_en?: string;
+  icon?: string; // Lucide icon name string
+  tier: "root" | "vice" | "head" | "leaf";
+  children?: OrgNodeData[];
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, School, Globe, Heart, LogIn } from "lucide-react";
+import { Menu, X, Globe, Heart, LogIn } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
@@ -64,12 +65,18 @@ export default function Navbar() {
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-school-blue-800 flex items-center justify-center">
-              <School className="w-5 h-5 text-school-gold-400" />
+          <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0 group">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-school-gold-400/60">
+              <Image
+                src="/images/about/kamrieng%20high%20school.jpg"
+                alt="School logo"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-110"
+                sizes="40px"
+              />
             </div>
             <div className="hidden sm:block">
-              <p className={cn("text-sm font-bold leading-tight", isTransparent ? "text-white" : "text-school-blue-800")}>
+              <p className={cn("text-sm font-bold leading-tight transition-colors", isTransparent ? "text-white" : "text-school-blue-800", "group-hover:text-school-gold-500")}>
                 {locale === "km"
                   ? process.env.NEXT_PUBLIC_SCHOOL_NAME_KM
                   : process.env.NEXT_PUBLIC_SCHOOL_NAME_EN}

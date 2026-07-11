@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Battambang } from "next/font/google";
-import { getLocale } from "next-intl/server";
-import { generateSchoolJsonLd } from "@/lib/structured-data";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,8 +17,8 @@ const battambang = Battambang({
 
 export const metadata: Metadata = {
   title: {
-    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng Hight School",
-    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng Hight School"}`,
+    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School",
+    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}`,
   },
   description: "Official website of the high school.",
   metadataBase: new URL(
@@ -28,23 +26,13 @@ export const metadata: Metadata = {
   ),
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-  const schoolJsonLd = generateSchoolJsonLd();
-
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schoolJsonLd) }}
-          suppressHydrationWarning
-        />
-      </head>
+    <html suppressHydrationWarning>
       <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`}>
         {children}
       </body>

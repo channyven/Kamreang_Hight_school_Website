@@ -10,18 +10,31 @@ import {
   ArrowRight,
   Quote,
   Mail,
-  FileText,
+  Phone,
   Calendar,
   MapPin,
   Users,
   GraduationCap,
   BookOpen,
   TrendingUp,
+  ShieldCheck,
+  Award,
+  Crown,
+  Handshake,
+  Telescope,
+  Star,
+  HeartHandshake,
 } from "lucide-react";
 import { cn, getLocalizedText, getAvatarUrl } from "@/lib/utils";
 import type { SchoolInfo, Leadership, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 // ─── Animated Counter Hook ────────────────────────────────────
 
@@ -229,7 +242,7 @@ const MILESTONES = [
     title_en: "School Founded",
     title_km: "បង្កើតសាលា",
     desc_en:
-      "Kamrieng Hight School was founded through the initiative of the Kamrieng district governor and district education office, together with local authorities, to bring secondary education to this rural community.",
+      "Kamrieng High School was founded through the initiative of the Kamrieng district governor and district education office, together with local authorities, to bring secondary education to this rural community.",
     desc_km:
       "វិទ្យាល័យកំរៀង ត្រូវបានបង្កើតឡើងតាមគំនិតផ្ដួចផ្ដើមរបស់លោក សុខ គង់ អភិបាលស្រុកកំរៀង និងលោក នូប ធឿន ប្រធានការិយាល័យអប់រំ យុវជន និងកីឡាស្រុកកំរៀង រួមជាមួយអាជ្ញាធរមូលដ្ឋាន។",
     color: "#1e3a8a",
@@ -242,7 +255,7 @@ const MILESTONES = [
     title_en: 'Recognized as a "Best School"',
     title_km: "ទទួលស្គាល់ជា \"សាលាល្អ\"",
     desc_en:
-      'The Ministry of Education, Youth and Sport formally recognized Kamrieng Hight School as a "Best School" (សាលាល្អ).',
+      'The Ministry of Education, Youth and Sport formally recognized Kamrieng High School as a "Best School" (សាលាល្អ).',
     desc_km:
       'ក្រសួងអប់រំ យុវជន និងកីឡា បានទទួលស្គាល់វិទ្យាល័យកំរៀងជា "សាលាល្អ" ។',
     color: "#f59e0b",
@@ -369,6 +382,126 @@ function SectionHeading({
   );
 }
 
+// ─── Leader Detail Dialog ─────────────────────────────────────
+
+function LeaderDetailDialog({
+  leader,
+  open,
+  onOpenChange,
+  km,
+  locale,
+}: {
+  leader: Leadership | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  km: boolean;
+  locale: string;
+}) {
+  if (!leader) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 gap-0">
+        {/* Header with photo and name */}
+        <div className="bg-gradient-to-r from-school-blue-800 to-school-blue-700 px-6 pt-8 pb-6 text-center">
+          <div className="relative w-24 h-24 mx-auto rounded-2xl overflow-hidden ring-4 ring-white/30 shadow-xl mb-4">
+            {leader.photo_url ? (
+              <Image
+                src={leader.photo_url}
+                alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
+                fill
+                className="object-cover"
+                sizes="96px"
+              />
+            ) : (
+              <Image
+                src={getAvatarUrl(
+                  getLocalizedText(leader.name_km, leader.name_en, locale),
+                  96
+                )}
+                alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
+                fill
+                className="object-cover"
+                sizes="96px"
+              />
+            )}
+          </div>
+          <DialogTitle className={cn("text-xl font-bold text-white mb-0.5 flex items-center justify-center gap-2", km && "font-khmer")}>
+            <span>{getLocalizedText(leader.name_km, leader.name_en, locale)}</span>
+            {leader.gender && (
+              <span className="text-lg text-white/80">{leader.gender}</span>
+            )}
+          </DialogTitle>
+          {leader.name_km && leader.name_en && (
+            <p className={cn("text-sm text-white/70 mb-1", km && "font-khmer")}>
+              {km ? leader.name_en : leader.name_km}
+            </p>
+          )}
+          {(leader.position_km || leader.position_en) && (
+            <DialogDescription className={cn("inline-flex items-center gap-1.5 text-xs text-white/80 bg-white/15 rounded-full px-4 py-1.5 mt-1", km && "font-khmer")}>
+              {getLocalizedText(leader.position_km, leader.position_en, locale)}
+            </DialogDescription>
+          )}
+        </div>
+
+        {/* Details body */}
+        <div className="px-6 py-5 space-y-3">
+          {/* Phone */}
+          {leader.phone && (
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80">
+              <div className="w-9 h-9 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Phone className="w-4 h-4 text-gray-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-0.5">
+                  {km ? "ទូរស័ព្ទ" : "Phone"}
+                </p>
+                <p className="text-sm font-medium text-gray-800">
+                  {leader.phone}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Title */}
+          {(leader.title_km || leader.title_en) && (
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-school-blue-50/50">
+              <div className="w-9 h-9 rounded-lg bg-school-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <GraduationCap className="w-4 h-4 text-school-blue-700" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-school-blue-500 mb-0.5">
+                  {km ? "តួនាទី" : "Position"}
+                </p>
+                <p className={cn("text-sm font-medium text-gray-800", km && "font-khmer")}>
+                  {getLocalizedText(leader.title_km, leader.title_en, locale)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Bio */}
+          {(leader.bio_km || leader.bio_en) && (
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-50/60">
+              <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Quote className="w-4 h-4 text-amber-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-500 mb-0.5">
+                  {km ? "ជីវប្រវត្តិ" : "Biography"}
+                </p>
+                <p className={cn("text-sm leading-relaxed text-gray-600 italic", km && "font-khmer")}>
+                  &ldquo;{getLocalizedText(leader.bio_km, leader.bio_en, locale)}&rdquo;
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Main Component ────────────────────────────────────────────
 
 interface AboutPageClientProps {
@@ -402,6 +535,7 @@ export default function AboutPageClient({
   );
   const principal = leaders[0];
   const viceLeaders = leaders.slice(1);
+  const [selectedLeader, setSelectedLeader] = useState<Leadership | null>(null);
   const vision = infoMap["vision"];
   const mission = infoMap["mission"];
   const history = infoMap["history"];
@@ -410,17 +544,24 @@ export default function AboutPageClient({
     <div className="min-h-screen bg-gradient-to-b from-[#f8f9ff] via-white to-[#f8f9ff]">
       {/* ─── HERO ─── */}
       <ScrollReveal variant="fade-in" duration={0.8}>
-        <section className="relative pt-24 pb-20 overflow-hidden bg-school-blue-800">
-          {/* Decorative background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-school-gold-500/10 blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-white/5 blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-school-blue-700/30 blur-3xl" />
+        <section className="relative pt-24 pb-20 overflow-hidden">
+          {/* Banner Image Background */}
+          <div className="absolute inset-0">
+            <Image
+              src="/images/about/banner%20about%20page.png"
+              alt="School banner"
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-school-blue-900/85 via-school-blue-800/75 to-school-blue-900/85" />
           </div>
 
           {/* Subtle grid pattern */}
           <div
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
@@ -467,8 +608,8 @@ export default function AboutPageClient({
               )}
             >
               {km
-                ? "សាលារៀនសាធារណៈនៅស្រុកកំរៀង ខេត្តបាត់ដំបង បម្រើសហគមន៍ជនបទនេះតាំងពីឆ្នាំ ២០០០ — ប្ដេជ្ញាពង្រីកលទ្ធភាពទទួលបានការអប់រំប្រកបដោយគុណភាពសម្រាប់សិស្សគ្រប់រូប។"
-                : "A public secondary school in Kamrieng district, Battambang province, serving this rural community since 2000 — committed to expanding access to quality education for every student."}
+                ? "សាលារៀនសាធារណៈនៅស្រុកកំរៀង ខេត្តបាត់ដំបង បម្រើសហគមន៍ជនបទនេះតាំងពីឆ្នាំ ២០០០ ប្ដេជ្ញាពង្រីកលទ្ធភាពទទួលបានការអប់រំប្រកបដោយគុណភាពសម្រាប់សិស្សគ្រប់រូប។"
+                : "A public secondary school in Kamrieng district, Battambang province, serving this rural community since 2000, committed to expanding access to quality education for every student."}
             </motion.p>
           </div>
 
@@ -518,122 +659,140 @@ export default function AboutPageClient({
       </section>
 
       {/* ─── VISION / MISSION / VALUES ─── */}
-      <section className="py-16 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <ScrollReveal variant="fade-up">
-            <SectionHeading
-              khmer="ចក្ខុវិស័យ និងបេសកកម្ម"
-              english="Vision & Mission"
-            />
+            <div className="text-center mb-16">
+              <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-goldMain mb-3">
+                {km ? "ទិសដៅរបស់យើង" : "OUR DIRECTION"}
+              </p>
+              <h2 className={cn("text-4xl md:text-5xl font-extrabold text-school-navy mb-5 tracking-tight", km && "font-khmer")}>
+                {km ? "ចក្ខុវិស័យ និងបេសកកម្ម" : "Vision & Mission"}
+              </h2>
+              <div className="w-14 h-1.5 bg-school-goldMain mx-auto rounded-full" />
+            </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Vision + Mission row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
             {/* Vision */}
-            <ScrollReveal variant="fade-left" delay={0.1}>
-              <div className="bg-white rounded-2xl p-8 border border-blue-50 hover:shadow-lg transition-shadow duration-300 group h-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-school-blue-50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <Eye className="w-5 h-5 text-school-blue-800" />
+            <ScrollReveal variant="fade-up" delay={0.1}>
+              <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full border-l-[6px] border-l-school-goldMain">
+                <div className="p-10 md:p-12">
+                  <div className="mb-10">
+                    <div className="w-20 h-20 rounded-2xl bg-[#fff9eb] flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 mb-8">
+                      <Telescope className="w-10 h-10 text-school-goldMain" />
+                    </div>
+                    <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
+                      {km ? "ចក្ខុវិស័យរបស់យើង" : "Our Vision"}
+                    </h3>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-school-gold-500 uppercase tracking-wider">
-                      {km ? "ចក្ខុវិស័យ" : "Vision"}
-                    </p>
-                  </div>
+                  <div
+                    className={cn(
+                      "text-[16px] leading-[1.8] text-gray-600 font-medium",
+                      km && "font-khmer"
+                    )}
+                    dangerouslySetInnerHTML={{
+                      __html: vision
+                        ? getLocalizedText(vision.content_km, vision.content_en, locale)
+                        : "",
+                    }}
+                  />
                 </div>
-                <div
-                  className={cn(
-                    "text-sm leading-relaxed prose prose-sm max-w-none",
-                    km && "font-khmer"
-                  )}
-                  style={{ color: "#4b5563" }}
-                  dangerouslySetInnerHTML={{
-                    __html: vision
-                      ? getLocalizedText(vision.content_km, vision.content_en, locale)
-                      : "",
-                  }}
-                />
               </div>
             </ScrollReveal>
 
             {/* Mission */}
-            <ScrollReveal variant="fade-up" delay={0.15}>
-              <div className="bg-white rounded-2xl p-8 border border-blue-50 hover:shadow-lg transition-shadow duration-300 group h-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-school-blue-50 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <Target className="w-5 h-5 text-school-blue-800" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-school-gold-500 uppercase tracking-wider">
-                      {km ? "បេសកកម្ម" : "Mission"}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className={cn(
-                    "text-sm leading-relaxed prose prose-sm max-w-none",
-                    km && "font-khmer"
-                  )}
-                  style={{ color: "#4b5563" }}
-                  dangerouslySetInnerHTML={{
-                    __html: mission
-                      ? getLocalizedText(mission.content_km, mission.content_en, locale)
-                      : "",
-                  }}
-                />
-              </div>
-            </ScrollReveal>
-
-            {/* Core Values */}
-            <ScrollReveal variant="fade-right" delay={0.2}>
-              <div className="relative overflow-hidden rounded-2xl p-8 h-full bg-school-gold-500">
-                {/* Decorative circles */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10" />
-                <div className="absolute -bottom-10 -left-10 w-24 h-24 rounded-full bg-white/10" />
-
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                      <Heart className="w-5 h-5 text-white" />
+            <ScrollReveal variant="fade-up" delay={0.2}>
+              <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full border-l-[6px] border-l-[#1e3a8a]">
+                <div className="p-10 md:p-12">
+                  <div className="mb-10">
+                    <div className="w-20 h-20 rounded-2xl bg-[#eff4ff] flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 mb-8">
+                      <Target className="w-10 h-10 text-[#1e3a8a]" />
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold leading-tight text-yellow-900/70">
-                        {km ? "គុណតម្លៃ" : "Core Values"}
-                      </p>
-                      <p className="text-xs tracking-[0.15em] uppercase text-yellow-900/60 font-semibold">
-                        VALUES
-                      </p>
-                    </div>
+                    <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
+                      {km ? "បេសកកម្មរបស់យើង" : "Our Mission"}
+                    </h3>
                   </div>
-
-                  <ul className="space-y-5">
-                    {[
-                      { en: "Integrity", km: "សុច្ចរិតភាព" },
-                      { en: "Excellence", km: "ឧត្តមភាព" },
-                      { en: "Dignity", km: "សេចក្តីថ្លៃថ្នូរ" },
-                      {
-                        en: "Mutual Respect",
-                        km: "ការគោរពគ្នាទៅវិញទៅមក",
-                      },
-                    ].map((v, i) => (
-                      <motion.li
-                        key={v.en}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
-                        className="flex items-center gap-3"
-                      >
-                        <span className="w-2.5 h-2.5 rounded-full bg-school-blue-800 flex-shrink-0" />
-                        <span className="text-sm font-bold text-yellow-900">
-                          {km ? v.km : v.en}
-                        </span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                  <div
+                    className={cn(
+                      "text-[16px] leading-[1.8] text-gray-600 font-medium",
+                      km && "font-khmer"
+                    )}
+                    dangerouslySetInnerHTML={{
+                      __html: mission
+                        ? getLocalizedText(mission.content_km, mission.content_en, locale)
+                        : "",
+                    }}
+                  />
                 </div>
               </div>
             </ScrollReveal>
+          </div>
+
+          {/* Core Values row */}
+          <div className="mt-20">
+            <ScrollReveal variant="fade-up" delay={0.25}>
+              <div className="text-center mb-16">
+                <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-goldMain mb-3">
+                  {km ? "អ្វីដែលយើងប្រកាន់ខ្ជាប់" : "WHAT WE STAND FOR"}
+                </p>
+                <h2 className={cn("text-4xl md:text-5xl font-extrabold text-school-navy mb-5 tracking-tight", km && "font-khmer")}>
+                  {km ? "គុណតម្លៃស្នូលរបស់យើង" : "Our Core Values"}
+                </h2>
+                <div className="w-14 h-1.5 bg-school-goldMain mx-auto rounded-full" />
+              </div>
+            </ScrollReveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                {
+                  en: "Integrity",
+                  km: "សុច្ចរិតភាព",
+                  icon: Handshake,
+                  desc_en: "We act with honesty, transparency, and strong moral principles in all our interactions and decisions.",
+                  desc_km: "យើងប្រព្រឹត្តដោយភាពស្មោះត្រង់ តម្លាភាព និងគោលការណ៍សីលធម៌រឹងមាំក្នុងគ្រប់អន្តរកម្ម និងការសម្រេចចិត្តរបស់យើង។",
+                },
+                {
+                  en: "Excellence",
+                  km: "ឧត្តមភាព",
+                  icon: Star,
+                  desc_en: "We pursue the highest standards in everything we do, in academics, character, and service to our community.",
+                  desc_km: "យើងខិតខំសម្រេចបាននូវស្តង់ដារខ្ពស់បំផុតក្នុងគ្រប់កិច្ចការដែលយើងធ្វើ ទាំងការសិក្សា ចរិតលក្ខណៈ និងការបម្រើសហគមន៍របស់យើង។",
+                },
+                {
+                  en: "Dignity",
+                  km: "សេចក្តីថ្លៃថ្នូរ",
+                  icon: Crown,
+                  desc_en: "We treat everyone with honor and respect, valuing the inherent worth of every individual in our school.",
+                  desc_km: "យើងប្រព្រឹត្តចំពោះអ្នកគ្រប់គ្នាដោយកិត្តិយស និងការគោរព ដោយផ្តល់តម្លៃដល់សេចក្តីថ្លៃថ្នូររបស់បុគ្គលម្នាក់ៗនៅក្នុងសាលារបស់យើង។",
+                },
+                {
+                  en: "Mutual Respect",
+                  km: "ការគោរពគ្នាទៅវិញទៅមក",
+                  icon: HeartHandshake,
+                  desc_en: "We honor diversity and value every voice, fostering a supportive environment built on understanding.",
+                  desc_km: "យើងផ្តល់កិត្តិយសដល់ភាពចម្រុះ និងផ្តល់តម្លៃដល់គ្រប់សំឡេង ដោយជំរុញបរិយាកាសគាំទ្រដែលបង្កើតឡើងលើការយោគយល់គ្នា។",
+                },
+              ].map((v, i) => {
+                const ValueIcon = v.icon;
+                return (
+                  <ScrollReveal key={v.en} variant="fade-up" delay={0.3 + i * 0.1}>
+                    <div className="group bg-white rounded-2xl p-10 text-center border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full flex flex-col items-center">
+                      <div className="w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center mb-10 transition-all duration-500 group-hover:scale-110 group-hover:bg-[#fff9eb] group-hover:shadow-lg group-hover:shadow-school-goldMain/10">
+                        <ValueIcon className="w-10 h-10 text-school-goldMain transition-transform duration-500 group-hover:rotate-12" />
+                      </div>
+                      <h4 className={cn("text-2xl font-bold text-school-navy mb-5", km && "font-khmer")}>
+                        {km ? v.km : v.en}
+                      </h4>
+                      <p className={cn("text-[15px] text-gray-500 leading-relaxed font-medium", km && "font-khmer")}>
+                        {km ? v.desc_km : v.desc_en}
+                      </p>
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -675,33 +834,28 @@ export default function AboutPageClient({
               </div>
             </ScrollReveal>
 
-            {/* Image / placeholder */}
+            {/* Image: Real school photo */}
             <ScrollReveal variant="fade-right" delay={0.2}>
-              <div className="relative rounded-2xl overflow-hidden flex items-end group cursor-pointer min-h-[320px] bg-gradient-to-br from-school-blue-800 to-school-blue-600">
-                {/* Decorative elements */}
-                <div className="absolute top-8 right-8 w-40 h-40 rounded-full bg-school-gold-400/20 transition-transform duration-500 group-hover:scale-125" />
-                <div className="absolute top-24 right-24 w-60 h-60 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-110" />
+              <div className="relative rounded-2xl overflow-hidden group cursor-pointer min-h-[320px] shadow-lg">
+                <Image
+                  src="/images/about/4.png"
+                  alt={km ? "រូបថតសាលា" : "School photo"}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+                {/* Dark gradient overlay for badge */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-                {/* School building icon */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                  <svg viewBox="0 0 200 180" className="w-48 h-48 text-white" fill="currentColor">
-                    <rect x="30" y="80" width="140" height="100" rx="4" />
-                    <rect x="50" y="40" width="100" height="50" rx="3" />
-                    <rect x="65" y="10" width="70" height="35" rx="3" />
-                    <polygon points="65,10 100,0 135,10" />
-                    <rect x="80" y="120" width="40" height="60" rx="2" />
-                    <rect x="45" y="100" width="18" height="24" rx="2" />
-                    <rect x="137" y="100" width="18" height="24" rx="2" />
-                    <rect x="90" y="25" width="10" height="12" rx="1" />
-                    <rect x="110" y="25" width="10" height="12" rx="1" />
-                  </svg>
-                </div>
+                {/* Decorative accent */}
+                <div className="absolute top-4 right-4 w-24 h-24 rounded-full bg-school-gold-400/15 transition-transform duration-500 group-hover:scale-125" />
 
-                <div className="relative z-10 p-6 w-full flex justify-between items-end">
-                  <span className="text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm bg-black/30 text-white">
+                <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-between items-end">
+                  <span className="text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm bg-black/40 text-white border border-white/10">
                     {km ? "បង្កើតឆ្នាំ ២០០០" : "Established 2000"}
                   </span>
-                  <ArrowRight className="w-5 h-5 text-white/60 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight className="w-5 h-5 text-white/70 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </div>
             </ScrollReveal>
@@ -864,14 +1018,18 @@ export default function AboutPageClient({
           {/* Principal featured card */}
           {principal && (
             <ScrollReveal variant="fade-up" delay={0.1}>
-              <div className="relative bg-white rounded-3xl overflow-hidden mb-10 shadow-[0_8px_30px_rgba(30,58,138,0.10)] hover:shadow-[0_12px_40px_rgba(30,58,138,0.15)] transition-shadow duration-500">
+              <button
+                type="button"
+                onClick={() => setSelectedLeader(principal)}
+                className="relative bg-white rounded-3xl overflow-hidden mb-10 shadow-[0_8px_30px_rgba(30,58,138,0.10)] hover:shadow-[0_12px_40px_rgba(30,58,138,0.15)] transition-all duration-500 w-full text-left cursor-pointer group"
+              >
                 {/* Top accent strip */}
                 <div className="h-1.5 w-full bg-gradient-to-r from-school-blue-800 to-school-gold-500" />
 
                 <div className="grid grid-cols-1 md:grid-cols-[300px_1fr]">
                   {/* Photo */}
                   <div className="flex items-center justify-center p-8 md:p-10 bg-gradient-to-br from-blue-50 to-blue-100/50">
-                    <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-2xl overflow-hidden ring-4 ring-white shadow-xl shrink-0 transition-transform duration-300 hover:scale-[1.02]">
+                    <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-2xl overflow-hidden ring-4 ring-white shadow-xl shrink-0 transition-transform duration-300 group-hover:scale-[1.02]">
                       {principal.photo_url ? (
                         <Image
                           src={principal.photo_url}
@@ -925,18 +1083,14 @@ export default function AboutPageClient({
                     )}
 
                     <div className="relative flex flex-wrap gap-3">
-                      <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-school-blue-800 hover:bg-school-blue-700 transition-colors shadow-md shadow-school-blue-800/20">
+                      <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-school-blue-800 shadow-md shadow-school-blue-800/20">
                         <Mail className="w-4 h-4" />
-                        {km ? "ការណែនាំ" : "View Message"}
-                      </button>
-                      <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-school-blue-800 text-school-blue-800 hover:bg-blue-50 transition-colors">
-                        <FileText className="w-4 h-4" />
-                        {km ? "ជីវប្រវត្ដិ" : "Biography"}
-                      </button>
+                        {km ? "ចុចមើលព័ត៌មានលម្អិត" : "Click for details"}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             </ScrollReveal>
           )}
 
@@ -945,7 +1099,11 @@ export default function AboutPageClient({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {viceLeaders.map((leader, i) => (
                 <ScrollReveal key={leader.id} variant="fade-up" delay={0.1 + i * 0.1}>
-                  <div className="group bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg border border-gray-100/80 hover:border-school-blue-100">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLeader(leader)}
+                    className="group bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg border border-gray-100/80 hover:border-school-blue-100 w-full cursor-pointer"
+                  >
                     <div className="relative w-24 h-24 mx-auto rounded-full mb-4 overflow-hidden ring-4 ring-blue-50 transition-all duration-500 group-hover:ring-school-gold-500/40">
                       {leader.photo_url ? (
                         <Image
@@ -980,13 +1138,22 @@ export default function AboutPageClient({
                     <p className={cn("text-sm text-gray-500", km && "font-khmer")}>
                       {getLocalizedText(leader.position_km, leader.position_en, locale)}
                     </p>
-                  </div>
+                  </button>
                 </ScrollReveal>
               ))}
             </div>
           )}
         </div>
       </section>
+
+      {/* ─── LEADER DIALOG ─── */}
+      <LeaderDetailDialog
+        leader={selectedLeader}
+        open={selectedLeader !== null}
+        onOpenChange={(open) => { if (!open) setSelectedLeader(null); }}
+        km={km}
+        locale={locale}
+      />
 
       {/* ─── ORGANIZATION & TEACHERS ─── */}
       <OrganizationSection teachers={teachers} locale={locale} />
