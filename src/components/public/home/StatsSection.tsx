@@ -7,172 +7,151 @@ import { Users, GraduationCap, BookOpen, Award, TrendingUp } from "lucide-react"
 import type { Statistics } from "@/types";
 import { formatNumber } from "@/lib/utils";
 
-interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  suffix?: string;
-  delay?: number;
-  color: string;
-}
+const STAT_ICONS = [
+  { icon: Users, accent: "blue" },
+  { icon: GraduationCap, accent: "emerald" },
+  { icon: BookOpen, accent: "violet" },
+  { icon: Award, accent: "amber" },
+  { icon: TrendingUp, accent: "rose" },
+] as const;
+
+const ACCENT_MAP: Record<string, { bg: string; text: string; ring: string }> = {
+  blue:    { bg: "bg-blue-50",    text: "text-blue-600",   ring: "ring-blue-200/50" },
+  emerald: { bg: "bg-emerald-50", text: "text-emerald-600", ring: "ring-emerald-200/50" },
+  violet:  { bg: "bg-violet-50",  text: "text-violet-600",  ring: "ring-violet-200/50" },
+  amber:   { bg: "bg-amber-50",   text: "text-amber-600",   ring: "ring-amber-200/50" },
+  rose:    { bg: "bg-rose-50",    text: "text-rose-600",    ring: "ring-rose-200/50" },
+};
 
 function useCounter(target: number, active: boolean, duration = 2000) {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     if (!active) return;
     let start = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
       start += step;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
+      if (start >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(start));
     }, 16);
     return () => clearInterval(timer);
   }, [target, active, duration]);
-
   return count;
 }
 
-function StatCard({ icon, label, value, suffix = "", delay = 0, color }: StatCardProps) {
+function StatCard({ icon, label, value, suffix = "", delay = 0, accent: accentKey }: {
+  icon: React.ReactNode; label: string; value: number; suffix?: string; delay?: number; accent: string;
+}) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
   const count = useCounter(value, inView);
   const locale = useLocale();
+  const colors = ACCENT_MAP[accentKey] ?? ACCENT_MAP.blue;
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay }}
-      className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow"
+      transition={{ duration: 0.4, delay, ease: "easeOut" }}
+      className="relative bg-white rounded-xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-default"
     >
-      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4`}>
-        {icon}
+      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg ${colors.bg} mb-3 ring-1 ${colors.ring}`}>
+        <span className={`w-5 h-5 ${colors.text}`}>{icon}</span>
       </div>
-      <p className="text-3xl font-bold text-gray-900 counter-value tabular-nums">
+      <p className="text-2xl sm:text-3xl font-bold text-gray-900 tabular-nums tracking-tight">
         {formatNumber(count, locale)}
-        {suffix}
+        {suffix && <span className="text-base sm:text-lg font-semibold text-gray-400 ml-0.5">{suffix}</span>}
       </p>
-      <p className="text-sm text-gray-500 mt-1">{label}</p>
+      <p className="text-xs sm:text-sm text-gray-500 mt-1.5 leading-snug">{label}</p>
     </motion.div>
   );
 }
 
-interface StatsSectionProps {
-  stats: Statistics | null;
+function GenderCard({ male, female, total }: { male: number; female: number; total: number }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const locale = useLocale();
+  const malePct = total > 0 ? (male / total) * 100 : 0;
+  const femalePct = total > 0 ? (female / total) * 100 : 0;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, delay: 0.25, ease: "easeOut" }}
+      className="bg-white rounded-xl p-5 sm:p-6 border border-gray-100 shadow-sm"
+    >
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-school-blue-50 flex items-center justify-center">
+            <Users className="w-5 h-5 text-school-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-700">{locale === "km" ? "សិស្សតាមភេទ" : "Students by Gender"}</p>
+            <p className="text-xs text-gray-400 tabular-nums">{formatNumber(total, locale)} {locale === "km" ? "នាក់" : "students"}</p>
+          </div>
+        </div>
+      </div>
+      <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+        <motion.div initial={{ width: 0 }} animate={inView ? { width: `${malePct}%` } : {}} transition={{ duration: 1, delay: 0.35, ease: "easeOut" }} className="absolute inset-y-0 left-0 rounded-full bg-school-blue-500" />
+        <motion.div initial={{ width: 0 }} animate={inView ? { width: `${femalePct}%` } : {}} transition={{ duration: 1, delay: 0.55, ease: "easeOut" }} className="absolute inset-y-0 right-0 rounded-full bg-amber-400" style={{ left: `${malePct}%` }} />
+      </div>
+      <div className="flex justify-between mt-3">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-school-blue-500 ring-1 ring-blue-200" />
+          <span className="text-xs sm:text-sm text-gray-600">{locale === "km" ? "ប្រុស" : "Male"}</span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">{formatNumber(male, locale)}<span className="text-gray-400 font-normal ml-1">({malePct.toFixed(1)}%)</span></span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-200" />
+          <span className="text-xs sm:text-sm text-gray-600">{locale === "km" ? "ស្រី" : "Female"}</span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">{formatNumber(female, locale)}<span className="text-gray-400 font-normal ml-1">({femalePct.toFixed(1)}%)</span></span>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
+
+interface StatsSectionProps { stats: Statistics | null; }
 
 export default function StatsSection({ stats }: StatsSectionProps) {
   const t = useTranslations("stats");
   const locale = useLocale();
-
   if (!stats) return null;
 
-  const cards: StatCardProps[] = [
-    {
-      icon: <Users className="w-6 h-6 text-blue-600" />,
-      label: t("total_students"),
-      value: stats.total_students ?? 0,
-      color: "bg-blue-100",
-      delay: 0,
-    },
-    {
-      icon: <GraduationCap className="w-6 h-6 text-green-600" />,
-      label: t("total_teachers"),
-      value: stats.total_teachers ?? 0,
-      color: "bg-green-100",
-      delay: 0.1,
-    },
-    {
-      icon: <BookOpen className="w-6 h-6 text-purple-600" />,
-      label: t("total_classes"),
-      value: stats.total_classes ?? 0,
-      color: "bg-purple-100",
-      delay: 0.2,
-    },
-    {
-      icon: <Award className="w-6 h-6 text-yellow-600" />,
-      label: t("grade_a"),
-      value: stats.grade_a_students ?? 0,
-      color: "bg-yellow-100",
-      delay: 0.3,
-    },
-    {
-      icon: <TrendingUp className="w-6 h-6 text-red-600" />,
-      label: t("graduation_rate"),
-      value: stats.graduation_rate ?? 0,
-      suffix: "%",
-      color: "bg-red-100",
-      delay: 0.4,
-    },
-  ];
+  const values = [stats.total_students ?? 0, stats.total_teachers ?? 0, stats.total_classes ?? 0, stats.grade_a_students ?? 0, stats.graduation_rate ?? 0];
+  const labels = [t("total_students"), t("total_teachers"), t("total_classes"), t("grade_a"), t("graduation_rate")];
+  const suffixes = ["", "", "", "", "%"];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 sm:py-20 bg-[linear-gradient(to_right,#f8fafc_1px,transparent_1px),linear-gradient(to_bottom,#f8fafc_1px,transparent_1px)] bg-[size:4rem_4rem]">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <span className="text-school-gold-500 font-semibold text-sm uppercase tracking-wider">
+        <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className="text-center mb-12 sm:mb-14">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="block w-8 h-px bg-school-gold-400/60" />
+            <span className="block w-2 h-2 rounded-full bg-school-gold-500" />
+            <span className="block w-8 h-px bg-school-gold-400/60" />
+          </div>
+          <span className="inline-block px-3 py-1 rounded-full bg-school-blue-50 text-school-blue-700 text-xs font-semibold tracking-wide mb-3">
             {stats.academic_year}
           </span>
-          <h2 className={`text-3xl font-bold text-gray-900 mt-2 ${locale === "km" ? "font-khmer" : ""}`}>
+          <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight ${locale === "km" ? "font-khmer" : ""}`}>
             {t("subtitle")}
           </h2>
         </motion.div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {cards.map((card) => (
-            <StatCard key={card.label} {...card} />
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {values.map((value, i) => {
+            const IconComponent = STAT_ICONS[i].icon;
+            return <StatCard key={labels[i]} icon={<IconComponent className="w-5 h-5" />} label={labels[i]} value={value} suffix={suffixes[i]} delay={i * 0.08} accent={STAT_ICONS[i].accent} />;
+          })}
         </div>
 
-        {/* Gender breakdown bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-8 bg-white rounded-2xl p-6 shadow-md border border-gray-100"
-        >
-          <p className="text-sm font-medium text-gray-600 mb-3">
-            {locale === "km" ? "សិស្សតាមភេទ" : "Students by Gender"}
-          </p>
-          <div className="flex rounded-full overflow-hidden h-4">
-            <div
-              className="bg-blue-500 transition-all duration-1000"
-              style={{
-                width: `${((stats.male_students ?? 0) / (stats.total_students ?? 1)) * 100}%`,
-              }}
-            />
-            <div
-              className="bg-pink-400 transition-all duration-1000"
-              style={{
-                width: `${((stats.female_students ?? 0) / (stats.total_students ?? 1)) * 100}%`,
-              }}
-            />
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-              {locale === "km" ? "ប្រុស" : "Male"} ({formatNumber(stats.male_students ?? 0, locale)})
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-pink-400 inline-block" />
-              {locale === "km" ? "ស្រី" : "Female"} ({formatNumber(stats.female_students ?? 0, locale)})
-            </span>
-          </div>
-        </motion.div>
+        <div className="mt-6 sm:mt-8 max-w-2xl mx-auto">
+          <GenderCard male={stats.male_students ?? 0} female={stats.female_students ?? 0} total={stats.total_students ?? 0} />
+        </div>
       </div>
     </section>
   );
