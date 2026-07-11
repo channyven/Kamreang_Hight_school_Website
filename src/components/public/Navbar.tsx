@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, School, Globe, Heart, LogIn, Search, ArrowRight, FlaskConical } from "lucide-react";
+import { Menu, X, School, Globe, Heart, LogIn, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
@@ -101,21 +101,6 @@ export default function Navbar() {
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
-            {/* Research icon */}
-            <Link
-              href={`/${locale}/research`}
-              aria-label={t("research")}
-              title={t("research")}
-              className={cn(
-                "inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors",
-                isTransparent
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : "text-gray-600 hover:text-school-blue-800 hover:bg-gray-100"
-              )}
-            >
-              <FlaskConical className="w-[18px] h-[18px]" />
-            </Link>
-
             {/* Donate CTA */}
             <Link
               href={`/${locale}/donate`}
@@ -159,7 +144,7 @@ export default function Navbar() {
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (searchQuery.trim()) {
-                      router.push(`/${locale}/news?q=${encodeURIComponent(searchQuery.trim())}`);
+                      router.push(`/${locale}/search?q=${encodeURIComponent(searchQuery.trim())}`);
                     }
                     setSearchOpen(false);
                     setSearchQuery("");
@@ -170,7 +155,7 @@ export default function Navbar() {
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={locale === "km" ? "ស្វែងរកព័ត៌មាន..." : "Search news..."}
+                    placeholder={locale === "km" ? "ស្វែងរកតាមពាក្យគន្លឹះ..." : "Search by keyword..."}
                     autoFocus
                     className={cn(
                       "w-44 h-9 px-3 rounded-xl text-sm border outline-none transition-all",
@@ -263,7 +248,7 @@ export default function Navbar() {
                   const formData = new FormData(e.currentTarget);
                   const q = formData.get("mobile-q") as string;
                   if (q?.trim()) {
-                    router.push(`/${locale}/news?q=${encodeURIComponent(q.trim())}`);
+                    router.push(`/${locale}/search?q=${encodeURIComponent(q.trim())}`);
                   }
                   setMobileOpen(false);
                 }}
@@ -274,7 +259,7 @@ export default function Navbar() {
                   <input
                     name="mobile-q"
                     type="search"
-                    placeholder={locale === "km" ? "ស្វែងរកព័ត៌មាន..." : "Search news..."}
+                    placeholder={locale === "km" ? "ស្វែងរកតាមពាក្យគន្លឹះ..." : "Search by keyword..."}
                     className="w-full h-10 pl-9 pr-3 rounded-xl bg-gray-100 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-school-blue-800/30"
                   />
                 </div>

@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/achievements",
     "/contact",
     "/about",
-    "/research",
+    "/search",
   ];
 
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.flatMap((route) =>

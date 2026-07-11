@@ -6,7 +6,6 @@
     "news": "News",
     "achievements": "Achievements",
     "contact": "Contact",
-    "research": "Research",
     "donate": "Donate",
     "admin": "Dashboard"
   },
@@ -74,13 +73,24 @@
   "governance": {
     "title": "School Governance"
   },
-  "research": {
-    "title": "Research",
-    "subtitle": "Academic research and publications from our school community",
-    "featured_title": "Featured Research",
-    "featured_desc": "Highlighted research papers, studies, and academic projects by our students and faculty.",
-    "categories_title": "Research Areas",
-    "categories_desc": "Our research spans multiple disciplines, fostering innovation and critical thinking."
+  "search": {
+    "title": "Search",
+    "subtitle": "Search news, achievements, teachers, and more across the school website",
+    "placeholder": "Search by keyword...",
+    "no_results": "No results found",
+    "no_results_desc": "No results match \"{query}\". Try searching with different keywords",
+    "clear": "Clear search",
+    "quick_search": "Quick search:",
+    "results_for": "Found {count} result for \"{query}\"",
+    "results_for_plural": "Found {count} results for \"{query}\"",
+    "section_events": "Events",
+    "section_news": "News",
+    "section_achievements": "Achievements",
+    "section_teachers": "Teachers",
+    "view_all_news": "View all news results",
+    "view_all_achievements": "View all achievements",
+    "view_all_teachers": "View all teachers",
+    "years_experience": "{years} years experience"
   },
   "donate": {
     "title": "Support Our School",

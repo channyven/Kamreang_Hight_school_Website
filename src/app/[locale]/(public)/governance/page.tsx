@@ -12,8 +12,6 @@ import {
   Smartphone,
   Handshake,
   MessageCircleQuestion,
-  FlaskConical,
-  Presentation,
   type LucideIcon,
 } from "lucide-react";
 
@@ -82,16 +80,7 @@ const CULTURE_ITEMS: GovernanceItem[] = [
     en: "Students practice presenting questions, exercises, and new knowledge",
     icon: MessageCircleQuestion,
   },
-  {
-    km: "សិស្សរៀនជាគម្រោងស្រាវជ្រាវ ដើម្បីពង្រឹងការយល់ដឹងខ្លឹមសារមេរៀន",
-    en: "Students undertake research projects to deepen their understanding of lessons",
-    icon: FlaskConical,
-  },
-  {
-    km: "សិស្សផ្សព្វផ្សាយគម្រោងស្រាវជ្រាវ ដើម្បីអភិវឌ្ឍជំនាញ និងបទពិសោធន៍ជាក់ស្តែង",
-    en: "Students present research projects to build practical skills and experience",
-    icon: Presentation,
-  },
+
 ];
 
 function ItemCard({ item, index, km }: { item: GovernanceItem; index: number; km: boolean }) {

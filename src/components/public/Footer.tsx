@@ -25,13 +25,13 @@ export default async function Footer() {
 
   const quickLinks = [
     { label: t("nav.home"), href: `/${locale}` },
-    { label: t("nav.research"), href: `/${locale}/research` },
     { label: t("nav.about"), href: `/${locale}/about` },
     { label: t("nav.governance"), href: `/${locale}/governance` },
     { label: t("nav.news"), href: `/${locale}/news` },
     { label: t("nav.achievements"), href: `/${locale}/achievements` },
     { label: t("nav.contact"), href: `/${locale}/contact` },
     { label: t("nav.donate"), href: `/${locale}/donate` },
+    { label: locale === "km" ? "ស្វែងរក" : "Search", href: `/${locale}/search` },
   ];
 
   const schoolName =
