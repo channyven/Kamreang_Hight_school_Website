@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Loader2, User } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 import type { Teacher } from "@/types";
 
 // react-organizational-chart bundles Emotion for its connector lines, which
@@ -136,9 +136,13 @@ function TeacherCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
             sizes="64px"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center" style={{ background: "#eff4ff" }}>
-            <User className="w-8 h-8" style={{ color: "#a8c8ff" }} />
-          </div>
+          <Image
+            src={getAvatarUrl(km ? teacher.name_km : teacher.name_en, 64)}
+            alt={km ? teacher.name_km : teacher.name_en}
+            fill
+            className="object-cover"
+            sizes="64px"
+          />
         )}
       </div>
       <h4

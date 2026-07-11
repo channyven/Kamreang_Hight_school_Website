@@ -19,8 +19,8 @@ const battambang = Battambang({
 
 export const metadata: Metadata = {
   title: {
-    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School",
-    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School"}`,
+    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng Hight School",
+    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng Hight School"}`,
   },
   description: "Official website of the high school.",
   metadataBase: new URL(
