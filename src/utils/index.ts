@@ -117,6 +117,60 @@ export function buildStorageUrl(path: string): string {
   return `${supabaseUrl}/storage/v1/object/public/${path}`;
 }
 
+/**
+ * Convert a Google Drive share link to a direct image URL suitable
+ * for <img> or Next.js <Image>.
+ *
+ * Google Drive's uc?id= endpoint is unreliable (virus-scan page, auth
+ * prompts, etc.).  The /thumbnail?id= endpoint is more consistent for
+ * image display, while still requiring the file to be publicly shared.
+ *
+ * Accepted input formats:
+ *   https://drive.google.com/file/d/FILE_ID/view
+ *   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+ *   https://drive.google.com/open?id=FILE_ID
+ *
+ * If the input is not a recognised Google Drive link, returns it unchanged.
+ */
+export function convertGoogleDriveUrl(url: string): string {
+  if (!url) return url;
+
+  // Extract the file ID from various Google Drive URL patterns
+  const fileId = extractGoogleDriveFileId(url);
+  if (!fileId) {
+    // Already a known direct format – return as-is
+    if (
+      url.startsWith("https://drive.google.com/thumbnail?id=") ||
+      url.startsWith("https://drive.google.com/uc?id=")
+    ) {
+      return url;
+    }
+    return url;
+  }
+
+  // Thumbnail endpoint is more reliable for embedding images
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+}
+
+/**
+ * Extract the file ID from a Google Drive URL.
+ * Returns null if no recognised pattern is found.
+ */
+function extractGoogleDriveFileId(url: string): string | null {
+  // Pattern 1: /file/d/FILE_ID/view or /file/d/FILE_ID/view?whatever
+  const fileMatch = url.match(
+    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_\-.]+)\//
+  );
+  if (fileMatch) return fileMatch[1];
+
+  // Pattern 2: /open?id=FILE_ID
+  const openMatch = url.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
+  if (openMatch && url.includes("/open")) return openMatch[1];
+
+  return null;
+}
+
+
 // ─── Locale helpers ───────────────────────────────────────────
 
 export function getLocalizedText(
