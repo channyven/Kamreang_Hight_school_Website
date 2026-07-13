@@ -11,8 +11,8 @@ import {
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
   GraduationCap,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers/AuthContext";
+import { cn } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {

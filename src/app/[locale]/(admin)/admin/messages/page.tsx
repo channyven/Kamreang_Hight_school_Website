@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import type { Message } from "@/types";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate } from "@/utils";
 import { toast } from "sonner";
 import { markMessageRead, markMessageReplied, deleteMessage } from "@/actions/messages";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";

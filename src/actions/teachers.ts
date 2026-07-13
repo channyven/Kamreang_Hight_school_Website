@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { teacherSchema, type TeacherInput } from "@/lib/validations";
+import { teacherSchema, type TeacherInput } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 

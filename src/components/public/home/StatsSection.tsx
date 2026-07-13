@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { Users, GraduationCap, BookOpen, Award, TrendingUp } from "lucide-react";
 import type { Statistics } from "@/types";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/utils";
 
 const STAT_ICONS = [
   { icon: Users, accent: "blue" },
