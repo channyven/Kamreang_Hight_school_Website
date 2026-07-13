@@ -58,10 +58,10 @@ CREATE TABLE settings (
 -- Insert default settings
 INSERT INTO settings (key, value, description) VALUES
   ('school_info', '{
-    "name_km": "វិទ្យាល័យភ្នំពេញ",
-    "name_en": "Phnom Penh High School",
-    "address_km": "ភ្នំពេញ, កម្ពុជា",
-    "address_en": "Phnom Penh, Cambodia",
+    "name_km": "វិទ្យាល័យកំរៀង",
+    "name_en": "Kamrieng High School",
+    "address_km": "ភូមិអូរដា ឃុំអូរដា ស្រុកកំរៀង ខេត្តបាត់ដំបង",
+    "address_en": "Ou Da village, Ou Da commune, Kamrieng district, Battambang province",
     "phone": "+855 23 000 000",
     "email": "info@school.edu.kh",
     "map_embed_url": "",
@@ -70,8 +70,8 @@ INSERT INTO settings (key, value, description) VALUES
     "telegram_url": ""
   }', 'School contact and social information'),
   ('homepage', '{
-    "hero_title_km": "ស្វាគមន៍មកកាន់វិទ្យាល័យភ្នំពេញ",
-    "hero_title_en": "Welcome to Phnom Penh High School",
+    "hero_title_km": "ស្វាគមន៍មកកាន់វិទ្យាល័យកំរៀង",
+    "hero_title_en": "Welcome to Kamrieng High School",
     "hero_subtitle_km": "កន្លែងអប់រំដ៏ល្អបំផុត",
     "hero_subtitle_en": "The finest place of education",
     "hero_image_url": "",

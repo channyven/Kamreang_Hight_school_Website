@@ -11,7 +11,7 @@ import type { Message } from "@/types";
 import { formatRelativeDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { markMessageRead, markMessageReplied, deleteMessage } from "@/actions/messages";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const STATUS_BADGE: Record<string, { variant: "default" | "success" | "warning" | "destructive"; icon: React.ReactNode }> = {
   unread: { variant: "destructive", icon: <Mail className="w-3 h-3" /> },
@@ -145,6 +145,9 @@ export default function AdminMessagesPage() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-lg">{selected.subject}</DialogTitle>
+                <DialogDescription className="text-sm text-gray-500">
+                  {locale === "km" ? "ព័ត៌មានលម្អិតនៃសារ" : "Message details and contact information"}
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-2">
                 <div className="grid grid-cols-2 gap-3 text-sm">

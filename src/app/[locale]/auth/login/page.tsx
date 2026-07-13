@@ -130,7 +130,7 @@ function LoginForm() {
               Admin Portal
             </h1>
             <p className="text-sm mt-1" style={{ color: "#8892a0" }}>
-              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "School Management"}
+              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
             </p>
             <p className="text-xs mt-2 leading-relaxed" style={{ color: "#a3acba" }}>
               Sign in to manage news, achievements, teachers, and school content.
