@@ -103,6 +103,18 @@ export const teacherSchema = z.object({
 });
 export type TeacherInput = z.infer<typeof teacherSchema>;
 
+// ─── Governance Item ──────────────────────────────────────────
+
+export const governanceItemSchema = z.object({
+  section: z.enum(["governance", "culture"]),
+  icon: z.string().min(1, "Icon is required"),
+  text_km: z.string().min(1, "Khmer text is required").max(500),
+  text_en: z.string().min(1, "English text is required").max(500),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type GovernanceItemInput = z.infer<typeof governanceItemSchema>;
+
 // ─── User (Admin create/edit) ─────────────────────────────────
 
 export const createUserSchema = z.object({

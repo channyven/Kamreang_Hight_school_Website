@@ -8,6 +8,7 @@ import type {
   Teacher,
   HeroSlide,
   OrgNodeData,
+  GovernanceItem,
 } from "@/types";
 
 // ─── Hero Slides (max 5) ───────────────────────────────────────
@@ -452,6 +453,22 @@ export const mockAchievements: Achievement[] = [
     created_at: "2024-11-10T00:00:00Z",
     updated_at: "2024-11-10T00:00:00Z",
   },
+];
+
+// ─── Governance Items ──────────────────────────────────────────
+export const mockGovernanceItems: GovernanceItem[] = [
+  { id: "g1", section: "governance", icon: "ClipboardCheck", text_km: "តេស្តស្តង់ដារ តាមលំនាំប្រឡងបាក់ឌុប", text_en: "Standardized tests aligned with the national Baccalaureate exam format", sort_order: 1, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g2", section: "governance", icon: "NotebookPen", text_km: "ផែនការសិក្សាសិស្ស ផែនការបង្រៀន និងផែនការកែលម្អសាលារៀន", text_en: "Student learning plans, teaching plans, and school improvement plans", sort_order: 2, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g3", section: "governance", icon: "Users2", text_km: "គណៈកម្មការគ្រប់គ្រងថ្នាក់រៀន និងសាលារៀន", text_en: "Classroom and school management committees", sort_order: 3, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g4", section: "governance", icon: "FileSignature", text_km: "កិច្ចព្រមព្រៀងលទ្ធផលការងារប្រចាំឆ្នាំ", text_en: "Annual work performance agreements", sort_order: 4, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g5", section: "governance", icon: "Vote", text_km: "ក្រុមប្រឹក្សាសិស្ស", text_en: "Student council", sort_order: 5, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g6", section: "governance", icon: "LineChart", text_km: "ប្រព័ន្ធតាមដានសិស្សប្រចាំខែ និងត្រីមាស", text_en: "Monthly and quarterly student monitoring system", sort_order: 6, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g7", section: "culture", icon: "CalendarDays", text_km: "សិស្សមានកាលវិភាគរៀន និងបំពេញកិច្ចការផ្សេងៗប្រចាំថ្ងៃ ក្នុងមួយសប្តាហ៍ៗ", text_en: "Students follow a weekly class schedule and complete daily tasks", sort_order: 1, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g8", section: "culture", icon: "Smartphone", text_km: "សិស្សសិក្សាតាមរយៈ GEIP EdTech App មុនពេលរៀនជាមួយគ្នា", text_en: "Students study through the GEIP EdTech App before learning together", sort_order: 2, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g9", section: "culture", icon: "Handshake", text_km: "សិស្សរៀនផ្ទាល់ជាមួយគ្នា", text_en: "Students engage in direct peer-to-peer learning", sort_order: 3, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g10", section: "culture", icon: "MessageCircleQuestion", text_km: "សិស្សហ្វឹកហាត់បង្ហាញសំណួរ លំហាត់ និងចំណេះដឹងថ្មីៗ", text_en: "Students practice presenting questions, exercises, and new knowledge", sort_order: 4, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g11", section: "culture", icon: "FlaskConical", text_km: "សិស្សរៀនជាគម្រោងស្រាវជ្រាវ ដើម្បីពង្រឹងការយល់ដឹងខ្លឹមសារមេរៀន", text_en: "Students undertake research projects to deepen their understanding of lessons", sort_order: 5, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "g12", section: "culture", icon: "Presentation", text_km: "សិស្សផ្សព្វផ្សាយគម្រោងស្រាវជ្រាវ ដើម្បីអភិវឌ្ឍជំនាញ និងបទពិសោធន៍ជាក់ស្តែង", text_en: "Students present research projects to build practical skills and experience", sort_order: 6, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
 ];
 
 // ─── School Info ───────────────────────────────────────────────
