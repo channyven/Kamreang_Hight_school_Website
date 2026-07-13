@@ -130,7 +130,7 @@ function LoginForm() {
               Admin Portal
             </h1>
             <p className="text-sm mt-1" style={{ color: "#8892a0" }}>
-              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "School Management"}
+              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
             </p>
           </div>
 

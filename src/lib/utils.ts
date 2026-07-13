@@ -128,6 +128,23 @@ export function getLocalizedText(
   return enText ?? kmText ?? "";
 }
 
+// ─── Avatar helper ────────────────────────────────────────────
+
+/**
+ * Generate a placeholderc avatar URL using ui-avatars.com.
+ * Renders the initials of the given name over a school-branded background.
+ * Swap this for real photo URLs once actual images are available.
+ */
+export function getAvatarUrl(
+  name: string | null | undefined,
+  size: number = 96,
+  bg: string = "1e3a8a",
+  fg: string = "fff"
+): string {
+  const safeName = encodeURIComponent(name?.trim() || "?");
+  return `https://ui-avatars.com/api/?name=${safeName}&background=${bg}&color=${fg}&size=${size}&font-size=0.5&bold=true&format=png`;
+}
+
 // ─── Misc ─────────────────────────────────────────────────────
 
 export function generateUniqueSlug(base: string, existing: string[]): string {
