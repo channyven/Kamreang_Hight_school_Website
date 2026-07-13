@@ -39,7 +39,8 @@ export const newsSchema = z.object({
   content_en: z.string().optional(),
   excerpt_km: z.string().max(500).optional(),
   excerpt_en: z.string().max(500).optional(),
-  featured_image: z.string().url().optional().or(z.literal("")),
+  // Accept any string (full URL or relative proxy path like /api/proxy-image?url=...)
+  featured_image: z.string().optional().or(z.literal("")),
   gallery_images: z.array(z.string()).default([]),
   category_id: z.string().uuid().optional().or(z.literal("")),
   is_featured: z.boolean().default(false),

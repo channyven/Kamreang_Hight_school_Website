@@ -2,7 +2,7 @@
 
 import { createServerClient } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
-import type { ActionResult, SessionUser } from "@/types";
+import type { ActionResult, SessionUser, News, NewsCategory } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -74,29 +74,48 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
 
   const supabase = createServerClient();
   const user = await getCurrentUser();
-  const insertData = {
+  let insertData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
     created_by: user?.id ?? null,
     updated_by: user?.id ?? null,
   };
 
-  const { error } = await supabase.from("news").insert(insertData);
-  if (error) return { success: false, error: error.message };
+  // Attempt insert; if slug conflicts, retry with a suffixed slug
+  const maxRetries = 5;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const { error } = await supabase.from("news").insert(insertData);
 
-  // Audit log
-  if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
-      action: "create",
-      table_name: "news",
-    });
+    if (!error) {
+      // Audit log
+      if (user) {
+        await supabase.from("admin_audit_logs").insert({
+          user_id: user.id,
+          user_email: user.email,
+          action: "create",
+          table_name: "news",
+        });
+      }
+
+      revalidatePath("/[locale]/(public)/news", "page");
+      revalidatePath("/[locale]/(public)", "page");
+      revalidateTag("news");
+      return { success: true };
+    }
+
+    // If it's not a unique constraint violation on slug, bail out
+    if (!error.message.includes('news_slug_key') && !error.message.includes('duplicate key')) {
+      return { success: false, error: error.message };
+    }
+
+    // Append a counter to the slug and retry
+    const currentSlug = (insertData.slug as string | undefined) || "article";
+    const match = currentSlug.match(/-(\d+)$/);
+    const nextNum = match ? parseInt(match[1], 10) + 1 : 1;
+    const newSlug = currentSlug.replace(/-\d+$/, "") + `-${nextNum}`;
+    insertData = { ...insertData, slug: newSlug };
   }
 
-  revalidatePath("/[locale]/(public)/news", "page");
-  revalidatePath("/[locale]/(public)", "page");
-  revalidateTag("news");
-  return { success: true };
+  return { success: false, error: "Failed to create article due to slug conflict. Please try a different slug." };
 }
 
 export async function updateNews(
@@ -161,4 +180,22 @@ export async function deleteNews(id: string): Promise<ActionResult<void>> {
   revalidatePath("/[locale]/(public)", "page");
   revalidateTag("news");
   return { success: true };
+}
+
+// ─── Admin list fetch ───────────────────────────────────────────
+// The admin news list page cannot use the browser supabase client
+// directly because RLS restricts anon keys to only published news.
+// This server action uses the service role to fetch all articles.
+
+export async function getAdminNewsList(): Promise<News[]> {
+  try {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from("news")
+      .select("*, category:news_categories(*)")
+      .order("created_at", { ascending: false });
+    return (data ?? []) as News[];
+  } catch {
+    return [];
+  }
 }

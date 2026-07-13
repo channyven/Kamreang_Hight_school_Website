@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase, STORAGE_BUCKETS } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
-import { slugify, convertGoogleDriveUrl } from "@/utils";
+import { generateUniqueSlug, convertGoogleDriveUrl } from "@/utils";
 import ImagePreview from "@/components/admin/ImagePreview";
 import PhotoGallery from "@/components/admin/PhotoGallery";
 import { createNews, updateNews } from "@/actions/news";
@@ -34,6 +34,7 @@ export default function NewsFormPage({ params }: PageProps) {
   const [categories, setCategories] = useState<NewsCategory[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [uploadingFeatured, setUploadingFeatured] = useState(false);
+  const [existingSlugs, setExistingSlugs] = useState<string[]>([]);
   const featuredInputRef = useRef<HTMLInputElement>(null);
 
   const handleFeaturedUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +73,13 @@ export default function NewsFormPage({ params }: PageProps) {
 
   const titleEn = watch("title_en");
 
-  // Auto-generate slug from English title
+  // Auto-generate slug from English title (ensuring uniqueness)
   useEffect(() => {
     if (isNew && titleEn) {
-      setValue("slug", slugify(titleEn));
+      const unique = generateUniqueSlug(titleEn, existingSlugs);
+      setValue("slug", unique);
     }
-  }, [titleEn, isNew, setValue]);
+  }, [titleEn, isNew, existingSlugs, setValue]);
 
   useEffect(() => {
     const init = async () => {
@@ -86,6 +88,19 @@ export default function NewsFormPage({ params }: PageProps) {
         .select("*")
         .order("sort_order");
       setCategories((cats ?? []) as NewsCategory[]);
+
+      // Fetch all existing slugs for uniqueness check
+      const { data: slugsData } = await supabase
+        .from("news")
+        .select("slug");
+
+      const allSlugs = (slugsData ?? [])
+        .map((r) => r.slug)
+        .filter(Boolean) as string[];
+
+      if (isNew) {
+        setExistingSlugs(allSlugs);
+      }
 
       if (!isNew) {
         const { data } = await supabase
@@ -103,6 +118,9 @@ export default function NewsFormPage({ params }: PageProps) {
               setValue(k as keyof NewsInput, v as string);
             }
           });
+
+          // Exclude current article's slug from the conflict check
+          setExistingSlugs(allSlugs.filter((s) => s !== data.slug));
         }
         setLoading(false);
       }
