@@ -159,10 +159,10 @@ export default function NewsGridClient({ news, locale, t }: NewsGridClientProps)
 
                 <Link
                   href={`/${locale}/news/${item.slug}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-school-blue-700 group-hover:text-school-gold-500 transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-school-blue-50 hover:bg-school-blue-800 text-school-blue-700 hover:text-white text-xs font-semibold transition-all duration-300"
                 >
                   <span>{t.read_more}</span>
-                  <span className="w-6 h-6 rounded-full bg-school-blue-50 group-hover:bg-school-gold-100 flex items-center justify-center transition-all duration-200">
+                  <span className="w-5 h-5 rounded-full bg-white/80 hover:bg-school-gold-400 flex items-center justify-center transition-all duration-300 shrink-0">
                     <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </span>
                 </Link>

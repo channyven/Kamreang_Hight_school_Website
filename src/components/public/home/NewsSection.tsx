@@ -64,8 +64,14 @@ export default function NewsSection({ news }: NewsSectionProps) {
                   </div>
                   <h3 className={`font-semibold text-gray-900 text-base mb-2 line-clamp-2 ${locale === "km" ? "font-khmer" : ""}`}>{title}</h3>
                   {excerpt && <p className={`text-sm text-gray-500 line-clamp-2 mb-4 ${locale === "km" ? "font-khmer" : ""}`}>{truncate(excerpt, 120)}</p>}
-                  <Link href={`/${locale}/news/${item.slug}`} className="inline-flex items-center text-sm font-medium text-school-blue-700 hover:text-school-blue-900 gap-1 transition-colors group">
-                    {t("read_more")}<ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  <Link
+                    href={`/${locale}/news/${item.slug}`}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-school-blue-50 hover:bg-school-blue-800 text-school-blue-700 hover:text-white text-sm font-semibold transition-all duration-300 group"
+                  >
+                    <span>{t("read_more")}</span>
+                    <span className="w-5 h-5 rounded-full bg-white/80 group-hover:bg-school-gold-400 flex items-center justify-center transition-all duration-300">
+                      <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+                    </span>
                   </Link>
                 </div>
               </motion.article>

@@ -10,6 +10,26 @@ import { Button } from "@/components/ui/button";
 import { getPublishedNews } from "@/lib/queries";
 import ShareButton from "@/components/public/ShareButton";
 
+// Fallback images for news without a featured_image
+const FALLBACK_IMAGES = [
+  "/images/news/new1.png",
+  "/images/news/new2.png",
+  "/images/news/new4.png",
+  "/images/news/new3.png",
+  "/images/news/new5.png",
+  "/images/news/new6.png",
+];
+
+function getNewsImage(item: { featured_image?: string | null; id: string }): string {
+  if (item.featured_image) return item.featured_image;
+  let hash = 0;
+  for (let i = 0; i < item.id.length; i++) {
+    hash = ((hash << 5) - hash) + item.id.charCodeAt(i);
+    hash |= 0;
+  }
+  return FALLBACK_IMAGES[Math.abs(hash) % FALLBACK_IMAGES.length];
+}
+
 interface NewsDetailPageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
@@ -81,11 +101,9 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         </h1>
 
         {/* Featured image */}
-        {news.featured_image && (
-          <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-8 shadow-lg">
-            <Image src={news.featured_image} alt={title} fill className="object-cover" priority />
-          </div>
-        )}
+        <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-8 shadow-lg bg-gray-100">
+          <Image src={getNewsImage(news)} alt={title} fill className="object-cover" priority />
+        </div>
 
         {/* Content */}
         <article
@@ -118,9 +136,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                     className="group block rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow"
                   >
                     <div className="relative aspect-[16/9] bg-gray-100">
-                      {item.featured_image && (
-                        <Image src={item.featured_image} alt={rTitle} fill className="object-cover group-hover:scale-105 transition-transform" />
-                      )}
+                      <Image src={getNewsImage(item)} alt={rTitle} fill className="object-cover group-hover:scale-105 transition-transform" />
                     </div>
                     <div className="p-3">
                       <p className={`text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-school-blue-800 ${locale === "km" ? "font-khmer" : ""}`}>
