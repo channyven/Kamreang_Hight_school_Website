@@ -50,8 +50,8 @@
   "contact": {
     "title": "Contact Us",
     "subtitle": "Get in touch with us",
-    "name": "Full Name",
-    "email": "Email Address",
+    "name": "Your Name",
+    "email": "Email",
     "phone": "Phone Number",
     "subject": "Subject",
     "message": "Message",

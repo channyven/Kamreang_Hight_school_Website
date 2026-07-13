@@ -58,20 +58,20 @@ CREATE TABLE settings (
 -- Insert default settings
 INSERT INTO settings (key, value, description) VALUES
   ('school_info', '{
-    "name_km": "វិទ្យាល័យភ្នំពេញ",
-    "name_en": "Phnom Penh High School",
-    "address_km": "ភ្នំពេញ, កម្ពុជា",
-    "address_en": "Phnom Penh, Cambodia",
+    "name_km": "វិទ្យាល័យកំរៀង",
+    "name_en": "Kamrieng High School",
+    "address_km": "ខេត្តបាត់ដំបង, កម្ពុជា",
+    "address_en": "Battambang Province, Cambodia",
     "phone": "+855 23 000 000",
-    "email": "info@school.edu.kh",
+    "email": "reachtalab@gmail.com",
     "map_embed_url": "",
     "facebook_url": "",
     "youtube_url": "",
     "telegram_url": ""
   }', 'School contact and social information'),
   ('homepage', '{
-    "hero_title_km": "ស្វាគមន៍មកកាន់វិទ្យាល័យភ្នំពេញ",
-    "hero_title_en": "Welcome to Phnom Penh High School",
+    "hero_title_km": "ស្វាគមន៍មកកាន់វិទ្យាល័យកំរៀង",
+    "hero_title_en": "Welcome to Kamrieng High School",
     "hero_subtitle_km": "កន្លែងអប់រំដ៏ល្អបំផុត",
     "hero_subtitle_en": "The finest place of education",
     "hero_image_url": "",

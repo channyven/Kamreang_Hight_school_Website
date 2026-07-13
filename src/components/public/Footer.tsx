@@ -10,9 +10,9 @@ async function getFooterContactInfo(locale: string) {
   return {
     address:
       (km ? settings.school_address_km : settings.school_address_en) ??
-      (km ? "ភ្នំពេញ, កម្ពុជា" : "Phnom Penh, Cambodia"),
-    phone: settings.school_phone ?? "+855 23 000 000",
-    email: settings.school_email ?? "info@school.edu.kh",
+      (km ? "ខេត្តបាត់ដំបង, កម្ពុជា" : "Battambang Province, Cambodia"),
+    phone: settings.school_phone ?? "095 85 85 45",
+    email: settings.school_email ?? "reachtalab@gmail.com",
     facebook: settings.school_facebook ?? "#",
     youtube: settings.school_youtube ?? "#",
   };
