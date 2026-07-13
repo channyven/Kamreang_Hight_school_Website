@@ -184,6 +184,20 @@ export interface Teacher {
   updated_at: string;
 }
 
+export type GovernanceSection = "governance" | "culture";
+
+export interface GovernanceItem {
+  id: string;
+  section: GovernanceSection;
+  icon: string;
+  text_km: string;
+  text_en: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface HeroSlide {
   id: string;
   title_km: string;

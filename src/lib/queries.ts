@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, Leadership, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, GovernanceItem, Leadership, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -9,6 +9,7 @@ import {
   mockNews,
   mockNewsCategories,
   mockStats,
+  mockGovernanceItems,
 } from "@/lib/mock-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
@@ -89,6 +90,21 @@ export const getNewsCategories = unstable_cache(
   },
   ["news-categories"],
   { tags: ["news_categories"], revalidate: 60 }
+);
+
+export const getGovernanceItems = unstable_cache(
+  async (): Promise<GovernanceItem[]> => {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from("governance_items")
+      .select("*")
+      .eq("is_active", true)
+      .order("section")
+      .order("sort_order");
+    return data && data.length > 0 ? (data as GovernanceItem[]) : mockGovernanceItems;
+  },
+  ["governance-items"],
+  { tags: ["governance_items"], revalidate: 60 }
 );
 
 export const getCurrentStatistics = unstable_cache(
