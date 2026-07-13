@@ -16,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(`/${locale}/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      router.push(`/${locale}/login?redirect=${encodeURIComponent(pathname)}`);
     }
   }, [user, loading, router, locale, pathname]);
 
