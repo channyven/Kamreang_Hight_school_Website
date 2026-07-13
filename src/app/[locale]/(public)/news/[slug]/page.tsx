@@ -9,6 +9,7 @@ import { Calendar, Eye, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPublishedNews } from "@/lib/queries";
 import ShareButton from "@/components/public/ShareButton";
+import PhotoGallery from "@/components/public/PhotoGallery";
 
 // Fallback images for news without a featured_image
 const FALLBACK_IMAGES = [
@@ -102,7 +103,14 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
 
         {/* Featured image */}
         <div className="relative aspect-[16/9] rounded-2xl overflow-hidden mb-8 shadow-lg bg-gray-100">
-          <Image src={getNewsImage(news)} alt={title} fill className="object-cover" priority />
+          <Image
+            src={getNewsImage(news)}
+            alt={title}
+            fill
+            className="object-cover"
+            priority
+            unoptimized={news.featured_image?.includes("google.com") || news.featured_image?.includes("firebasestorage") || false}
+          />
         </div>
 
         {/* Content */}
@@ -112,6 +120,13 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           }`}
           dangerouslySetInnerHTML={{ __html: content ?? "" }}
         />
+
+        {/* Photo gallery */}
+        {news.gallery_images && news.gallery_images.length > 0 && (
+          <div className="mt-10">
+            <PhotoGallery images={news.gallery_images} locale={locale} />
+          </div>
+        )}
 
         {/* Share */}
         <div className="mt-10 pt-6 border-t flex items-center justify-between">
@@ -136,7 +151,13 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                     className="group block rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow"
                   >
                     <div className="relative aspect-[16/9] bg-gray-100">
-                      <Image src={getNewsImage(item)} alt={rTitle} fill className="object-cover group-hover:scale-105 transition-transform" />
+                      <Image
+                        src={getNewsImage(item)}
+                        alt={rTitle}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform"
+                        unoptimized={item.featured_image?.includes("google.com") || item.featured_image?.includes("firebasestorage") || false}
+                      />
                     </div>
                     <div className="p-3">
                       <p className={`text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-school-blue-800 ${locale === "km" ? "font-khmer" : ""}`}>

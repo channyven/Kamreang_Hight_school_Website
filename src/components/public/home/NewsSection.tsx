@@ -50,7 +50,14 @@ export default function NewsSection({ news }: NewsSectionProps) {
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                   {item.featured_image ? (
-                    <Image src={item.featured_image} alt={title} fill className="object-cover group-hover:scale-[1.04] transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image
+                      src={item.featured_image}
+                      alt={title}
+                      fill
+                      className="object-cover group-hover:scale-[1.04] transition-transform duration-700"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      unoptimized={item.featured_image.includes("google.com") || item.featured_image.includes("firebasestorage")}
+                    />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-school-blue-800 to-school-blue-900 opacity-60" />
                   )}

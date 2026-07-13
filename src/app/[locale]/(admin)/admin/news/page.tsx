@@ -163,6 +163,7 @@ export default function AdminNewsPage() {
                                 width={40}
                                 height={32}
                                 className="object-cover w-full h-full"
+                                unoptimized={item.featured_image.includes("google.com") || item.featured_image.includes("firebasestorage")}
                               />
                             </div>
                           )}

@@ -73,6 +73,7 @@ export interface News {
   excerpt_km?: string;
   excerpt_en?: string;
   featured_image?: string;
+  gallery_images?: string[];
   category_id?: string;
   is_featured: boolean;
   status: ContentStatus;

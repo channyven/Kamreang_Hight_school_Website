@@ -53,6 +53,7 @@ export default function NewsGridClient({ news, locale, t }: NewsGridClientProps)
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized={item.featured_image.includes("google.com") || item.featured_image.includes("firebasestorage")}
                   />
                   {/* Dark overlay on hover to show excerpt */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
