@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, GovernanceItem, Leadership, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, GovernanceItem, Leadership, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -129,6 +129,24 @@ export const getNewsCategories = unstable_cache(
   },
   ["news-categories"],
   { tags: ["news_categories"], revalidate: 60 }
+);
+
+export const getPublishedDocuments = unstable_cache(
+  async (): Promise<AppDocument[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("downloads")
+        .select("*, category:download_categories(name_km, name_en, slug)")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as unknown as AppDocument[];
+    } catch {
+      return [];
+    }
+  },
+  ["published-documents"],
+  { tags: ["documents"], revalidate: 60 }
 );
 
 export const getGovernanceItems = unstable_cache(
