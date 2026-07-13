@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { achievementSchema, type AchievementInput } from "@/lib/validations";
+import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 

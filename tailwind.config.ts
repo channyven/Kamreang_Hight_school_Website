@@ -56,6 +56,8 @@ const config: Config = {
         },
         // School brand colors
         school: {
+          navy: "hsl(var(--school-navy))",
+          goldMain: "hsl(var(--school-gold-main))",
           blue: {
             50: "#eff6ff",
             100: "#dbeafe",

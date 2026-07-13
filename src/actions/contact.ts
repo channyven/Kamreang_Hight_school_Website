@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { contactSchema } from "@/lib/validations";
+import { contactSchema } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 
 export async function submitContactMessage(

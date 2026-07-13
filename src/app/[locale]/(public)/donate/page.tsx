@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Heart, Building2, Smartphone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import CopyButton from "@/components/public/CopyButton";
 
 export async function generateMetadata(): Promise<Metadata> {

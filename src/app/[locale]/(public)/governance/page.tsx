@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { getGovernanceIcon } from "@/lib/governance-icons";
 import { getGovernanceItems } from "@/lib/queries";
 import type { GovernanceItem } from "@/types";

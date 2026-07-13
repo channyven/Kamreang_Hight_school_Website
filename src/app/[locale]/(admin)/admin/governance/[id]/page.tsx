@@ -14,10 +14,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { governanceItemSchema, type GovernanceItemInput } from "@/lib/validations";
+import { governanceItemSchema, type GovernanceItemInput } from "@/schemas/validations";
 import { createGovernanceItem, updateGovernanceItem, getGovernanceItemById } from "@/actions/governance";
 import { GOVERNANCE_ICON_NAMES, getGovernanceIcon } from "@/lib/governance-icons";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import type { GovernanceSection } from "@/types";
 
 interface PageProps { params: Promise<{ id: string }>; }

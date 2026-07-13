@@ -11,8 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/contexts/AuthContext";
-import { getInitials } from "@/lib/utils";
+import { useAuth } from "@/providers/AuthContext";
+import { getInitials } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 const ROLE_LABELS: Record<string, string> = {

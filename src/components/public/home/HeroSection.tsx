@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "next-intl";
 import { ChevronLeft, ChevronRight, ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import type { HeroSlide } from "@/types";
 
 interface HeroSectionProps {
@@ -17,8 +17,8 @@ interface HeroSectionProps {
 const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: "slide-welcome",
-    title_km: "សូមស្វាគមន៍មកវិទ្យាល័យ",
-    title_en: "Welcome to Our High School",
+    title_km: "សូមស្វាគមន៍មកវិទ្យាល័យកំរៀង",
+    title_en: "Welcome to Kamrieng High School",
     subtitle_km: "ផ្ដល់ការអប់រំប្រកបដោយគុណភាព វប្បធម៌ និងនវានុវត្ត",
     subtitle_en: "Empowering the next generation of Cambodian leaders through academic rigor, cultural integrity, and innovative learning.",
     gradient: "linear-gradient(135deg, #061525 0%, #0c2d5e 55%, #092045 100%)",

@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { governanceItemSchema, type GovernanceItemInput } from "@/lib/validations";
+import { governanceItemSchema, type GovernanceItemInput } from "@/schemas/validations";
 import type { ActionResult, GovernanceItem } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 

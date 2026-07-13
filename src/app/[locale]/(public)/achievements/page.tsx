@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
-import { getLocalizedText, formatShortDate } from "@/lib/utils";
+import { getLocalizedText, formatShortDate } from "@/utils";
 import { Trophy, Star } from "lucide-react";
 import { getPublishedAchievements } from "@/lib/queries";
 

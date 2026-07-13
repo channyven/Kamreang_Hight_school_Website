@@ -5,7 +5,7 @@ import { getLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatShortDate, getLocalizedText, truncate } from "@/lib/utils";
+import { formatShortDate, getLocalizedText, truncate } from "@/utils";
 import { Calendar, ArrowRight, Search } from "lucide-react";
 import { getPublishedNews, getNewsCategories } from "@/lib/queries";
 

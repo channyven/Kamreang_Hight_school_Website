@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { GovernanceItem, GovernanceSection } from "@/types";
-import { getLocalizedText, cn } from "@/lib/utils";
+import { getLocalizedText, cn } from "@/utils";
 import { getGovernanceIcon } from "@/lib/governance-icons";
 import { toast } from "sonner";
 import { deleteGovernanceItem, getAllGovernanceItems } from "@/actions/governance";

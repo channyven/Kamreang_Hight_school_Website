@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title:
       locale === "km"
         ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យ")
-        : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School"),
+        : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"),
     description:
       locale === "km"
         ? "ស្វាគមន៍មកកាន់វិទ្យាល័យ"
