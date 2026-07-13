@@ -43,10 +43,17 @@ src/
 │   ├── ui/                  # shadcn/ui primitives
 │   ├── public/              # Public site components
 │   └── admin/               # Admin components
-├── contexts/AuthContext.tsx  # Firebase + Supabase auth bridge
+├── providers/AuthContext.tsx # Firebase + Supabase auth bridge
 ├── i18n/                    # next-intl config
-├── lib/                     # Supabase, Firebase, utils, validations
-└── types/                   # TypeScript interfaces
+├── lib/
+│   ├── firebase/            # Firebase SDK client
+│   ├── supabase/            # Supabase clients + storage helpers
+│   ├── queries.ts           # Cached server reads
+│   └── ...                  # mock-data, structured-data, upload
+├── schemas/                 # Zod validation schemas
+├── styles/globals.css       # Tailwind base styles
+├── types/                   # TypeScript interfaces
+└── utils/                   # Helper functions (cn, dates, formatting)
 messages/
 ├── km.json                  # Khmer translations
 └── en.json                  # English translations
@@ -145,3 +152,57 @@ Visit:
 |-------|-----|-------|
 | `school-blue` | `#1e3a8a` | Primary brand, navbar, buttons |
 | `school-gold` | `#f59e0b` | Accent, highlights, featured |
+
+--------------------------------------------------------------------
+
+## Changelog — `bug/clean-structure-project` (2026-07-13)
+
+### 1. Folder structure refactor (two passes, zero functional change)
+
+**6 files moved with `git mv` (history preserved):**
+
+| From | To |
+|---|---|
+| `src/contexts/AuthContext.tsx` | `src/providers/AuthContext.tsx` |
+| `src/lib/validations.ts` | `src/schemas/validations.ts` |
+| `src/app/globals.css` | `src/styles/globals.css` |
+| `src/lib/utils.ts` | `src/utils/index.ts` |
+| `src/lib/firebase.ts` | `src/lib/firebase/index.ts` |
+| `src/lib/supabase.ts` | `src/lib/supabase/index.ts` |
+
+**Imports updated across ~55 files:**
+
+- `@/contexts/AuthContext` → `@/providers/AuthContext` (8 files)
+- `@/lib/validations` → `@/schemas/validations` (13 files)
+- `@/lib/utils` → `@/utils` (37 files — all `components/ui/*`, public/admin components, pages)
+- `./globals.css` → `../styles/globals.css` (1 file: `src/app/layout.tsx`)
+- `@/lib/firebase` and `@/lib/supabase` needed no changes (they resolve to the new `index.ts` automatically)
+
+**`tsconfig.json`:** `@/contexts/*` alias replaced with `@/providers/*`; added `@/schemas/*` and `@/utils/*`.
+
+Deliberately **not** created: `features/`, `store/`, `hooks/`, `permissions/`, `constants/`, `config/`, i18n `locales/` split — all would be empty folders or architectural changes, not file moves.
+
+### 2. Bug fixes
+
+- **`next.config.ts`** — added `*.supabase.co/storage/v1/object/public/**` to `images.remotePatterns`; previously any Supabase-hosted image returned 400 from `/_next/image`.
+- **Teacher photos 400** — the live Supabase DB had 14 `teachers.photo_url` rows pointing at deleted files (`teacher-van-srina.png` etc.). Updated all 14 rows in the live DB to the real files (`/images/about/teachers/teacher-01.jpg`…`14.jpg`), recorded in `supabase/migrations/010_fix_teacher_photo_paths.sql`. *This migration is already applied to the live DB — no need to run it again.*
+- **`src/lib/mock-data.ts`** — removed 2 leadership `photo_url` entries pointing at deleted `leader-*.png` files.
+- **`package.json`** — resolved the merge conflict, restored `firebase-admin`, re-enabled `"lint": "next lint"`.
+- **Port 3000** — killed a stale `node.exe` process squatting on it; the dev server binds 3000 again.
+
+### 3. Docs
+
+- **`README.md`** — project-structure diagram updated to the new layout.
+- **`todo.md`** — 2 file references updated to the moved paths.
+
+### Verified
+
+`tsc --noEmit` clean · lint at pre-existing baseline (nothing new) · production build succeeds (29 routes) · live smoke test: all public routes 200, `/km/admin` auth-gate 307, About page renders all 14 new teacher images.
+
+### Still open (not touched)
+
+- 14 pre-existing lint errors (incl. a real `useCounter` conditional-hook bug in `AboutPageClient.tsx:193`)
+- Unauthenticated `/api/diagtmp` route (CRIT-3 in `todo.md`) — anyone can grant themselves admin via `?email=`
+- Duplicate login pages (`[locale]/(auth)/login` vs `[locale]/auth/login`)
+- `fix_package.js` at repo root — if ever run, it silently disables linting again
+- Migration numbering collision at merge time: this branch has `009_update_school_info_content.sql`, `feat/governance` has `009_governance_items.sql` — renumber one when merging

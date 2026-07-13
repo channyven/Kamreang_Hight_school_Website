@@ -11,7 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import type { NewsCategory } from "@/types";
-import { getLocalizedText } from "@/lib/utils";
+import { getLocalizedText } from "@/utils";
 
 interface CategoryFiltersProps {
   categories: NewsCategory[];

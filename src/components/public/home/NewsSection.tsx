@@ -8,7 +8,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { News } from "@/types";
-import { formatShortDate, getLocalizedText, truncate } from "@/lib/utils";
+import { formatShortDate, getLocalizedText, truncate } from "@/utils";
 
 interface NewsSectionProps { news: News[]; }
 

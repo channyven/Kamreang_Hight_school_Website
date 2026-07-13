@@ -1,0 +1,287 @@
+
+> school-website@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.108.169:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1439ms
+ ✓ Compiled /middleware in 432ms (189 modules)
+ ○ Compiling /[locale]/about ...
+ ✓ Compiled /[locale]/about in 4.5s (2028 modules)
+ ✓ Compiled in 770ms (851 modules)
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ GET /km/about 500 in 6079ms
+ ○ Compiling /[locale] ...
+ ✓ Compiled /[locale] in 2.2s (2031 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2297980326'
+}
+ GET /km/about 500 in 1351ms
+ GET /favicon.ico 500 in 3746ms
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ GET /favicon.ico 500 in 340ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled /_not-found in 444ms (2036 modules)
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ GET /en/about 500 in 796ms
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Failed to generate static paths for /[locale]:
+[Error: Cannot find module './vendor-chunks/next.js'
+Require stack:
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/webpack-runtime.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/app/[locale]/(public)/page.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/require.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/load-components.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/utils.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/dev/static-paths-worker.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/compiled/jest-worker/processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /favicon.ico 500 in 396ms
+ ⨯ Error: Cannot find module './1331.js'
+Require stack:
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/webpack-runtime.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/app/_not-found/page.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/require.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/load-components.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/utils.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/swc/options.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/swc/index.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/config.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/next.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/app/[locale]/(public)/about/page.js:6:7422)
+    at Object.<anonymous> (.next/server/app/[locale]/(public)/about/page.js:6:7521) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/en/about'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1371ms (2384 modules)
+ GET /en/about 500 in 1876ms
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ ⨯ Error: Couldn't find next-intl config file. Please follow the instructions at https://next-intl.dev/docs/getting-started/app-router
+    at RootLayout (src/app/layout.tsx:36:33)
+  34 |   children: React.ReactNode;
+  35 | }) {
+> 36 |   const locale = await getLocale();
+     |                                 ^
+  37 |   const schoolJsonLd = generateSchoolJsonLd();
+  38 |
+  39 |   return ( {
+  digest: '2431200745'
+}
+ HEAD /en/about 500 in 921ms
+ ⨯ Failed to generate static paths for /[locale]/about:
+[Error: Cannot find module './vendor-chunks/@formatjs.js'
+Require stack:
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/webpack-runtime.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/server/app/[locale]/(public)/about/page.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/require.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/load-components.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/build/utils.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/server/dev/static-paths-worker.js
+- /Users/macbook/Desktop/Kamreang_Hight_school_Website/node_modules/next/dist/compiled/jest-worker/processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+[?25h

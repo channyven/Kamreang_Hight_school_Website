@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import type { News } from "@/types";
-import { formatShortDate, getLocalizedText } from "@/lib/utils";
+import { formatShortDate, getLocalizedText } from "@/utils";
 import { toast } from "sonner";
 import { deleteNews } from "@/actions/news";
 

@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Calendar, ArrowRight, Eye, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { News } from "@/types";
-import { formatShortDate, getLocalizedText } from "@/lib/utils";
+import { formatShortDate, getLocalizedText } from "@/utils";
 
 interface NewsGridClientProps {
   news: News[];

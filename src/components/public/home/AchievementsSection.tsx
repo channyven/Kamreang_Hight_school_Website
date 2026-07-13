@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { ArrowRight, Trophy, Medal, Award, Star, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Achievement } from "@/types";
-import { getLocalizedText, formatShortDate } from "@/lib/utils";
+import { getLocalizedText, formatShortDate } from "@/utils";
 
 const LEVEL_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
   national:   { bg: "bg-red-50 border-red-200",    text: "text-red-700",   icon: <Award className="w-3.5 h-3.5" /> },

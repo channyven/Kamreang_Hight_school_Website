@@ -1,15 +1,12 @@
 import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { locales, defaultLocale } from "@/i18n/config";
+import { defaultLocale } from "@/i18n/config";
+import { routing } from "@/i18n/routing";
 
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: "always",
-});
+const intlMiddleware = createMiddleware(routing);
 
 const ADMIN_PATH = /^\/[a-z]{2}\/admin(\/.*)?$/;
-const AUTH_PATH = /^\/[a-z]{2}\/auth(\/.*)?$/;
+const LOGIN_PATH = /^\/[a-z]{2}\/login(\/.*)?$/;
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,14 +20,14 @@ export default async function middleware(request: NextRequest) {
 
     if (!sessionCookie?.value) {
       const locale = pathname.split("/")[1] ?? defaultLocale;
-      const loginUrl = new URL(`/${locale}/auth/login`, request.url);
+      const loginUrl = new URL(`/${locale}/login`, request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  // Redirect authenticated users away from auth pages
-  if (AUTH_PATH.test(pathname)) {
+  // Redirect authenticated users away from the login page
+  if (LOGIN_PATH.test(pathname)) {
     const sessionCookie = request.cookies.get("__session");
     if (sessionCookie?.value) {
       const locale = pathname.split("/")[1] ?? defaultLocale;

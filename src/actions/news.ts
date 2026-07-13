@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { newsSchema, type NewsInput } from "@/lib/validations";
+import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";

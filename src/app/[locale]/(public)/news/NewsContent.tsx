@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { News, NewsCategory } from "@/types";
-import { getLocalizedText, formatShortDate } from "@/lib/utils";
+import { getLocalizedText, formatShortDate } from "@/utils";
 import BackToTop from "./BackToTop";
 import CategoryFilters from "./CategoryFilters";
 import NewsGridClient from "./NewsGridClient";

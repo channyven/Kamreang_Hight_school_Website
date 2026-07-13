@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, getLocalizedText, stripHtml, truncate } from "@/lib/utils";
+import { formatDate, getLocalizedText, stripHtml, truncate } from "@/utils";
 import { Calendar, Eye, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPublishedNews } from "@/lib/queries";

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Upload, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { convertGoogleDriveUrl } from "@/lib/utils";
+import { convertGoogleDriveUrl } from "@/utils";
 import { uploadImage } from "@/lib/upload";
 import { STORAGE_BUCKETS } from "@/lib/supabase";
 import { toast } from "sonner";

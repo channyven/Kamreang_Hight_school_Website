@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
 
