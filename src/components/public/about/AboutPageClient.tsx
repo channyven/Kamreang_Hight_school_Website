@@ -25,7 +25,7 @@ import {
   Star,
   HeartHandshake,
 } from "lucide-react";
-import { cn, getLocalizedText, getAvatarUrl } from "@/lib/utils";
+import { cn, getLocalizedText, getAvatarUrl } from "@/utils";
 import type { SchoolInfo, Leadership, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";

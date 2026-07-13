@@ -3,7 +3,7 @@
 import type { Control, FieldErrors } from "react-hook-form";
 import { useController } from "react-hook-form";
 import { useLocale } from "next-intl";
-import type { DocumentInput } from "@/lib/validations";
+import type { DocumentInput } from "@/schemas/validations";
 import { Label } from "@/components/ui/label";
 import {
   Select,

@@ -11,10 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/contexts/AuthContext";
-import { updateUserSchema } from "@/lib/validations";
+import { useAuth } from "@/providers/AuthContext";
+import { updateUserSchema } from "@/schemas/validations";
 import { updateUser } from "@/actions/users";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
 import type { z } from "zod";
 
 type UpdateInput = z.infer<typeof updateUserSchema>;

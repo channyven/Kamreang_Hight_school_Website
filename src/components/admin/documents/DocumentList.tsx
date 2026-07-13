@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatRelativeDate, formatFileSize } from "@/lib/utils";
+import { formatRelativeDate, formatFileSize } from "@/utils";
 import { DOCUMENT_CATEGORIES, type AppDocument } from "@/types";
 
 interface DocumentListProps {

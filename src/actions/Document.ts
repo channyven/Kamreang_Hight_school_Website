@@ -2,7 +2,7 @@
 
 import { createServerClient } from "@/lib/supabase";
 import type { AppDocument, DocumentCategory, ActionResult } from "@/types";
-import { documentSchema, type DocumentInput } from "@/lib/validations";
+import { documentSchema, type DocumentInput } from "@/schemas/validations";
 import { ensureDocumentCategory, CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
 import { revalidatePath } from "next/cache";
 

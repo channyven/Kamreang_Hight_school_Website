@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Loader2, GraduationCap, BookOpen,  Layers,  Search, Phone } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { cn, getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/utils";
 import type { Teacher } from "@/types";
 import { orgChartData } from "@/lib/mock-data";
 import {

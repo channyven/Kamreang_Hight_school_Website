@@ -73,6 +73,7 @@ export interface News {
   excerpt_km?: string;
   excerpt_en?: string;
   featured_image?: string;
+  gallery_images?: string[];
   category_id?: string;
   is_featured: boolean;
   status: ContentStatus;
@@ -214,6 +215,20 @@ export interface Teacher {
   grade_levels?: number[];
   is_active: boolean;
   sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type GovernanceSection = "governance" | "culture";
+
+export interface GovernanceItem {
+  id: string;
+  section: GovernanceSection;
+  icon: string;
+  text_km: string;
+  text_en: string;
+  sort_order: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }

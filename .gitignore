@@ -42,4 +42,10 @@ Thumbs.db
 next-env.d.ts
 
 .vercel
+.firebase-debug
+.dataconnect/
+.dataconnect-generated/
+.firebase
+.firebaserc
 .claude/
+kamrieng-highschool/

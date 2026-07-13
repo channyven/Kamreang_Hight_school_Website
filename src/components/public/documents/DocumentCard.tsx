@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useLocale } from "next-intl";
 import { Calendar, Download, FileText, FileSpreadsheet, FileImage, File } from "lucide-react";
-import { formatRelativeDate, formatFileSize } from "@/lib/utils";
+import { formatRelativeDate, formatFileSize } from "@/utils";
 import type { AppDocument } from "@/types";
 import CategoryBadge from "./CategoryBadge";
 

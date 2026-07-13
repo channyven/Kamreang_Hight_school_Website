@@ -1,7 +1,7 @@
 "use client";
 
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { DocumentInput } from "@/lib/validations";
+import type { DocumentInput } from "@/schemas/validations";
 import { Label } from "@/components/ui/label";
 
 interface ContentCardProps {

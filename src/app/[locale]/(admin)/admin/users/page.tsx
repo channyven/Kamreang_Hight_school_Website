@@ -10,10 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@/types";
-import { formatShortDate, getInitials } from "@/lib/utils";
+import { formatShortDate, getInitials } from "@/utils";
 import { toast } from "sonner";
 import { deleteUser, toggleUserActive } from "@/actions/users";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/providers/AuthContext";
 
 const ROLE_COLORS: Record<string, string> = {
   administrator: "bg-red-100 text-red-700",
