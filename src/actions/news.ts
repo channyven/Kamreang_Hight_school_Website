@@ -4,16 +4,10 @@ import { createServerClient } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
-<<<<<<< HEAD
 import { cookies } from "next/headers";
+import { requireAdmin } from "@/lib/auth-guard";
 
 // ─── Session helper ───────────────────────────────────────────
-// Decodes the Firebase ID token stored in the httpOnly __session
-// cookie (set by /api/auth/session) to extract the firebase_uid,
-// then looks up the corresponding admin_users record.
-// This does NOT verify the JWT signature; validation is delegated
-// to Firebase Auth at token-creation time and the httpOnly cookie
-// is inaccessible to XSS.
 
 async function getCurrentUser(): Promise<SessionUser | null> {
   try {
@@ -21,7 +15,6 @@ async function getCurrentUser(): Promise<SessionUser | null> {
     const token = cookieStore.get("__session")?.value;
     if (!token) return null;
 
-    // Decode the JWT payload (second base64url segment)
     const payloadBase64 = token.split(".")[1];
     if (!payloadBase64) return null;
     const payload = JSON.parse(
@@ -46,7 +39,6 @@ async function getCurrentUser(): Promise<SessionUser | null> {
 
 // ─── Helpers ───────────────────────────────────────────────────
 
-/** Transform empty strings to null so Supabase doesn't reject them */
 function sanitizeInput(
   data: NewsInput
 ): Record<string, unknown> {
@@ -54,11 +46,9 @@ function sanitizeInput(
   for (const key of ["category_id", "featured_image", "publish_date"] as const) {
     if (record[key] === "") record[key] = null;
   }
-  // Ensure gallery_images is always an array
   if (!Array.isArray(record.gallery_images)) {
     record.gallery_images = [];
   }
-  // Auto-set publish_date to now if status is published and no date was provided
   if (data.status === "published" && (!data.publish_date || data.publish_date === "")) {
     record.publish_date = new Date().toISOString();
   }
@@ -66,9 +56,6 @@ function sanitizeInput(
 }
 
 // ─── CRUD Actions ─────────────────────────────────────────────
-=======
-import { requireAdmin } from "@/lib/auth-guard";
->>>>>>> 8fcc294 (pull code)
 
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
   try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
