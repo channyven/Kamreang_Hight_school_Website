@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         setUser(null);
-        await setSessionCookie(null);
+        try { await setSessionCookie(null); } catch { /* cookie deletion failure is non-critical */ }
       }
 
       setLoading(false);
