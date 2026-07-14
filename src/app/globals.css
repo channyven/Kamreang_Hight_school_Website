@@ -114,6 +114,16 @@
   .prose-khmer {
     font-family: var(--font-battambang), "Battambang", sans-serif;
     line-height: 2;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* English prose readability */
+  .prose-english {
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   /* Scrollbar */

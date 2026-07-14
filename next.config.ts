@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ui-avatars.com",
       },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+      },
     ],
   },
 };

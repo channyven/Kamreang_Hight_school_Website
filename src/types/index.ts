@@ -155,6 +155,23 @@ export interface Leadership {
   updated_at: string;
 }
 
+export interface Milestone {
+  id: string;
+  year: string;
+  title_km: string;
+  title_en: string;
+  description_km?: string;
+  description_en?: string;
+  image_url?: string;
+  caption_km?: string;
+  caption_en?: string;
+  color?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface SchoolInfo {
   id: string;
   section: string;

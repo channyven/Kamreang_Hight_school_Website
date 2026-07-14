@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AboutPage() {
   const locale = await getLocale();
-  const [{ schoolInfo, leadership, teachers }, statistics] = await Promise.all([
+  const [{ schoolInfo, leadership, teachers, milestones }, statistics] = await Promise.all([
     getAboutPageData(),
     getCurrentStatistics(),
   ]);
@@ -20,6 +20,7 @@ export default async function AboutPage() {
       schoolInfo={schoolInfo}
       leadership={leadership}
       teachers={teachers}
+      milestones={milestones}
       statistics={statistics}
       locale={locale}
     />

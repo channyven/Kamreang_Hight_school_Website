@@ -31,6 +31,7 @@ export const STORAGE_BUCKETS = {
   ACHIEVEMENT_IMAGES: "achievement-images",
   AVATARS: "school-avatars",
   SETTINGS: "settings-images",
+  SCHOOL_IMAGES: "school-images",
 } as const;
 
 export type StorageBucket =

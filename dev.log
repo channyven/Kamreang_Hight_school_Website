@@ -1,0 +1,101 @@
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.108.169:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1497ms
+ ✓ Compiled /middleware in 290ms (189  ✓ Compiled /middleware in 174ms (189 modules)
+ ○ Compiling /[locale]/about ...
+ ✓ Compiled /[locale]/about in 3.3s (2025 modules)
+ ✓ Compiled in 292ms (849 modules)
+ GET /en/about 200 in 4342ms
+ ✓ Compiled /api/auth/session in 456ms (2013 modules)
+ DELETE /api/auth/session 200 in 594ms
+ GET /km/about 200 in 90ms
+ DELETE /api/auth/session 200 in 13ms
+ ✓ Compiled in 1214ms (2008 modules)
+ ✓ Compiled in 116ms (850 modules)
+ ✓ Compiled in 995ms (2008 modules)
+ GET /km/about 200 in 281ms
+ GET /km/about 200 in 197ms
+ GET /km/about 200 in 81ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/cache/webpack/server-development/21.pack.gz_' -> '/Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/cache/webpack/server-development/21.pack.gz'
+ ○ Compiling /[locale] ...
+ ✓ Compiled /[locale] in 816ms (2043 modules)
+ GET /en 200 in 1775ms
+ ✓ Compiled /api/auth/session in 126ms (1198 modules)
+ DELETE /api/auth/session 200 in 246ms
+ GET /en/about 200 in 88ms
+ GET /km/about 200 in 111ms
+ GET /en/about 200 in 356ms
+ DELETE /api/auth/session 200 in 13ms
+ GET /km/about 200 in 103ms
+ DELETE /api/auth/session 200 in 47ms
+ GET /en/about 200 in 36ms
+ DELETE /api/auth/session 200 in 10ms
+ GET /en/about 200 in 88ms
+ DELETE /api/auth/session 200 in 11ms
+ GET /en/about 200 in 202ms
+ GET /en/about 200 in 167ms
+ GET /km/about 200 in 108ms
+ GET /en/about 200 in 86ms
+ GET /en/about 200 in 85ms
+ ✓ Compiled in 959ms (2022 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /en/about 200 in 463ms
+ GET /en/about 200 in 628ms
+ GET /en/about 200 in 588ms
+ ✓ Compiled /api/auth/session in 106ms (1177 modules)
+ DELETE /api/auth/session 200 in 221ms
+ ✓ Compiled in 829ms (2041 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /en/about 200 in 437ms
+ GET /en/about 200 in 490ms
+ GET /en/about 200 in 110ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 749ms (2046 modules)
+ DELETE /api/auth/session 404 in 1163ms
+ GET /en/about 200 in 553ms
+ GET /en/about 200 in 874ms
+ GET /en/about 200 in 29ms
+ DELETE /api/auth/session 200 in 41ms
+ GET /en/about 200 in 188ms
+ GET /en/about 200 in 208ms
+ GET /en/about 200 in 213ms
+ DELETE /api/auth/session 200 in 12ms
+ GET /km/about 200 in 46ms
+ DELETE /api/auth/session 200 in 12ms
+ GET /en/about 200 in 100ms
+ DELETE /api/auth/session 200 in 13ms
+ ✓  ✓ Compiled in 1866ms (3844 modu GET  ⚠ Fast Refresh had t GET /en/about 200 in 79ms
+ ✓ Compiled in 1043ms (2022 modules)
+ GET /en/about 200 in 311ms
+ ✓ Compiled in 372ms (2022 modules)
+ GET /en/about 200 in 142ms
+ GET /en/about 200 in 140ms
+ GET /en/about 200 in 56ms
+ GET /en/about 200 in 391ms
+ ✓ Compiled /api/auth/session in 178ms (1177 modules)
+ DELETE /api/auth/session 200 in 361ms
+ ✓ Compiled in 949ms (2022 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /en/about 200 in 296ms
+ GET /en/about 200 in 393ms
+ GET /en/about 200 in 425ms
+ ✓ Compiled /api/auth/session in 107ms (1177 modules)
+ DELETE /api/auth/session 200 in 219ms
+ ✓ Compiled in 353ms (2041 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /en/about 200 in 247ms
+ GET /en/about 200 in 613ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled /_not-found in 370ms (2046 modules)
+ GET /en/about 200 in 550ms
+ GET /en/about 200 in 555ms
+ DELETE /api/auth/session 200 in 23ms
+ ✓ Compiled in 1584ms (2022 m ✓ Com GET /en/about 200 in 288ms
+ GET /en/about 200 in 108ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/macbook/Desktop/Kamreang_Hight_school_Website/.next/cache/webpack/server-development/0.pack.gz'
+z'
