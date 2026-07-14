@@ -1,21 +1,22 @@
 "use server";
 
-import { createServerClient } from "@/lib/supabase";
 import { teacherSchema, type TeacherInput } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
+import { TeacherService } from "@/services";
 
 export async function createTeacher(
   data: TeacherInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = teacherSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
-  const { error } = await supabase.from("teachers").insert(parsed.data);
-  if (error) return { success: false, error: error.message };
+  const error = await new TeacherService().create(parsed.data);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)/about", "page");
   revalidateTag("teachers");
@@ -26,17 +27,14 @@ export async function updateTeacher(
   id: string,
   data: TeacherInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = teacherSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
-  const { error } = await supabase
-    .from("teachers")
-    .update({ ...parsed.data, updated_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await new TeacherService().update(id, parsed.data);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)/about", "page");
   revalidateTag("teachers");
@@ -44,9 +42,9 @@ export async function updateTeacher(
 }
 
 export async function deleteTeacher(id: string): Promise<ActionResult<void>> {
-  const supabase = createServerClient();
-  const { error } = await supabase.from("teachers").delete().eq("id", id);
-  if (error) return { success: false, error: error.message };
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+  const error = await new TeacherService().remove(id);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)/about", "page");
   revalidateTag("teachers");

@@ -86,6 +86,21 @@ export const statisticsSchema = z.object({
 });
 export type StatisticsInput = z.infer<typeof statisticsSchema>;
 
+// ─── Document ──────────────────────────────────────────────────
+
+export const documentSchema = z.object({
+  title_km: z.string().min(1, "Khmer title is required").max(500),
+  title_en: z.string().min(1, "English title is required").max(500),
+  description_km: z.string().max(1000).optional().or(z.literal("")),
+  description_en: z.string().max(1000).optional().or(z.literal("")),
+  file_url: z.string().url("Must be a valid URL").min(1, "File URL is required"),
+  file_name: z.string().min(1, "File name is required").max(300),
+  category: z.enum(["report", "result", "form", "policy", "other"]).default("other"),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type DocumentInput = z.infer<typeof documentSchema>;
+
 // ─── Teacher ──────────────────────────────────────────────────
 
 export const teacherSchema = z.object({

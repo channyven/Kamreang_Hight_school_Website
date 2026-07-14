@@ -40,6 +40,7 @@ export default function Navbar() {
       { key: "governance", href: `/${locale}/governance` },
       { key: "news", href: `/${locale}/news` },
       { key: "achievements", href: `/${locale}/achievements` },
+      { key: "document", href: `/${locale}/document` },
       { key: "contact", href: `/${locale}/contact` },
     ],
     [locale]

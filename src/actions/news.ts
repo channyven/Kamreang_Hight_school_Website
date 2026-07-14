@@ -1,6 +1,8 @@
 "use server";
 
-import { createServerClient } from "@/lib/supabase";
+import { cookies } from "next/headers";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser, News, NewsCategory } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -20,7 +22,6 @@ async function getCurrentUser(): Promise<SessionUser | null> {
     const token = cookieStore.get("__session")?.value;
     if (!token) return null;
 
-    // Decode the JWT payload (second base64url segment)
     const payloadBase64 = token.split(".")[1];
     if (!payloadBase64) return null;
     const payload = JSON.parse(
@@ -29,6 +30,7 @@ async function getCurrentUser(): Promise<SessionUser | null> {
     const firebaseUid: string | undefined = payload.sub;
     if (!firebaseUid) return null;
 
+    const { createServerClient } = await import("@/lib/supabase");
     const supabase = createServerClient();
     const { data } = await supabase
       .from("admin_users")
@@ -97,12 +99,15 @@ function isSlugConflict(error: { code?: string; message: string }): boolean {
 }
 
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
   let insertData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
@@ -148,12 +153,15 @@ export async function updateNews(
   id: string,
   data: NewsInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
   let updateData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
@@ -200,20 +208,22 @@ export async function updateNews(
 }
 
 export async function deleteNews(id: string): Promise<ActionResult<void>> {
-  const supabase = createServerClient();
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
 
-  const { error } = await supabase.from("news").delete().eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await newsService.remove(id);
+  if (error) return { success: false, error };
 
-  // Audit log
   if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
+    await auditService.log({
+      userId: user.id,
+      userEmail: user.email,
       action: "delete",
-      table_name: "news",
-      record_id: id,
+      tableName: "news",
+      recordId: id,
     });
   }
 

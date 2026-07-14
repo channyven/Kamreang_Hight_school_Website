@@ -6,6 +6,7 @@
     "news": "ព័ត៌មាន",
     "achievements": "សិទ្ធិសម្រេច",
     "contact": "ទំនាក់ទំនង",
+    "document": "ឯកសារ",
     "donate": "បរិច្ចាគ",
     "admin": "ផ្ទាំងគ្រប់គ្រង"
   },
@@ -126,6 +127,7 @@
     "governance": "អភិបាលកិច្ច",
     "messages": "សារ",
     "settings": "ការកំណត់",
+    "documents": "ឯកសារ",
     "audit_logs": "កំណត់ហេតុ",
     "logout": "ចេញ",
     "profile": "ប្រវត្តិ"

@@ -39,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning>
-      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`} suppressHydrationWarning>
         {children}
       </body>
     </html>
