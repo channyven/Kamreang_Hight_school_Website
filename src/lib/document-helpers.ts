@@ -1,5 +1,5 @@
 import { createServerClient } from "@/lib/supabase";
-import { DOCUMENT_CATEGORIES, type DocumentCategory } from "@/types";
+import type { DocumentCategory } from "@/types";
 
 /**
  * Map our string categories to download_category slugs.

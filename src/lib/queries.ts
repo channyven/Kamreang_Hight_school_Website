@@ -5,9 +5,6 @@ import {
   mockSchoolInfo,
   mockLeadership,
   mockTeachers,
-  mockAchievements,
-  mockNews,
-  mockNewsCategories,
   mockStats,
   mockGovernanceItems,
 } from "@/lib/mock-data";
@@ -48,13 +45,17 @@ export const getAboutPageData = unstable_cache(
       // Check if Supabase data is still placeholder/seed content (e.g. "Phnom Penh High School")
       // If so, fall back to mock data which has the correct Kamrieng High School content
       const hasPlaceholderData = info?.some(
-        (row: any) =>
-          row.content_en?.includes("Phnom Penh") ||
-          row.content_en?.includes("established in 1960")
+        (row: Record<string, unknown>) =>
+          typeof row.content_en === "string" &&
+          (row.content_en.includes("Phnom Penh") ||
+          row.content_en.includes("established in 1960"))
       );
 
       // Check if teachers have grade_levels — Supabase data likely doesn't
-      const hasGradeLevels = teacherRows?.some((t: any) => t.grade_levels && t.grade_levels.length > 0);
+      const hasGradeLevels = teacherRows?.some(
+        (t: Record<string, unknown>) =>
+          Array.isArray(t.grade_levels) && t.grade_levels.length > 0
+      );
 
       return {
         schoolInfo: info && info.length > 0 && !hasPlaceholderData
@@ -86,11 +87,9 @@ export const getPublishedAchievements = unstable_cache(
         .select("*")
         .eq("status", "published")
         .order("achievement_date", { ascending: false });
-      return data && data.length > 0
-        ? (data as Achievement[])
-        : mockAchievements.filter((a) => a.status === "published");
+      return (data ?? []) as Achievement[];
     } catch {
-      return mockAchievements.filter((a) => a.status === "published");
+      return [];
     }
   },
   ["published-achievements"],
@@ -101,20 +100,25 @@ export const getPublishedNews = unstable_cache(
   async (): Promise<News[]> => {
     try {
       const supabase = createServerClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("news")
         .select("*, category:news_categories(*)")
         .eq("status", "published")
         .order("publish_date", { ascending: false });
-      return data && data.length > 0
-        ? (data as News[])
-        : mockNews.filter((n) => n.status === "published");
-    } catch {
-      return mockNews.filter((n) => n.status === "published");
+
+      if (error) {
+        console.error("[getPublishedNews] Supabase query failed:", error);
+        return [];
+      }
+
+      return data ? (data as News[]) : [];
+    } catch (err) {
+      console.error("[getPublishedNews] Unexpected error:", err);
+      return [];
     }
   },
   ["published-news"],
-  { tags: ["news"], revalidate: 60 }
+  { tags: ["news"], revalidate: 30 }
 );
 
 export const getNewsCategories = unstable_cache(
@@ -122,9 +126,9 @@ export const getNewsCategories = unstable_cache(
     try {
       const supabase = createServerClient();
       const { data } = await supabase.from("news_categories").select("*").order("sort_order");
-      return data && data.length > 0 ? (data as NewsCategory[]) : mockNewsCategories;
+      return (data ?? []) as NewsCategory[];
     } catch {
-      return mockNewsCategories;
+      return [];
     }
   },
   ["news-categories"],

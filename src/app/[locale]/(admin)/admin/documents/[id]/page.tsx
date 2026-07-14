@@ -15,7 +15,7 @@ import { documentSchema } from "@/schemas/validations";
 import ContentCard from "@/components/admin/documents/ContentCard";
 import FileCard from "@/components/admin/documents/FileCard";
 import SettingsCard from "@/components/admin/documents/SettingsCard";
-import type { AppDocument, DocumentCategory } from "@/types";
+import type { DocumentCategory } from "@/types";
 
 interface PageProps {
   params: Promise<{ id: string }>;

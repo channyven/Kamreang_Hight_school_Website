@@ -57,11 +57,6 @@ function isImageFile(fileName?: string | null): boolean {
   );
 }
 
-/** Determine if the file is a PDF. */
-function isPdfFile(fileName?: string | null): boolean {
-  return getExtension(fileName) === "pdf";
-}
-
 /** Determine if the file is viewable in an iframe. */
 function isViewableInIframe(fileName?: string | null): boolean {
   const ext = getExtension(fileName);

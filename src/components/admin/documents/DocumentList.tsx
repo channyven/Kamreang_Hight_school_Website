@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeDate, formatFileSize } from "@/utils";
-import { DOCUMENT_CATEGORIES, type AppDocument } from "@/types";
+import type { AppDocument } from "@/types";
 import Link from "next/link";
 
 interface DocumentListProps {

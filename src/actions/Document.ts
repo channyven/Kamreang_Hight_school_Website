@@ -5,6 +5,7 @@ import type { AppDocument, DocumentCategory, ActionResult } from "@/types";
 import { documentSchema, type DocumentInput } from "@/schemas/validations";
 import { ensureDocumentCategory, CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 
 /**
  * Fetch a single document by ID.
@@ -79,6 +80,7 @@ export async function getDocuments(params?: {
 export async function createDocument(
   data: DocumentInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = documentSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -164,6 +166,7 @@ export async function updateDocument(
 export async function deleteDocument(
   id: string
 ): Promise<ActionResult> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase.from("downloads").delete().eq("id", id);
 

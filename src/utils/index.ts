@@ -121,14 +121,20 @@ export function buildStorageUrl(path: string): string {
  * Convert a Google Drive share link to a direct image URL suitable
  * for <img> or Next.js <Image>.
  *
- * Google Drive's uc?id= endpoint is unreliable (virus-scan page, auth
- * prompts, etc.).  The /thumbnail?id= endpoint is more consistent for
- * image display, while still requiring the file to be publicly shared.
+ * The returned URL uses Google's usercontent domain which serves the raw
+ * file directly (200 OK) instead of the thumbnail endpoint which returns
+ * a 302 redirect that some browsers / Next.js Image have trouble following.
+ *
+ * The file MUST be publicly shared ("Anyone with the link can view").
  *
  * Accepted input formats:
  *   https://drive.google.com/file/d/FILE_ID/view
  *   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
  *   https://drive.google.com/open?id=FILE_ID
+ *   https://drive.google.com/thumbnail?id=FILE_ID&sz=...
+ *   https://drive.google.com/uc?id=FILE_ID
+ *   https://drive.usercontent.google.com/download?id=FILE_ID&export=view
+ *   https://lh3.googleusercontent.com/d/FILE_ID=...
  *
  * If the input is not a recognised Google Drive link, returns it unchanged.
  */
@@ -141,15 +147,20 @@ export function convertGoogleDriveUrl(url: string): string {
     // Already a known direct format – return as-is
     if (
       url.startsWith("https://drive.google.com/thumbnail?id=") ||
-      url.startsWith("https://drive.google.com/uc?id=")
+      url.startsWith("https://drive.google.com/uc?id=") ||
+      url.startsWith("https://drive.usercontent.google.com/download?id=") ||
+      url.startsWith("https://lh3.googleusercontent.com/d/")
     ) {
       return url;
     }
     return url;
   }
 
-  // Thumbnail endpoint is more reliable for embedding images
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+  // Google Drive blocks hotlinking when browsers send Sec-Fetch-* headers.
+  // Serve the image through our own API proxy which fetches it server-side
+  // (without those headers) and returns it as a same-origin response.
+  const directUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=view`;
+  return `/api/proxy-image?url=${encodeURIComponent(directUrl)}`;
 }
 
 /**
@@ -163,9 +174,9 @@ function extractGoogleDriveFileId(url: string): string | null {
   );
   if (fileMatch) return fileMatch[1];
 
-  // Pattern 2: /open?id=FILE_ID
-  const openMatch = url.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
-  if (openMatch && url.includes("/open")) return openMatch[1];
+  // Pattern 2: /open?id=FILE_ID or /download?id=FILE_ID
+  const queryIdMatch = url.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
+  if (queryIdMatch && (url.includes("/open") || url.includes("/download"))) return queryIdMatch[1];
 
   return null;
 }

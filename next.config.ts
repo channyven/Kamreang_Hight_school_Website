@@ -4,12 +4,6 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -41,6 +35,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "drive.google.com",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "drive.usercontent.google.com",
+        pathname: "/download/**",
       },
     ],
   },

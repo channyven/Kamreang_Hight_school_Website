@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { convertGoogleDriveUrl } from "@/utils";
-import { uploadImage } from "@/lib/upload";
-import { STORAGE_BUCKETS } from "@/lib/supabase";
-import { toast } from "sonner";
 
 interface PhotoGalleryProps {
   images: string[];
@@ -18,17 +15,17 @@ interface PhotoGalleryProps {
 
 export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoGalleryProps) {
   const [newUrl, setNewUrl] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showError, setShowError] = useState(false);
 
   const addImage = () => {
     const url = newUrl.trim();
-    if (!url) return;
+    if (!url) {
+      setShowError(true);
+      return;
+    }
 
-    // Convert Google Drive links
     const converted = convertGoogleDriveUrl(url);
 
-    // Avoid duplicates
     if (images.includes(converted)) {
       setNewUrl("");
       return;
@@ -36,62 +33,7 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
 
     onChange([...images, converted]);
     setNewUrl("");
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const fileArray = Array.from(files);
-    setUploading(true);
-    let uploaded = 0;
-    const errors: string[] = [];
-
-    // Upload all files in parallel
-    const uploadPromises = fileArray.map(async (file) => {
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const result = await uploadImage(formData, STORAGE_BUCKETS.NEWS_IMAGES, "gallery");
-        return { url: result.url, error: null };
-      } catch (err) {
-        return { url: null, error: err instanceof Error ? err.message : `${file.name} failed` };
-      }
-    });
-
-    const results = await Promise.all(uploadPromises);
-
-    const newImages = [...images];
-    results.forEach((r) => {
-      if (r.url && !newImages.includes(r.url)) {
-        newImages.push(r.url);
-        uploaded++;
-      } else if (r.error) {
-        errors.push(r.error);
-      }
-    });
-    if (uploaded > 0) {
-      onChange(newImages);
-    }
-
-    if (uploaded > 0) {
-      toast.success(
-        locale === "km"
-          ? `បានបញ្ចូល ${uploaded} រូបភាព`
-          : `${uploaded} image${uploaded > 1 ? "s" : ""} uploaded`
-      );
-    }
-
-    if (errors.length > 0) {
-      toast.error(
-        locale === "km"
-          ? `បរាជ័យ ${errors.length} រូបភាព`
-          : `${errors.length} upload${errors.length > 1 ? "s" : ""} failed`
-      );
-    }
-
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    setShowError(false);
   };
 
   const removeImage = (index: number) => {
@@ -116,42 +58,19 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
 
   return (
     <div className="space-y-3">
-      {/* Upload + URL row */}
+      {/* URL input row */}
       <div className="flex gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="shrink-0"
-        >
-          {uploading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Upload className="w-4 h-4" />
-          )}
-          <span className="ml-1 hidden sm:inline">
-            {uploading
-              ? (locale === "km" ? "កំពុងបញ្ចូល..." : "Uploading...")
-              : (locale === "km" ? "បញ្ចូលច្រើន" : "Upload All")}
-          </span>
-        </Button>
         <div className="flex-1 relative">
+          <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
           <Input
             value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
+            onChange={(e) => {
+              setNewUrl(e.target.value);
+              if (showError) setShowError(false);
+            }}
             onKeyDown={handleKeyDown}
-            placeholder={locale === "km" ? "តំណ Google Drive ឬ URL" : "Paste URL or Google Drive link"}
-            className="pr-8 text-sm"
+            placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link..."}
+            className={`pl-9 pr-8 text-sm ${showError ? "border-red-400 focus-visible:ring-red-400" : ""}`}
           />
         </div>
         <Button
@@ -167,9 +86,17 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
 
       <p className="text-[10px] text-gray-400 leading-tight -mt-1.5">
         {locale === "km"
-          ? "💡 អ្នកអាចជ្រើសរើសរូបភាពច្រើនក្នុងពេលតែមួយ"
-          : "💡 Select multiple images at once from your computer"}
+          ? "💡 បិទភ្ជាប់តំណ Google Drive ដោយផ្ទាល់ — វានឹងបម្លែងដោយស្វ័យប្រវត្តិ"
+          : "💡 Paste Google Drive links — they will be auto-converted"}
       </p>
+      {showError && (
+        <p className="text-[11px] text-red-500 font-medium flex items-center gap-1 -mt-1">
+          <AlertTriangle className="w-3 h-3 shrink-0" />
+          {locale === "km"
+            ? "សូមបញ្ចូលតំណរូបភាពមុនពេលចុចបន្ថែម"
+            : "Please enter an image URL before clicking Add"}
+        </p>
+      )}
 
       {images.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 rounded-lg border border-dashed border-gray-200 bg-gray-50/50">
@@ -178,7 +105,7 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
             {locale === "km" ? "មិនទាន់មានរូបភាពទេ" : "No gallery images yet"}
           </p>
           <p className="text-[10px] text-gray-300 mt-0.5">
-            {locale === "km" ? "បន្ថែមតំណភ្ជាប់ Google Drive ឬ URL រូបភាព" : "Add Google Drive links or image URLs above"}
+            {locale === "km" ? "បន្ថែមតំណ Google Drive ខាងលើ" : "Add Google Drive links above"}
           </p>
         </div>
       ) : (
@@ -195,6 +122,8 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
           ))}
         </div>
       )}
+
+
     </div>
   );
 }
@@ -213,7 +142,6 @@ function GalleryImageCard({ url, index, total, onRemove, onMove }: GalleryImageC
 
   return (
     <div className="group relative aspect-[4/3] rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
-      {/* Reorder buttons */}
       <div className="absolute top-1 left-1 z-20 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           type="button"
@@ -233,7 +161,6 @@ function GalleryImageCard({ url, index, total, onRemove, onMove }: GalleryImageC
         </button>
       </div>
 
-      {/* Delete button */}
       <button
         type="button"
         onClick={() => onRemove(index)}
@@ -242,19 +169,16 @@ function GalleryImageCard({ url, index, total, onRemove, onMove }: GalleryImageC
         <Trash2 className="w-3 h-3" />
       </button>
 
-      {/* Index badge */}
       <div className="absolute bottom-1 left-1 z-10 px-1.5 py-0.5 rounded bg-black/40 text-white text-[10px] font-medium">
         #{index + 1}
       </div>
 
-      {/* Loading spinner */}
       {!loaded && !error && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
           <div className="w-5 h-5 border-2 border-school-blue-800 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
-      {/* Error state */}
       {error ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 bg-red-50 p-2">
           <AlertTriangle className="w-4 h-4 text-red-300" />

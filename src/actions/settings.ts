@@ -3,12 +3,14 @@
 import { createServerClient } from "@/lib/supabase";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export async function upsertSetting(
   key: string,
   value: string,
   description?: string
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("settings")
@@ -28,6 +30,7 @@ export async function upsertSchoolInfo(
   contentKm: string,
   contentEn: string
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("school_info")
@@ -61,6 +64,7 @@ export async function updateLeadership(
     is_active: boolean;
   }
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("leadership")
