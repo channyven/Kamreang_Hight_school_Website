@@ -3,10 +3,11 @@
 import { cookies } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
+import { createServerClient } from "@/lib/supabase";
+import { NewsService } from "@/services/news.service";
+import { AuditService } from "@/services/audit.service";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
-import type { ActionResult, SessionUser, News, NewsCategory } from "@/types";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
+import type { ActionResult, SessionUser, News } from "@/types";
 
 // ─── Session helper ───────────────────────────────────────────
 // Decodes the Firebase ID token stored in the httpOnly __session
@@ -30,7 +31,6 @@ async function getCurrentUser(): Promise<SessionUser | null> {
     const firebaseUid: string | undefined = payload.sub;
     if (!firebaseUid) return null;
 
-    const { createServerClient } = await import("@/lib/supabase");
     const supabase = createServerClient();
     const { data } = await supabase
       .from("admin_users")
@@ -106,8 +106,7 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const newsService = new NewsService();
-  const auditService = new AuditService();
+  const supabase = createServerClient();
   const user = await getCurrentUser();
   let insertData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
@@ -160,8 +159,7 @@ export async function updateNews(
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const newsService = new NewsService();
-  const auditService = new AuditService();
+  const supabase = createServerClient();
   const user = await getCurrentUser();
   let updateData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
