@@ -8,11 +8,10 @@ import { Plus, Search, Eye, Edit, Trash2, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
 import type { News } from "@/types";
 import { formatShortDate, getLocalizedText } from "@/utils";
 import { toast } from "sonner";
-import { deleteNews } from "@/actions/news";
+import { deleteNews, getAdminNewsList } from "@/actions/news";
 
 const STATUS_COLORS: Record<string, "default" | "success" | "warning" | "destructive"> = {
   published: "success",
@@ -29,15 +28,13 @@ export default function AdminNewsPage() {
 
   const fetchNews = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from("news")
-      .select("*, category:news_categories(*)")
-      .order("created_at", { ascending: false });
+    // Use server action (service role) to bypass RLS that restricts anon to published only
+    const allItems = await getAdminNewsList();
+    let items = allItems;
 
-    if (statusFilter !== "all") query = query.eq("status", statusFilter);
-
-    const { data } = await query;
-    let items = (data ?? []) as News[];
+    if (statusFilter !== "all") {
+      items = items.filter((n) => n.status === statusFilter);
+    }
 
     if (search) {
       const q = search.toLowerCase();
