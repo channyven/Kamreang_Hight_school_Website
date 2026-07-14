@@ -100,7 +100,6 @@ export async function createDocument(
     file_url: parsed.data.file_url,
     file_name: parsed.data.file_name,
     category_id: categoryId,
-    sort_order: parsed.data.sort_order ?? 0,
     is_active: parsed.data.is_active,
   });
 
@@ -144,7 +143,6 @@ export async function updateDocument(
       file_url: parsed.data.file_url,
       file_name: parsed.data.file_name,
       category_id: categoryId,
-      sort_order: parsed.data.sort_order ?? 0,
       is_active: parsed.data.is_active,
       updated_at: new Date().toISOString(),
     })
