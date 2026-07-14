@@ -6,11 +6,10 @@ import { Search, Trash2, Loader2, Mail, MailOpen, CheckCircle, Clock } from "luc
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
 import type { Message } from "@/types";
 import { formatRelativeDate } from "@/utils";
 import { toast } from "sonner";
-import { markMessageRead, markMessageReplied, deleteMessage } from "@/actions/messages";
+import { getMessages, markMessageRead, markMessageReplied, deleteMessage } from "@/actions/messages";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const STATUS_BADGE: Record<string, { variant: "default" | "success" | "warning" | "destructive"; icon: React.ReactNode }> = {
@@ -29,10 +28,7 @@ export default function AdminMessagesPage() {
 
   const fetchMessages = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from("messages").select("*").order("created_at", { ascending: false });
-    if (statusFilter !== "all") query = query.eq("status", statusFilter);
-    const { data } = await query;
-    let list = (data ?? []) as Message[];
+    let list = await getMessages({ status: statusFilter });
     if (search) {
       const q = search.toLowerCase();
       list = list.filter((m) => m.name?.toLowerCase().includes(q) || m.email?.toLowerCase().includes(q) || m.subject?.toLowerCase().includes(q));
@@ -169,11 +165,7 @@ export default function AdminMessagesPage() {
                         <CheckCircle className="w-4 h-4 mr-1" />Mark as Replied
                       </Button>
                     )}
-                    <Button asChild size="sm" className="bg-school-blue-800 hover:bg-school-blue-900">
-                      <a href={`mailto:${selected.email}?subject=Re: ${selected.subject}`}>
-                        <Mail className="w-4 h-4 mr-1" />Reply via Email
-                      </a>
-                    </Button>
+
                   </div>
                 </div>
               </div>

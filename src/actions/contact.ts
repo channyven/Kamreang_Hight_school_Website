@@ -3,6 +3,7 @@
 import nodemailer from "nodemailer";
 import { contactSchema } from "@/schemas/validations";
 import { sendTelegramNotification } from "@/lib/telegram";
+import { createServerClient } from "@/lib/supabase";
 import type { ActionResult } from "@/types";
 
 export async function submitContactMessage(
@@ -18,6 +19,27 @@ export async function submitContactMessage(
 
   const { name, phone, email, subject, message } = parsed.data;
   const errors: string[] = [];
+
+  // ─── Persist to database (messages table) ───────────────────
+  // This ensures the message appears in the admin messages inbox.
+  try {
+    const supabase = createServerClient();
+    const { error: dbError } = await supabase.from("messages").insert({
+      name,
+      email,
+      phone: phone || null,
+      subject,
+      message,
+      status: "unread",
+    });
+    if (dbError) {
+      console.error("Database insert error:", dbError);
+      errors.push("Failed to save message");
+    }
+  } catch (error) {
+    console.error("Database insert error:", error);
+    errors.push("Failed to save message");
+  }
 
   // ─── Send Email ──────────────────────────────────────────────
   try {
