@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Link2 } from "lucide-react";
+import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Link2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { convertGoogleDriveUrl } from "@/utils";
 
 interface PhotoGalleryProps {
@@ -15,10 +23,14 @@ interface PhotoGalleryProps {
 
 export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoGalleryProps) {
   const [newUrl, setNewUrl] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   const addImage = () => {
     const url = newUrl.trim();
-    if (!url) return;
+    if (!url) {
+      setShowAlert(true);
+      return;
+    }
 
     const converted = convertGoogleDriveUrl(url);
 
@@ -63,6 +75,7 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
             onKeyDown={handleKeyDown}
             placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link..."}
             className="pl-9 pr-8 text-sm"
+            data-gallery-url-input
           />
         </div>
         <Button
@@ -106,6 +119,56 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
           ))}
         </div>
       )}
+
+      {/* ─── Empty URL Alert Dialog ─── */}
+      <Dialog open={showAlert} onOpenChange={setShowAlert}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-base">
+                  {locale === "km" ? "ត្រូវការតំណរូបភាព" : "Image URL Required"}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-gray-500 mt-0.5">
+                  {locale === "km"
+                    ? "សូមបញ្ចូលតំណរូបភាព Google Drive មុនពេលចុចបន្ថែម"
+                    : "Please paste a Google Drive image link before clicking Add"}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <DialogFooter className="sm:justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAlert(false)}
+              className="min-w-[100px]"
+            >
+              <X className="w-4 h-4 mr-1.5" />
+              {locale === "km" ? "បិទ" : "Close"}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowAlert(false);
+                // Focus the input field after closing
+                setTimeout(() => {
+                  const input = document.querySelector<HTMLInputElement>(
+                    "[data-gallery-url-input]"
+                  );
+                  input?.focus();
+                }, 100);
+              }}
+              className="bg-school-blue-800 hover:bg-school-blue-900 min-w-[100px]"
+            >
+              <Link2 className="w-4 h-4 mr-1.5" />
+              {locale === "km" ? "យល់ព្រម" : "OK"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

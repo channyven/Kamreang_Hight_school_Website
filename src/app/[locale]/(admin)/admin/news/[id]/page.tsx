@@ -20,6 +20,7 @@ import {
   Archive,
   Sparkles,
   Link as LinkIcon,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,14 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { generateUniqueSlug, convertGoogleDriveUrl } from "@/utils";
 import PhotoGallery from "@/components/admin/PhotoGallery";
 import { createNews, updateNews, getAdminNewsById } from "@/actions/news";
@@ -65,6 +74,8 @@ export default function NewsFormPage({ params }: PageProps) {
   const [existingSlugs, setExistingSlugs] = useState<string[]>([]);
 
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const [showImageDialog, setShowImageDialog] = useState(false);
+  const [pendingImageUrl, setPendingImageUrl] = useState("");
 
   const {
     register,
@@ -132,7 +143,7 @@ export default function NewsFormPage({ params }: PageProps) {
     init();
   }, [id, isNew, setValue]);
 
-  const onSubmit = async (data: NewsInput) => {
+  const doSubmit = async (data: NewsInput) => {
     const result = isNew
       ? await createNews(data)
       : await updateNews(id, data);
@@ -143,6 +154,26 @@ export default function NewsFormPage({ params }: PageProps) {
     } else {
       toast.error(result.error ?? "Failed to save");
     }
+  };
+
+  const onSubmit = async (data: NewsInput) => {
+    // If featured_image is empty, show the image dialog
+    if (!data.featured_image || data.featured_image.trim() === "") {
+      setPendingImageUrl("");
+      setShowImageDialog(true);
+      return;
+    }
+    await doSubmit(data);
+  };
+
+  const handleImageDialogConfirm = async () => {
+    if (pendingImageUrl.trim()) {
+      const converted = convertGoogleDriveUrl(pendingImageUrl.trim());
+      setValue("featured_image", converted);
+    }
+    setShowImageDialog(false);
+    // Small delay lets react-hook-form register the updated value before re-submitting
+    setTimeout(() => handleSubmit(doSubmit)(), 0);
   };
 
   const activeStatusMeta = STATUS_OPTIONS.find((s) => s.value === currentStatus);
@@ -507,6 +538,11 @@ export default function NewsFormPage({ params }: PageProps) {
                 <h2 className="font-semibold text-gray-900 text-sm">
                   {locale === "km" ? "រូបភាពតំណាង" : "Featured Image"}
                 </h2>
+                {watch("featured_image") && (
+                  <span className="ml-auto text-[10px] text-emerald-500 font-medium">
+                    ✓ {locale === "km" ? "មាន" : "Set"}
+                  </span>
+                )}
               </div>
               <div className="p-5">
                 <Input
@@ -585,6 +621,79 @@ export default function NewsFormPage({ params }: PageProps) {
           </div>
         </div>
       </form>
+
+      {/* ─── Featured Image Required Dialog ─── */}
+      <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg">
+                  {locale === "km" ? "ត្រូវការរូបភាពតំណាង" : "Featured Image Required"}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-gray-500 mt-0.5">
+                  {locale === "km"
+                    ? "សូមបញ្ចូលតំណរូបភាពមុនពេលចុចរក្សាទុក"
+                    : "Please enter an image URL before saving"}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="py-2">
+            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5 block">
+              {locale === "km" ? "តំណរូបភាព" : "Image URL"}
+            </Label>
+            <div className="relative">
+              <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+              <Input
+                value={pendingImageUrl}
+                onChange={(e) => setPendingImageUrl(e.target.value)}
+                placeholder={
+                  locale === "km"
+                    ? "បិទភ្ជាប់តំណ Google Drive..."
+                    : "Paste Google Drive link..."
+                }
+                className="pl-9 text-sm"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleImageDialogConfirm();
+                  }
+                }}
+              />
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1.5">
+              {locale === "km"
+                ? "ចម្លងតំណរូបភាពពី Google Drive ឬប្រភពផ្សេងទៀត"
+                : "Copy the image link from Google Drive or other sources"}
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowImageDialog(false);
+                setTimeout(() => handleSubmit(doSubmit)(), 0);
+              }}
+            >
+              {locale === "km" ? "រំលង" : "Skip"}
+            </Button>
+            <Button
+              onClick={handleImageDialogConfirm}
+              disabled={!pendingImageUrl.trim()}
+              className="bg-school-blue-800 hover:bg-school-blue-900"
+            >
+              <Save className="w-4 h-4 mr-1.5" />
+              {locale === "km" ? "រក្សាទុក" : "Save & Continue"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
