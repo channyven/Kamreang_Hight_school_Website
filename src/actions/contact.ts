@@ -2,7 +2,6 @@
 
 import nodemailer from "nodemailer";
 import { contactSchema } from "@/schemas/validations";
-import { sendTelegramNotification } from "@/lib/telegram";
 import { createServerClient } from "@/lib/supabase";
 import type { ActionResult } from "@/types";
 
@@ -72,19 +71,6 @@ export async function submitContactMessage(
   } catch (error) {
     console.error("Email send error:", error);
     errors.push("Failed to send email");
-  }
-
-  // ─── Send Telegram Notification ──────────────────────────────
-  const telegramSent = await sendTelegramNotification(
-    name,
-    phone,
-    email,
-    subject,
-    message
-  );
-
-  if (!telegramSent && process.env.TELEGRAM_BOT_TOKEN) {
-    console.warn("Telegram notification failed — email may still have sent.");
   }
 
   if (errors.length > 0) {
