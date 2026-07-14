@@ -240,3 +240,18 @@ export async function getAdminNewsList(): Promise<News[]> {
     return [];
   }
 }
+
+/** Fetch a single news item by ID using the service role (bypasses RLS) */
+export async function getAdminNewsById(id: string): Promise<News | null> {
+  try {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from("news")
+      .select("*, category:news_categories(*)")
+      .eq("id", id)
+      .single();
+    return data as News | null;
+  } catch {
+    return null;
+  }
+}

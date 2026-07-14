@@ -39,7 +39,7 @@ import { supabase } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import { generateUniqueSlug, convertGoogleDriveUrl } from "@/utils";
 import PhotoGallery from "@/components/admin/PhotoGallery";
-import { createNews, updateNews } from "@/actions/news";
+import { createNews, updateNews, getAdminNewsById } from "@/actions/news";
 import type { NewsCategory } from "@/types";
 import { useRouter as useNextRouter } from "next/navigation";
 
@@ -114,11 +114,7 @@ export default function NewsFormPage({ params }: PageProps) {
       }
 
       if (!isNew) {
-        const { data } = await supabase
-          .from("news")
-          .select("*")
-          .eq("id", id)
-          .single();
+        const data = await getAdminNewsById(id);
         if (data) {
           Object.entries(data).forEach(([k, v]) => {
             if (v === null) return;
