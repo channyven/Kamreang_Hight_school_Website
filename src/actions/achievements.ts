@@ -1,10 +1,10 @@
 "use server";
 
-import { createServerClient } from "@/lib/supabase";
 import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
+import { AchievementService } from "@/services";
 
 export async function createAchievement(
   data: AchievementInput
@@ -15,9 +15,8 @@ export async function createAchievement(
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
-  const { error } = await supabase.from("achievements").insert(parsed.data);
-  if (error) return { success: false, error: error.message };
+  const error = await new AchievementService().create(parsed.data);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)", "page");
   revalidateTag("achievements");
@@ -34,12 +33,8 @@ export async function updateAchievement(
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
-  const { error } = await supabase
-    .from("achievements")
-    .update({ ...parsed.data, updated_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await new AchievementService().update(id, parsed.data);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)", "page");
   revalidateTag("achievements");
@@ -50,9 +45,8 @@ export async function deleteAchievement(
   id: string
 ): Promise<ActionResult<void>> {
   try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
-  const supabase = createServerClient();
-  const { error } = await supabase.from("achievements").delete().eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await new AchievementService().remove(id);
+  if (error) return { success: false, error };
 
   revalidatePath("/[locale]/(public)", "page");
   revalidateTag("achievements");

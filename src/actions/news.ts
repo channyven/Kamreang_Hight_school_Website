@@ -1,13 +1,11 @@
 "use server";
 
-import { createServerClient } from "@/lib/supabase";
+import { cookies } from "next/headers";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser } from "@/types";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
-import { requireAdmin } from "@/lib/auth-guard";
-
-// ─── Session helper ───────────────────────────────────────────
+import { NewsService, AuditService } from "@/services";
 
 async function getCurrentUser(): Promise<SessionUser | null> {
   try {
@@ -23,6 +21,7 @@ async function getCurrentUser(): Promise<SessionUser | null> {
     const firebaseUid: string | undefined = payload.sub;
     if (!firebaseUid) return null;
 
+    const { createServerClient } = await import("@/lib/supabase");
     const supabase = createServerClient();
     const { data } = await supabase
       .from("admin_users")
@@ -37,51 +36,27 @@ async function getCurrentUser(): Promise<SessionUser | null> {
   }
 }
 
-// ─── Helpers ───────────────────────────────────────────────────
-
-function sanitizeInput(
-  data: NewsInput
-): Record<string, unknown> {
-  const record = { ...data } as Record<string, unknown>;
-  for (const key of ["category_id", "featured_image", "publish_date"] as const) {
-    if (record[key] === "") record[key] = null;
-  }
-  if (!Array.isArray(record.gallery_images)) {
-    record.gallery_images = [];
-  }
-  if (data.status === "published" && (!data.publish_date || data.publish_date === "")) {
-    record.publish_date = new Date().toISOString();
-  }
-  return record;
-}
-
-// ─── CRUD Actions ─────────────────────────────────────────────
-
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
   try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
-  const insertData = {
-    ...sanitizeInput(parsed.data),
-    created_by: user?.id ?? null,
-    updated_by: user?.id ?? null,
-  };
 
-  const { error } = await supabase.from("news").insert(insertData);
-  if (error) return { success: false, error: error.message };
+  const error = await newsService.create(parsed.data, user?.id);
+  if (error) return { success: false, error };
 
-  // Audit log
   if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
+    await auditService.log({
+      userId: user.id,
+      userEmail: user.email,
       action: "create",
-      table_name: "news",
+      tableName: "news",
     });
   }
 
@@ -96,33 +71,26 @@ export async function updateNews(
   data: NewsInput
 ): Promise<ActionResult<void>> {
   try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
-  const supabase = createServerClient();
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
-  const updateData = {
-    ...sanitizeInput(parsed.data),
-    updated_at: new Date().toISOString(),
-    updated_by: user?.id ?? null,
-  };
 
-  const { error } = await supabase
-    .from("news")
-    .update(updateData)
-    .eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await newsService.update(id, parsed.data, user?.id);
+  if (error) return { success: false, error };
 
-  // Audit log
   if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
+    await auditService.log({
+      userId: user.id,
+      userEmail: user.email,
       action: "update",
-      table_name: "news",
-      record_id: id,
+      tableName: "news",
+      recordId: id,
     });
   }
 
@@ -134,20 +102,21 @@ export async function updateNews(
 
 export async function deleteNews(id: string): Promise<ActionResult<void>> {
   try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
-  const supabase = createServerClient();
+
+  const newsService = new NewsService();
+  const auditService = new AuditService();
   const user = await getCurrentUser();
 
-  const { error } = await supabase.from("news").delete().eq("id", id);
-  if (error) return { success: false, error: error.message };
+  const error = await newsService.remove(id);
+  if (error) return { success: false, error };
 
-  // Audit log
   if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
+    await auditService.log({
+      userId: user.id,
+      userEmail: user.email,
       action: "delete",
-      table_name: "news",
-      record_id: id,
+      tableName: "news",
+      recordId: id,
     });
   }
 

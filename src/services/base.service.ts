@@ -1,0 +1,79 @@
+import { createServerClient } from "@/lib/supabase";
+import type { PostgrestSingleResponse } from "@supabase/supabase-js";
+
+export class BaseService {
+  protected supabase = createServerClient();
+
+  protected async getAll<T>(
+    table: string,
+    options?: {
+      orderBy?: string;
+      ascending?: boolean;
+      filters?: Record<string, unknown>;
+    }
+  ): Promise<T[]> {
+    let query = this.supabase.from(table).select("*");
+
+    if (options?.orderBy) {
+      query = query.order(options.orderBy, { ascending: options.ascending ?? true });
+    }
+
+    if (options?.filters) {
+      for (const [key, value] of Object.entries(options.filters)) {
+        if (value !== undefined && value !== null) {
+          query = query.eq(key, value);
+        }
+      }
+    }
+
+    const { data } = await query;
+    return (data ?? []) as T[];
+  }
+
+  protected async getById<T>(table: string, id: string): Promise<T | null> {
+    const { data } = await this.supabase
+      .from(table)
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    return data as T | null;
+  }
+
+  protected async insert<T>(table: string, values: Record<string, unknown>): Promise<{ data: T | null; error: string | null }> {
+    const { data, error } = await this.supabase
+      .from(table)
+      .insert(values)
+      .select()
+      .single();
+    if (error) return { data: null, error: error.message };
+    return { data: data as T, error: null };
+  }
+
+  protected async update<T>(
+    table: string,
+    id: string,
+    values: Record<string, unknown>
+  ): Promise<{ data: T | null; error: string | null }> {
+    const { data, error } = await this.supabase
+      .from(table)
+      .update(values)
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return { data: null, error: error.message };
+    return { data: data as T, error: null };
+  }
+
+  protected async remove(table: string, id: string): Promise<string | null> {
+    const { error } = await this.supabase.from(table).delete().eq("id", id);
+    return error?.message ?? null;
+  }
+
+  protected async exists(table: string, field: string, value: string): Promise<boolean> {
+    const { data } = await this.supabase
+      .from(table)
+      .select("id", { count: "exact", head: true })
+      .eq(field, value);
+    return data !== null && data.length > 0;
+  }
+}
