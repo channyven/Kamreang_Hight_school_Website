@@ -48,13 +48,17 @@ export const getAboutPageData = unstable_cache(
       // Check if Supabase data is still placeholder/seed content (e.g. "Phnom Penh High School")
       // If so, fall back to mock data which has the correct Kamrieng High School content
       const hasPlaceholderData = info?.some(
-        (row: any) =>
-          row.content_en?.includes("Phnom Penh") ||
-          row.content_en?.includes("established in 1960")
+        (row: Record<string, unknown>) =>
+          typeof row.content_en === "string" &&
+          (row.content_en.includes("Phnom Penh") ||
+          row.content_en.includes("established in 1960"))
       );
 
       // Check if teachers have grade_levels — Supabase data likely doesn't
-      const hasGradeLevels = teacherRows?.some((t: any) => t.grade_levels && t.grade_levels.length > 0);
+      const hasGradeLevels = teacherRows?.some(
+        (t: Record<string, unknown>) =>
+          Array.isArray(t.grade_levels) && t.grade_levels.length > 0
+      );
 
       return {
         schoolInfo: info && info.length > 0 && !hasPlaceholderData

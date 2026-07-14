@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { getPublishedDocuments } from "@/lib/queries";
-import { DOCUMENT_CATEGORIES, type DocumentCategory } from "@/types";
+import { DOCUMENT_CATEGORIES } from "@/types";
 import HeroSection from "@/components/public/documents/HeroSection";
 import { CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
 import DocumentGrid from "@/components/public/documents/DocumentGrid";

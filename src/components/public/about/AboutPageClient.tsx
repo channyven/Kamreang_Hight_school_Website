@@ -4,9 +4,7 @@ import Image from "next/image";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Eye,
   Target,
-  Heart,
   ArrowRight,
   Quote,
   Mail,
@@ -17,8 +15,6 @@ import {
   GraduationCap,
   BookOpen,
   TrendingUp,
-  ShieldCheck,
-  Award,
   Crown,
   Handshake,
   Telescope,
@@ -190,7 +186,8 @@ function AnimatedStatCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useIsInView(ref);
-  const count = instant ? numericValue : useCounter(numericValue, isVisible);
+  const animatedCount = useCounter(numericValue, isVisible);
+  const count = instant ? numericValue : animatedCount;
 
   // Format the number portion
   const displayNum = formatNum
