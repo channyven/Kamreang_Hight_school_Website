@@ -66,6 +66,36 @@ function sanitizeInput(
 
 // ─── CRUD Actions ─────────────────────────────────────────────
 
+/** Postgres unique-violation error code */
+const PG_UNIQUE_VIOLATION = "23505";
+
+/** Regex for a trailing slug counter, e.g. "-3" at the end of "my-article-3" */
+const SLUG_COUNTER_RE = /-(\d+)$/;
+
+/**
+ * Build the next unique slug by incrementing a trailing counter.
+ * e.g. "my-article"   → "my-article-1"
+ *      "my-article-3" → "my-article-4"
+ */
+function nextSlug(current: string): string {
+  const match = current.match(SLUG_COUNTER_RE);
+  const nextNum = match ? parseInt(match[1], 10) + 1 : 1;
+  return current.replace(SLUG_COUNTER_RE, "") + `-${nextNum}`;
+}
+
+/**
+ * Return true when the error is a unique-constraint violation on `news.slug`.
+ * Checks both the standard Postgres error code and a fallback string match
+ * for older Supabase clients that wrap the error differently.
+ */
+function isSlugConflict(error: { code?: string; message: string }): boolean {
+  return (
+    error.code === PG_UNIQUE_VIOLATION ||
+    error.message.includes("news_slug_key") ||
+    error.message.includes("duplicate key")
+  );
+}
+
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
@@ -81,7 +111,7 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
   };
 
   // Attempt insert; if slug conflicts, retry with a suffixed slug
-  const maxRetries = 5;
+  const maxRetries = 10;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const { error } = await supabase.from("news").insert(insertData);
 
@@ -96,26 +126,22 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
         });
       }
 
-      revalidatePath("/[locale]/(public)/news", "page");
-      revalidatePath("/[locale]/(public)", "page");
+      revalidatePath("/[locale]/news", "page");
+      revalidatePath("/", "layout");
       revalidateTag("news");
       return { success: true };
     }
 
-    // If it's not a unique constraint violation on slug, bail out
-    if (!error.message.includes('news_slug_key') && !error.message.includes('duplicate key')) {
+    // If it's not a unique constraint violation on slug, bail out immediately
+    if (!isSlugConflict(error)) {
       return { success: false, error: error.message };
     }
 
     // Append a counter to the slug and retry
-    const currentSlug = (insertData.slug as string | undefined) || "article";
-    const match = currentSlug.match(/-(\d+)$/);
-    const nextNum = match ? parseInt(match[1], 10) + 1 : 1;
-    const newSlug = currentSlug.replace(/-\d+$/, "") + `-${nextNum}`;
-    insertData = { ...insertData, slug: newSlug };
+    insertData = { ...insertData, slug: nextSlug((insertData.slug as string) || "article") };
   }
 
-  return { success: false, error: "Failed to create article due to slug conflict. Please try a different slug." };
+  return { success: false, error: "Failed to create article — slug is taken even after several attempts. Please try a different title." };
 }
 
 export async function updateNews(
@@ -129,33 +155,48 @@ export async function updateNews(
 
   const supabase = createServerClient();
   const user = await getCurrentUser();
-  const updateData = {
+  let updateData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
     updated_at: new Date().toISOString(),
     updated_by: user?.id ?? null,
   };
 
-  const { error } = await supabase
-    .from("news")
-    .update(updateData)
-    .eq("id", id);
-  if (error) return { success: false, error: error.message };
+  // Attempt update; if slug conflicts, retry with a suffixed slug
+  const maxRetries = 10;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const { error } = await supabase
+      .from("news")
+      .update(updateData)
+      .eq("id", id);
 
-  // Audit log
-  if (user) {
-    await supabase.from("admin_audit_logs").insert({
-      user_id: user.id,
-      user_email: user.email,
-      action: "update",
-      table_name: "news",
-      record_id: id,
-    });
+    if (!error) {
+      // Audit log
+      if (user) {
+        await supabase.from("admin_audit_logs").insert({
+          user_id: user.id,
+          user_email: user.email,
+          action: "update",
+          table_name: "news",
+          record_id: id,
+        });
+      }
+
+      revalidatePath("/[locale]/news", "page");
+      revalidatePath("/", "layout");
+      revalidateTag("news");
+      return { success: true };
+    }
+
+    // If it's not a unique constraint violation on slug, bail out immediately
+    if (!isSlugConflict(error)) {
+      return { success: false, error: error.message };
+    }
+
+    // Append a counter to the slug and retry
+    updateData = { ...updateData, slug: nextSlug((updateData.slug as string) || "article") };
   }
 
-  revalidatePath("/[locale]/(public)/news", "page");
-  revalidatePath("/[locale]/(public)", "page");
-  revalidateTag("news");
-  return { success: true };
+  return { success: false, error: "Failed to update article — slug is taken. Please try a different slug." };
 }
 
 export async function deleteNews(id: string): Promise<ActionResult<void>> {
@@ -176,8 +217,8 @@ export async function deleteNews(id: string): Promise<ActionResult<void>> {
     });
   }
 
-  revalidatePath("/[locale]/(public)/news", "page");
-  revalidatePath("/[locale]/(public)", "page");
+  revalidatePath("/[locale]/news", "page");
+  revalidatePath("/", "layout");
   revalidateTag("news");
   return { success: true };
 }

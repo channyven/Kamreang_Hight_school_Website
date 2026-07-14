@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ImageIcon, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 interface ImagePreviewProps {
   url?: string | null;
@@ -20,12 +20,7 @@ export default function ImagePreview({ url, className = "" }: ImagePreviewProps)
   }, [url]);
 
   if (!url) {
-    return (
-      <div className={`relative aspect-[16/9] rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5 overflow-hidden ${className}`}>
-        <ImageIcon className="w-6 h-6 text-gray-300" />
-        <span className="text-[11px] text-gray-400">No image yet</span>
-      </div>
-    );
+    return null;
   }
 
   return (

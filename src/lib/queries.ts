@@ -5,9 +5,6 @@ import {
   mockSchoolInfo,
   mockLeadership,
   mockTeachers,
-  mockAchievements,
-  mockNews,
-  mockNewsCategories,
   mockStats,
   mockGovernanceItems,
 } from "@/lib/mock-data";
@@ -86,11 +83,9 @@ export const getPublishedAchievements = unstable_cache(
         .select("*")
         .eq("status", "published")
         .order("achievement_date", { ascending: false });
-      return data && data.length > 0
-        ? (data as Achievement[])
-        : mockAchievements.filter((a) => a.status === "published");
+      return (data ?? []) as Achievement[];
     } catch {
-      return mockAchievements.filter((a) => a.status === "published");
+      return [];
     }
   },
   ["published-achievements"],
@@ -101,20 +96,25 @@ export const getPublishedNews = unstable_cache(
   async (): Promise<News[]> => {
     try {
       const supabase = createServerClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("news")
         .select("*, category:news_categories(*)")
         .eq("status", "published")
         .order("publish_date", { ascending: false });
-      return data && data.length > 0
-        ? (data as News[])
-        : mockNews.filter((n) => n.status === "published");
-    } catch {
-      return mockNews.filter((n) => n.status === "published");
+
+      if (error) {
+        console.error("[getPublishedNews] Supabase query failed:", error);
+        return [];
+      }
+
+      return data ? (data as News[]) : [];
+    } catch (err) {
+      console.error("[getPublishedNews] Unexpected error:", err);
+      return [];
     }
   },
   ["published-news"],
-  { tags: ["news"], revalidate: 60 }
+  { tags: ["news"], revalidate: 30 }
 );
 
 export const getNewsCategories = unstable_cache(
@@ -122,9 +122,9 @@ export const getNewsCategories = unstable_cache(
     try {
       const supabase = createServerClient();
       const { data } = await supabase.from("news_categories").select("*").order("sort_order");
-      return data && data.length > 0 ? (data as NewsCategory[]) : mockNewsCategories;
+      return (data ?? []) as NewsCategory[];
     } catch {
-      return mockNewsCategories;
+      return [];
     }
   },
   ["news-categories"],
