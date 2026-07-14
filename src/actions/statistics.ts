@@ -4,10 +4,12 @@ import { createServerClient } from "@/lib/supabase";
 import { statisticsSchema, type StatisticsInput } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export async function createStatistics(
   data: StatisticsInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = statisticsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -26,6 +28,7 @@ export async function updateStatistics(
   id: string,
   data: StatisticsInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = statisticsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -46,6 +49,7 @@ export async function updateStatistics(
 export async function setCurrentStatistics(
   id: string
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("statistics")
@@ -59,6 +63,7 @@ export async function setCurrentStatistics(
 }
 
 export async function deleteStatistics(id: string): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase.from("statistics").delete().eq("id", id);
   if (error) return { success: false, error: error.message };

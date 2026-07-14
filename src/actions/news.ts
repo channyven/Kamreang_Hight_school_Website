@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
+<<<<<<< HEAD
 import { cookies } from "next/headers";
 
 // ─── Session helper ───────────────────────────────────────────
@@ -65,8 +66,12 @@ function sanitizeInput(
 }
 
 // ─── CRUD Actions ─────────────────────────────────────────────
+=======
+import { requireAdmin } from "@/lib/auth-guard";
+>>>>>>> 8fcc294 (pull code)
 
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -103,6 +108,7 @@ export async function updateNews(
   id: string,
   data: NewsInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -140,6 +146,7 @@ export async function updateNews(
 }
 
 export async function deleteNews(id: string): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const user = await getCurrentUser();
 

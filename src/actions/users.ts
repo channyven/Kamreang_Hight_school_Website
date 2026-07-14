@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase";
 import { createUserSchema, updateUserSchema } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import type { z } from "zod";
+import { requireAdmin } from "@/lib/auth-guard";
 
 type CreateUserInput = z.infer<typeof createUserSchema>;
 type UpdateUserInput = z.infer<typeof updateUserSchema>;
@@ -11,6 +12,7 @@ type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export async function createUser(
   data: CreateUserInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = createUserSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -35,6 +37,7 @@ export async function updateUser(
   id: string,
   data: UpdateUserInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = updateUserSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
@@ -54,6 +57,7 @@ export async function toggleUserActive(
   id: string,
   isActive: boolean
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("admin_users")
@@ -64,6 +68,7 @@ export async function toggleUserActive(
 }
 
 export async function deleteUser(id: string): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase.from("admin_users").delete().eq("id", id);
   if (error) return { success: false, error: error.message };
