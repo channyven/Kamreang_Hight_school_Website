@@ -1,10 +1,9 @@
 import { createServerClient } from "@/lib/supabase";
-import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 export class BaseService {
   protected supabase = createServerClient();
 
-  protected async getAll<T>(
+  protected async dbGetAll<T>(
     table: string,
     options?: {
       orderBy?: string;
@@ -30,7 +29,7 @@ export class BaseService {
     return (data ?? []) as T[];
   }
 
-  protected async getById<T>(table: string, id: string): Promise<T | null> {
+  protected async dbGetById<T>(table: string, id: string): Promise<T | null> {
     const { data } = await this.supabase
       .from(table)
       .select("*")
@@ -39,7 +38,10 @@ export class BaseService {
     return data as T | null;
   }
 
-  protected async insert<T>(table: string, values: Record<string, unknown>): Promise<{ data: T | null; error: string | null }> {
+  protected async dbInsert<T>(
+    table: string,
+    values: Record<string, unknown>
+  ): Promise<{ data: T | null; error: string | null }> {
     const { data, error } = await this.supabase
       .from(table)
       .insert(values)
@@ -49,7 +51,7 @@ export class BaseService {
     return { data: data as T, error: null };
   }
 
-  protected async update<T>(
+  protected async dbUpdate<T>(
     table: string,
     id: string,
     values: Record<string, unknown>
@@ -64,16 +66,8 @@ export class BaseService {
     return { data: data as T, error: null };
   }
 
-  protected async remove(table: string, id: string): Promise<string | null> {
+  protected async dbRemove(table: string, id: string): Promise<string | null> {
     const { error } = await this.supabase.from(table).delete().eq("id", id);
     return error?.message ?? null;
-  }
-
-  protected async exists(table: string, field: string, value: string): Promise<boolean> {
-    const { data } = await this.supabase
-      .from(table)
-      .select("id", { count: "exact", head: true })
-      .eq(field, value);
-    return data !== null && data.length > 0;
   }
 }

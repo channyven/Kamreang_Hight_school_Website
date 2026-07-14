@@ -23,7 +23,7 @@ export class NewsService extends BaseService {
       created_by: userId ?? null,
       updated_by: userId ?? null,
     };
-    const { error } = await this.insert<News>("news", insertData);
+    const { error } = await this.dbInsert<News>("news", insertData);
     return error;
   }
 
@@ -33,11 +33,11 @@ export class NewsService extends BaseService {
       updated_at: new Date().toISOString(),
       updated_by: userId ?? null,
     };
-    const { error } = await this.update<News>("news", id, updateData);
+    const { error } = await this.dbUpdate<News>("news", id, updateData);
     return error;
   }
 
   async remove(id: string): Promise<string | null> {
-    return this.remove("news", id);
+    return this.dbRemove("news", id);
   }
 }
