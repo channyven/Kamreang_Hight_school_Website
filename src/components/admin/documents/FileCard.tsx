@@ -15,9 +15,7 @@ interface FileCardProps {
 export default function FileCard({ register, errors }: FileCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
-      <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-        <span className="text-lg">📎</span> File
-      </h2>
+      <h2 className="font-semibold text-gray-900">File</h2>
 
       {/* File URL */}
       <div className="space-y-1.5">
@@ -54,6 +52,7 @@ export default function FileCard({ register, errors }: FileCardProps) {
           Display name shown to visitors, including the extension.
         </p>
       </div>
+
     </div>
   );
 }

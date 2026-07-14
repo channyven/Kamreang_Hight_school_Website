@@ -136,6 +136,7 @@ export interface AppDocument {
   category?: { name_km: string; name_en: string; slug: string };
   category_id?: string;
   download_count?: number;
+  sort_order?: number;
   created_by?: string;
   updated_by?: string;
   is_active: boolean;
