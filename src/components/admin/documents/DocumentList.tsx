@@ -6,6 +6,7 @@ import {
   FileSpreadsheet,
   FileImage,
   File,
+  Pencil,
   Trash2,
   Download,
   Loader2,
@@ -14,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeDate, formatFileSize } from "@/utils";
 import { DOCUMENT_CATEGORIES, type AppDocument } from "@/types";
+import Link from "next/link";
 
 interface DocumentListProps {
   /** Array of documents to display. */
@@ -127,6 +129,18 @@ export default function DocumentList({ documents, loading, onDelete }: DocumentL
               {/* Actions */}
               <td className="px-5 py-4">
                 <div className="flex items-center justify-end gap-1">
+                  {/* Edit button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    asChild
+                  >
+                    <Link href={`/${locale}/admin/documents/${doc.id}`}>
+                      <Pencil className="w-4 h-4 text-blue-400 hover:text-blue-600" />
+                    </Link>
+                  </Button>
+                  {/* Download button */}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -137,6 +151,7 @@ export default function DocumentList({ documents, loading, onDelete }: DocumentL
                       <Download className="w-4 h-4 text-gray-400" />
                     </a>
                   </Button>
+                  {/* Delete button */}
                   <Button
                     variant="ghost"
                     size="icon"

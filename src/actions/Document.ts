@@ -7,6 +7,25 @@ import { ensureDocumentCategory, CATEGORY_SLUG_MAP } from "@/lib/document-helper
 import { revalidatePath } from "next/cache";
 
 /**
+ * Fetch a single document by ID.
+ */
+export async function getDocumentById(id: string): Promise<AppDocument | null> {
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from("downloads")
+    .select("*, category:download_categories(name_km, name_en, slug)")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Get document by ID error:", error);
+    return null;
+  }
+
+  return data as unknown as AppDocument;
+}
+
+/**
  * Fetch all documents (admin), optionally filtered by category and search.
  * Uses the existing `downloads` table with a JOIN to `download_categories`.
  */
@@ -21,9 +40,18 @@ export async function getDocuments(params?: {
     .order("created_at", { ascending: false });
 
   if (params?.category && params.category !== "all") {
-    // Filter by category slug via the joined category name
-    const catSlug = getCategorySlug(params.category);
-    query = query.eq("category.slug", catSlug);
+    // Look up the category ID by slug first, then filter by category_id directly.
+    // This is more reliable than filtering on the joined resource.
+    const catSlug = CATEGORY_SLUG_MAP[params.category] ?? "other-documents";
+    const { data: cat } = await supabase
+      .from("download_categories")
+      .select("id")
+      .eq("slug", catSlug)
+      .maybeSingle();
+
+    if (cat) {
+      query = query.eq("category_id", cat.id);
+    }
   }
 
   const { data, error } = await query;
@@ -43,11 +71,6 @@ export async function getDocuments(params?: {
   }
 
   return documents;
-}
-
-/** Map category string to download_categories slug using shared mapping. */
-function getCategorySlug(category: DocumentCategory): string {
-  return CATEGORY_SLUG_MAP[category] ?? "other-documents";
 }
 
 /**
@@ -77,11 +100,58 @@ export async function createDocument(
     file_url: parsed.data.file_url,
     file_name: parsed.data.file_name,
     category_id: categoryId,
+    sort_order: parsed.data.sort_order ?? 0,
     is_active: parsed.data.is_active,
   });
 
   if (error) {
     console.error("Create document error:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/[locale]/(public)", "page");
+  revalidatePath("/[locale]/(admin)/admin/documents", "page");
+  return { success: true };
+}
+
+/**
+ * Update an existing document in the `downloads` table.
+ */
+export async function updateDocument(
+  id: string,
+  data: DocumentInput
+): Promise<ActionResult<void>> {
+  const parsed = documentSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0]?.message };
+  }
+
+  const supabase = createServerClient();
+
+  // Ensure the download_category exists and get its ID
+  const categoryId = await ensureDocumentCategory(parsed.data.category);
+  if (!categoryId) {
+    return { success: false, error: "Failed to resolve document category" };
+  }
+
+  const { error } = await supabase
+    .from("downloads")
+    .update({
+      title_km: parsed.data.title_km,
+      title_en: parsed.data.title_en,
+      description_km: parsed.data.description_km || null,
+      description_en: parsed.data.description_en || null,
+      file_url: parsed.data.file_url,
+      file_name: parsed.data.file_name,
+      category_id: categoryId,
+      sort_order: parsed.data.sort_order ?? 0,
+      is_active: parsed.data.is_active,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Update document error:", error);
     return { success: false, error: error.message };
   }
 
