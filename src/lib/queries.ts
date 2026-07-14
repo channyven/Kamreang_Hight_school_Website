@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -10,6 +10,7 @@ import {
   mockNews,
   mockNewsCategories,
   mockStats,
+  mockGovernanceItems,
 } from "@/lib/mock-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
@@ -49,13 +50,17 @@ export const getAboutPageData = unstable_cache(
       // Check if Supabase data is still placeholder/seed content (e.g. "Phnom Penh High School")
       // If so, fall back to mock data which has the correct Kamrieng High School content
       const hasPlaceholderData = info?.some(
-        (row: any) =>
-          row.content_en?.includes("Phnom Penh") ||
-          row.content_en?.includes("established in 1960")
+        (row: Record<string, unknown>) =>
+          typeof row.content_en === "string" &&
+          (row.content_en.includes("Phnom Penh") ||
+            row.content_en.includes("established in 1960"))
       );
 
       // Check if teachers have grade_levels — Supabase data likely doesn't
-      const hasGradeLevels = teacherRows?.some((t: any) => t.grade_levels && t.grade_levels.length > 0);
+      const hasGradeLevels = teacherRows?.some(
+        (t: Record<string, unknown>) =>
+          Array.isArray(t.grade_levels) && t.grade_levels.length > 0
+      );
 
       return {
         schoolInfo: info && info.length > 0 && !hasPlaceholderData
@@ -134,6 +139,39 @@ export const getNewsCategories = unstable_cache(
   },
   ["news-categories"],
   { tags: ["news_categories"], revalidate: 60 }
+);
+
+export const getPublishedDocuments = unstable_cache(
+  async (): Promise<AppDocument[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("downloads")
+        .select("*, category:download_categories(name_km, name_en, slug)")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as unknown as AppDocument[];
+    } catch {
+      return [];
+    }
+  },
+  ["published-documents"],
+  { tags: ["documents"], revalidate: 60 }
+);
+
+export const getGovernanceItems = unstable_cache(
+  async (): Promise<GovernanceItem[]> => {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from("governance_items")
+      .select("*")
+      .eq("is_active", true)
+      .order("section")
+      .order("sort_order");
+    return data && data.length > 0 ? (data as GovernanceItem[]) : mockGovernanceItems;
+  },
+  ["governance-items"],
+  { tags: ["governance_items"], revalidate: 60 }
 );
 
 export const getCurrentStatistics = unstable_cache(

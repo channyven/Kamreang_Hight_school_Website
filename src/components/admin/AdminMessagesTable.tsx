@@ -1,6 +1,6 @@
 "use client";
 
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate } from "@/utils";
 import type { Message } from "@/types";
 
 interface AdminMessagesTableProps {

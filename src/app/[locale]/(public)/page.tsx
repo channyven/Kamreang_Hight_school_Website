@@ -6,6 +6,24 @@ import NewsSection from "@/components/public/home/NewsSection";
 import AchievementsSection from "@/components/public/home/AchievementsSection";
 import { getCurrentStatistics, getPublishedAchievements, getPublishedNews } from "@/lib/queries";
 import { mockHeroSlides } from "@/lib/mock-data";
+import type { News } from "@/types";
+
+// Fallback images for the home page news cards only
+const HOME_NEWS_IMAGES = [
+  "/images/news/new1.png",
+  "/images/news/new2.png",
+  "/images/news/new4.png",
+  "/images/news/new3.png",
+  "/images/news/new5.png",
+  "/images/news/new6.png",
+];
+
+function addFallbackImages(news: News[]): News[] {
+  return news.map((item, i) => ({
+    ...item,
+    featured_image: item.featured_image || HOME_NEWS_IMAGES[i % HOME_NEWS_IMAGES.length],
+  }));
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -27,7 +45,7 @@ export default async function HomePage() {
     getPublishedNews(),
     getPublishedAchievements(),
   ]);
-  const news = allNews.slice(0, 6);
+  const news = addFallbackImages(allNews.slice(0, 6));
   const achievements = allAchievements.slice(0, 6);
 
   return (

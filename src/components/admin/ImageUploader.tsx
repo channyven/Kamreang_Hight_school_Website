@@ -5,7 +5,7 @@ import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
 import { STORAGE_BUCKETS } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { toast } from "sonner";
 
 interface ImageUploaderProps {

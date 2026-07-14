@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Battambang } from "next/font/google";
-import "./globals.css";
+import "../styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,10 +20,16 @@ export const metadata: Metadata = {
     default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School",
     template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}`,
   },
-  description: "Official website of the high school.",
+  description: "Official website of Kamrieng High School — news, achievements, academics, and more.",
+  keywords: ["Kamrieng High School", "វិទ្យាល័យកំរៀង", "school", "education", "Cambodia", "high school"],
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   ),
+  icons: {
+    icon: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    shortcut: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    apple: { url: "/images/kamrieng-logo.png", type: "image/png" },
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +39,7 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning>
-      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`} suppressHydrationWarning>
         {children}
       </body>
     </html>

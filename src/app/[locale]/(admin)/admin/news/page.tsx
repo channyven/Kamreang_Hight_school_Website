@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import type { News } from "@/types";
-import { formatShortDate, getLocalizedText } from "@/lib/utils";
+import { formatShortDate, getLocalizedText } from "@/utils";
 import { toast } from "sonner";
 import { deleteNews } from "@/actions/news";
 
@@ -163,6 +163,7 @@ export default function AdminNewsPage() {
                                 width={40}
                                 height={32}
                                 className="object-cover w-full h-full"
+                                unoptimized={item.featured_image.includes("google.com") || item.featured_image.includes("firebasestorage")}
                               />
                             </div>
                           )}

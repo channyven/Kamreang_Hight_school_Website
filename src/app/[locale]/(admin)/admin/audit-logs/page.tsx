@@ -1,6 +1,6 @@
 import { createServerClient } from "@/lib/supabase";
 import { getLocale } from "next-intl/server";
-import { formatRelativeDate, formatShortDate } from "@/lib/utils";
+import { formatRelativeDate, formatShortDate } from "@/utils";
 import { Badge } from "@/components/ui/badge";
 import type { AuditLog } from "@/types";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, Heart, LogIn } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 
 interface NavLink {
@@ -33,25 +33,35 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks: NavLink[] = [
-    { key: "home", href: `/${locale}` },
-    { key: "about", href: `/${locale}/about` },
-    { key: "governance", href: `/${locale}/governance` },
-    { key: "news", href: `/${locale}/news` },
-    { key: "achievements", href: `/${locale}/achievements` },
-    { key: "contact", href: `/${locale}/contact` },
-  ];
+  const navLinks: NavLink[] = useMemo(
+    () => [
+      { key: "home", href: `/${locale}` },
+      { key: "about", href: `/${locale}/about` },
+      { key: "governance", href: `/${locale}/governance` },
+      { key: "news", href: `/${locale}/news` },
+      { key: "achievements", href: `/${locale}/achievements` },
+      { key: "document", href: `/${locale}/document` },
+      { key: "contact", href: `/${locale}/contact` },
+    ],
+    [locale]
+  );
 
-  const switchLocale = (newLocale: Locale) => {
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    router.push(segments.join("/"));
-  };
+  const switchLocale = useCallback(
+    (newLocale: Locale) => {
+      const segments = pathname.split("/");
+      segments[1] = newLocale;
+      router.push(segments.join("/"));
+    },
+    [pathname, router]
+  );
 
-  const isActive = (href: string) => {
-    if (href === `/${locale}`) return pathname === `/${locale}`;
-    return pathname.startsWith(href);
-  };
+  const isActive = useCallback(
+    (href: string) => {
+      if (href === `/${locale}`) return pathname === `/${locale}`;
+      return pathname.startsWith(href);
+    },
+    [locale, pathname]
+  );
 
   return (
     <header
@@ -64,7 +74,6 @@ export default function Navbar() {
     >
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0 group">
             <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-transparent transition-all duration-300 group-hover:ring-school-gold-400/60">
               <Image

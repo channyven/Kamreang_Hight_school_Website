@@ -4,9 +4,7 @@ import Image from "next/image";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Eye,
   Target,
-  Heart,
   ArrowRight,
   Quote,
   Mail,
@@ -17,15 +15,13 @@ import {
   GraduationCap,
   BookOpen,
   TrendingUp,
-  ShieldCheck,
-  Award,
   Crown,
   Handshake,
   Telescope,
   Star,
   HeartHandshake,
 } from "lucide-react";
-import { cn, getLocalizedText, getAvatarUrl } from "@/lib/utils";
+import { cn, getLocalizedText, getAvatarUrl } from "@/utils";
 import type { SchoolInfo, Leadership, Milestone, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";
@@ -156,7 +152,8 @@ function AnimatedStatCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useIsInView(ref);
-  const count = instant ? numericValue : useCounter(numericValue, isVisible);
+  const animatedCount = useCounter(numericValue, isVisible);
+  const count = instant ? numericValue : animatedCount;
 
   // Format the number portion
   const displayNum = formatNum

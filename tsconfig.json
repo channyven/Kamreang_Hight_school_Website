@@ -41,8 +41,14 @@
       "@/actions/*": [
         "./src/actions/*"
       ],
-      "@/contexts/*": [
-        "./src/contexts/*"
+      "@/providers/*": [
+        "./src/providers/*"
+      ],
+      "@/schemas/*": [
+        "./src/schemas/*"
+      ],
+      "@/utils/*": [
+        "./src/utils/*"
       ]
     }
   },

@@ -6,9 +6,9 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2, Mail, Lock, School } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { loginSchema, type LoginInput } from "@/lib/validations";
+import { Loader2, Mail, Lock } from "lucide-react";
+import { useAuth } from "@/providers/AuthContext";
+import { loginSchema, type LoginInput } from "@/schemas/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,8 +77,12 @@ export default function LoginPage() {
       >
         {/* Logo / header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-school-gold-500 mb-4">
-            <School className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-school-gold-500 mb-4 overflow-hidden">
+            <img
+              src="/images/kamrieng-logo.png"
+              alt="Kamrieng High School"
+              className="w-12 h-12 object-cover rounded-full"
+            />
           </div>
           <h1 className="text-2xl font-bold text-white">
             {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN}

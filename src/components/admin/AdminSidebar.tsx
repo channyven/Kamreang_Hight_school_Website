@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,10 +9,10 @@ import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap,
+  GraduationCap, Landmark,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers/AuthContext";
+import { cn } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "about", "teachers"] },
+  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance"] },
   { label: "Inbox", keys: ["messages"] },
   { label: "System", keys: ["users", "settings"] },
 ];
@@ -42,26 +42,37 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const allNavItems: NavItem[] = [
-    { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4.5 h-4.5" /> },
-    { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4.5 h-4.5" /> },
-    { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4.5 h-4.5" /> },
-    { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4.5 h-4.5" /> },
-    { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4.5 h-4.5" /> },
-    { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4.5 h-4.5" /> },
-    { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4.5 h-4.5" /> },
-    { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4.5 h-4.5" />, permission: "canManageUsers" },
-    { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4.5 h-4.5" />, permission: "canManageSettings" },
-  ];
-
-  const visibleItems = allNavItems.filter(
-    (item) => !item.permission || hasPermission(item.permission as Parameters<typeof hasPermission>[0])
+  const allNavItems: NavItem[] = useMemo(
+    () => [
+      { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4 h-4" /> },
+      { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4 h-4" /> },
+      { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4 h-4" /> },
+      { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4 h-4" /> },
+      { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4 h-4" /> },
+      { key: "documents", href: `/${locale}/admin/documents`, icon: <FileText className="w-4 h-4" /> },
+      { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
+      { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
+      { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
+      { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
+    ],
+    [locale]
   );
 
-  const isActive = (href: string) => {
-    if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
-    return pathname.startsWith(href);
-  };
+  const visibleItems = useMemo(
+    () =>
+      allNavItems.filter(
+        (item) => !item.permission || hasPermission(item.permission as Parameters<typeof hasPermission>[0])
+      ),
+    [allNavItems, hasPermission]
+  );
+
+  const isActive = useCallback(
+    (href: string) => {
+      if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
+      return pathname.startsWith(href);
+    },
+    [locale, pathname]
+  );
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full relative">
@@ -83,7 +94,7 @@ export default function AdminSidebar() {
           <div className="min-w-0">
             <p className="text-sm font-bold text-white leading-tight">Admin Portal</p>
             <p className="text-xs leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-              Kamrieng High School
+              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
             </p>
           </div>
         )}

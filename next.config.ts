@@ -4,12 +4,6 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -18,11 +12,33 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "i.pinimg.com",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
       {
         protocol: "https",
-        hostname: "*.supabase.co",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "drive.google.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
       },
     ],
   },
