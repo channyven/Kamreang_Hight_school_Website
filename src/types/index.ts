@@ -73,6 +73,7 @@ export interface News {
   excerpt_km?: string;
   excerpt_en?: string;
   featured_image?: string;
+  gallery_images?: string[];
   category_id?: string;
   is_featured: boolean;
   status: ContentStatus;
@@ -122,6 +123,36 @@ export interface Message {
   updated_at: string;
 }
 
+export interface AppDocument {
+  id: string;
+  title_km: string;
+  title_en: string;
+  description_km?: string;
+  description_en?: string;
+  file_url: string;
+  file_name?: string;
+  file_size?: number;
+  file_type?: string;
+  category?: { name_km: string; name_en: string; slug: string };
+  category_id?: string;
+  download_count?: number;
+  created_by?: string;
+  updated_by?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type DocumentCategory = "report" | "result" | "form" | "policy" | "other";
+
+export const DOCUMENT_CATEGORIES: { key: DocumentCategory; labelEn: string; labelKm: string }[] = [
+  { key: "report", labelEn: "Report", labelKm: "របាយការណ៍" },
+  { key: "result", labelEn: "Result", labelKm: "លទ្ធផល" },
+  { key: "form", labelEn: "Form", labelKm: "បែបបទ" },
+  { key: "policy", labelEn: "Policy", labelKm: "គោលនយោបាយ" },
+  { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
+];
+
 export interface AuditLog {
   id: string;
   user_id?: string;
@@ -147,6 +178,8 @@ export interface Leadership {
   bio_km?: string;
   bio_en?: string;
   photo_url?: string;
+  phone?: string;
+  gender?: string;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -176,10 +209,26 @@ export interface Teacher {
   qualification_km?: string;
   qualification_en?: string;
   photo_url?: string;
+  phone?: string;
+  gender?: string;
   years_experience?: number;
   grade_levels?: number[];
   is_active: boolean;
   sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type GovernanceSection = "governance" | "culture";
+
+export interface GovernanceItem {
+  id: string;
+  section: GovernanceSection;
+  icon: string;
+  text_km: string;
+  text_en: string;
+  sort_order: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -200,6 +249,17 @@ export interface HeroSlide {
   cta_secondary_href?: string;
   sort_order: number;
   is_active: boolean;
+}
+
+export interface OrgNodeData {
+  id: string;
+  name_km: string;
+  name_en: string;
+  description_km?: string;
+  description_en?: string;
+  icon?: string; // Lucide icon name string
+  tier: "root" | "vice" | "head" | "leaf";
+  children?: OrgNodeData[];
 }
 
 // ─────────────────────────────────────────────────────────────

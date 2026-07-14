@@ -60,8 +60,8 @@ INSERT INTO settings (key, value, description) VALUES
   ('school_info', '{
     "name_km": "វិទ្យាល័យកំរៀង",
     "name_en": "Kamrieng High School",
-    "address_km": "ខេត្តបាត់ដំបង, កម្ពុជា",
-    "address_en": "Battambang Province, Cambodia",
+    "address_km": "ភូមិអូរដា ឃុំអូរដា ស្រុកកំរៀង ខេត្តបាត់ដំបង",
+    "address_en": "Ou Da village, Ou Da commune, Kamrieng district, Battambang province",
     "phone": "+855 23 000 000",
     "email": "reachtalab@gmail.com",
     "map_embed_url": "",

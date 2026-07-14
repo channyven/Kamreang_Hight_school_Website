@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { formatRelativeDate } from "@/lib/utils";
+import { formatRelativeDate } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
 
@@ -250,12 +250,10 @@ export default async function AdminDashboardPage() {
                   {data.recentMessages.map((msg, i) => (
                     <tr
                       key={msg.id}
-                      className="transition-colors"
+                      className="transition-colors hover:[background:#f8faff]"
                       style={{
                         borderBottom: i < data.recentMessages.length - 1 ? "1px solid #eaeff6" : undefined,
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f8faff")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "")}
                     >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2.5">

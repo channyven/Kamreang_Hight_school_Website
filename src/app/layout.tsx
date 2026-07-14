@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Battambang } from "next/font/google";
-import { getLocale } from "next-intl/server";
-import { generateSchoolJsonLd } from "@/lib/structured-data";
-import "./globals.css";
+import "../styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,33 +17,29 @@ const battambang = Battambang({
 
 export const metadata: Metadata = {
   title: {
-    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School",
-    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "High School"}`,
+    default: process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School",
+    template: `%s | ${process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}`,
   },
-  description: "Official website of the high school.",
+  description: "Official website of Kamrieng High School — news, achievements, academics, and more.",
+  keywords: ["Kamrieng High School", "វិទ្យាល័យកំរៀង", "school", "education", "Cambodia", "high school"],
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   ),
+  icons: {
+    icon: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    shortcut: { url: "/images/kamrieng-logo.png", type: "image/png" },
+    apple: { url: "/images/kamrieng-logo.png", type: "image/png" },
+  },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
-  const schoolJsonLd = generateSchoolJsonLd();
-
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schoolJsonLd) }}
-          suppressHydrationWarning
-        />
-      </head>
-      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`}>
+    <html suppressHydrationWarning>
+      <body className={`${inter.variable} ${battambang.variable} font-sans antialiased`} suppressHydrationWarning>
         {children}
       </body>
     </html>

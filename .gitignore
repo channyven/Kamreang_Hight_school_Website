@@ -47,3 +47,5 @@ next-env.d.ts
 .dataconnect-generated/
 .firebase
 .firebaserc
+.claude/
+kamrieng-highschool/

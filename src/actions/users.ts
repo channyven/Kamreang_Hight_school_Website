@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase";
-import { createUserSchema, updateUserSchema } from "@/lib/validations";
+import { createUserSchema, updateUserSchema } from "@/schemas/validations";
 import type { ActionResult } from "@/types";
 import type { z } from "zod";
 

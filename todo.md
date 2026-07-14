@@ -61,11 +61,11 @@
 ## 🔵 Low
 
 - [ ] **LOW-1: Handle unhandled promise rejection in AuthContext**
-  - `src/contexts/AuthContext.tsx:78-80` — no try-catch on `setSessionCookie(null)` fetch.
+  - `src/providers/AuthContext.tsx:78-80` — no try-catch on `setSessionCookie(null)` fetch.
   - **Branch:** `fix/auth-context-unhandled-rejection`
 
 - [ ] **LOW-2: Fix phone regex allowing empty string**
-  - `src/lib/validations.ts:17-20` — `*` quantifier matches empty string; should be `+`.
+  - `src/schemas/validations.ts:17-20` — `*` quantifier matches empty string; should be `+`.
   - **Branch:** `fix/phone-regex-empty-match`
 
 ---

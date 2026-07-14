@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-
-import { contactSchema, type ContactInput } from "@/lib/validations";
+import { contactSchema, type ContactInput } from "@/schemas/validations";
 import { submitContactMessage } from "@/actions/contact";
 
 
@@ -262,25 +261,19 @@ export default function ContactPageClient({
 
             </div>
 
-
-
-
-            <div
-            className="rounded-2xl overflow-hidden border border-gray-200 h-64 bg-gray-100 flex items-center justify-center"
-            >
-
-              <p className="text-gray-400 text-sm">
-
-                {
-                  locale==="km"
-                  ?
-                  "ផែនទី Google"
-                  :
-                  "Google Map"
-                }
-
-              </p>
-
+            {/* Google Map */}
+            <div className="rounded-2xl overflow-hidden border border-gray-200 h-72 shadow-sm">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15631.744782126357!2d102.483699!3d13.0855486!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3104c85879b7f16b%3A0x2ae9cc3a5ce0878a!2sKamrieng%20High%20School!5e1!3m2!1sen!2skh!4v1"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={locale === "km" ? "ផែនទីវិទ្យាល័យកំរៀង" : "Kamrieng High School Map"}
+                className="w-full h-full"
+              />
             </div>
 
 

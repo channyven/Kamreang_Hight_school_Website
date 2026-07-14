@@ -1,7 +1,7 @@
 "use server";
 
 import nodemailer from "nodemailer";
-import { contactSchema } from "@/lib/validations";
+import { contactSchema } from "@/schemas/validations";
 import { sendTelegramNotification } from "@/lib/telegram";
 import type { ActionResult } from "@/types";
 
