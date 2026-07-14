@@ -53,7 +53,7 @@ const STATUS_OPTIONS = [
   { value: "archived", label: { en: "Archived", km: "ទុកក្នុងប័ណ្ណសារ" }, icon: Archive, color: "text-gray-500 bg-gray-50 border-gray-200" },
 ] as const;
 
-type TabId = "km" | "en";
+
 
 export default function NewsFormPage({ params }: PageProps) {
   const { id } = use(params);
@@ -63,7 +63,7 @@ export default function NewsFormPage({ params }: PageProps) {
   const [categories, setCategories] = useState<NewsCategory[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [existingSlugs, setExistingSlugs] = useState<string[]>([]);
-  const [langTab, setLangTab] = useState<TabId>("km");
+
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
   const {
@@ -215,67 +215,66 @@ export default function NewsFormPage({ params }: PageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ═══ Main Content ═══ */}
           <div className="lg:col-span-2 space-y-6">
-            {/* ── Bilingual Language Tabs ── */}
+            {/* ── Bilingual Content (Khmer & English side by side) ── */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="flex items-center border-b border-gray-100 bg-gray-50/50">
-                <div className="flex">
-                  {[
-                    { id: "km" as TabId, label: { en: "Khmer", km: "ភាសាខ្មែរ" }, flag: "🇰🇭" },
-                    { id: "en" as TabId, label: { en: "English", km: "ភាសាអង់គ្លេស" }, flag: "🇺🇸" },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setLangTab(tab.id)}
-                      className={`relative flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all duration-200 ${
-                        langTab === tab.id
-                          ? "text-school-blue-800 bg-white"
-                          : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
-                      }`}
-                    >
-                      {langTab === tab.id && (
-                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-school-blue-800" />
-                      )}
-                      <span className="text-base">{tab.flag}</span>
-                      {locale === "km" ? tab.label.km : tab.label.en}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex-1" />
-                <div className="hidden sm:flex items-center gap-2 pr-4">
-                  <Globe className="w-3.5 h-3.5 text-gray-300" />
-                  <span className="text-[11px] text-gray-400">
-                    {locale === "km" ? "បំពេញព័ត៌មានជាពីរភាសា" : "Bilingual content"}
-                  </span>
-                </div>
+              <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+                <Globe className="w-4 h-4 text-school-blue-800" />
+                <h2 className="font-semibold text-gray-900 text-sm">
+                  {locale === "km" ? "មាតិកាពីរភាសា" : "Bilingual Content"}
+                </h2>
+                <span className="text-[11px] text-gray-400 ml-auto">
+                  {locale === "km" ? "បំពេញទាំងពីរភាសា" : "Fill in both languages"}
+                </span>
               </div>
 
-              <div className="p-5 sm:p-6 space-y-5">
-                {/* Title */}
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-gray-700">
-                    {langTab === "km" ? "ចំណងជើង" : "Title"}
-                    <span className="text-red-400 ml-0.5">*</span>
+              <div className="p-5 sm:p-6 space-y-6">
+                {/* Title - Bilingual */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-gray-400" />
+                    {locale === "km" ? "ចំណងជើង" : "Title"}
+                    <span className="text-red-400">*</span>
                   </Label>
-                  <div className="relative">
-                    <Input
-                      {...register(langTab === "km" ? "title_km" : "title_en")}
-                      className={`font-${langTab === "km" ? "khmer" : "sans"} pr-16`}
-                      placeholder={
-                        langTab === "km"
-                          ? "បញ្ចូលចំណងជើងព័ត៌មាន..."
-                          : "Enter article title..."
-                      }
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 font-mono">
-                      {(langTab === "km" ? titleKm?.length ?? 0 : titleEn?.length ?? 0)}/500
-                    </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Khmer Title */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇰🇭</span> Khmer
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          {...register("title_km")}
+                          className="font-khmer pr-16"
+                          placeholder="បញ្ចូលចំណងជើងព័ត៌មាន..."
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 font-mono">
+                          {titleKm?.length ?? 0}/500
+                        </span>
+                      </div>
+                      {errors.title_km && (
+                        <p className="text-xs text-red-500">{errors.title_km.message as string}</p>
+                      )}
+                    </div>
+                    {/* English Title */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇺🇸</span> English
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          {...register("title_en")}
+                          className="pr-16"
+                          placeholder="Enter article title..."
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 font-mono">
+                          {titleEn?.length ?? 0}/500
+                        </span>
+                      </div>
+                      {errors.title_en && (
+                        <p className="text-xs text-red-500">{errors.title_en.message as string}</p>
+                      )}
+                    </div>
                   </div>
-                  {(langTab === "km" ? errors.title_km : errors.title_en) && (
-                    <p className="text-xs text-red-500">
-                      {(langTab === "km" ? errors.title_km?.message : errors.title_en?.message) as string}
-                    </p>
-                  )}
                 </div>
 
                 {/* Slug */}
@@ -284,7 +283,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     Slug <span className="text-red-400 ml-0.5">*</span>
                     <span className="text-[11px] font-normal text-gray-400 ml-2">(URL identifier)</span>
                   </Label>
-                  <div className="relative">
+                  <div className="relative max-w-lg">
                     <Input
                       {...register("slug", {
                         onChange: () => setSlugManuallyEdited(true),
@@ -304,55 +303,90 @@ export default function NewsFormPage({ params }: PageProps) {
 
                 <Separator />
 
-                {/* Excerpt */}
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-gray-700">
-                    {langTab === "km" ? "សង្ខេប" : "Excerpt"}
+                {/* Excerpt - Bilingual */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-gray-400" />
+                    {locale === "km" ? "សង្ខេប" : "Excerpt"}
                     <span className="text-[11px] font-normal text-gray-400 ml-2">
                       ({locale === "km" ? "អត្ថបទសង្ខេបខ្លី" : "Short summary shown in cards"})
                     </span>
                   </Label>
-                  <div className="relative">
-                    <textarea
-                      {...register(langTab === "km" ? "excerpt_km" : "excerpt_en")}
-                      rows={3}
-                      className={`w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none ${
-                        langTab === "km" ? "font-khmer" : ""
-                      }`}
-                      placeholder={
-                        langTab === "km"
-                          ? "បញ្ចូលសេចក្តីសង្ខេបខ្លី..."
-                          : "Enter a brief summary..."
-                      }
-                    />
-                    <span className="absolute right-3 bottom-2.5 text-[10px] text-gray-300 font-mono">
-                      {(langTab === "km" ? excerptKm?.length ?? 0 : excerptEn?.length ?? 0)}/500
-                    </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Khmer Excerpt */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇰🇭</span> Khmer
+                      </Label>
+                      <div className="relative">
+                        <textarea
+                          {...register("excerpt_km")}
+                          rows={3}
+                          className={`w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none font-khmer`}
+                          placeholder="បញ្ចូលសេចក្តីសង្ខេបខ្លី..."
+                        />
+                        <span className="absolute right-3 bottom-2.5 text-[10px] text-gray-300 font-mono">
+                          {excerptKm?.length ?? 0}/500
+                        </span>
+                      </div>
+                    </div>
+                    {/* English Excerpt */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇺🇸</span> English
+                      </Label>
+                      <div className="relative">
+                        <textarea
+                          {...register("excerpt_en")}
+                          rows={3}
+                          className={`w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none`}
+                          placeholder="Enter a brief summary..."
+                        />
+                        <span className="absolute right-3 bottom-2.5 text-[10px] text-gray-300 font-mono">
+                          {excerptEn?.length ?? 0}/500
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <Separator />
 
-                {/* Content */}
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold text-gray-700">
-                    {langTab === "km" ? "មាតិកា" : "Content"}
+                {/* Content - Bilingual */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-gray-400" />
+                    {locale === "km" ? "មាតិកា" : "Content"}
                     <span className="text-[11px] font-normal text-gray-400 ml-2">
                       ({locale === "km" ? "មាតិកា HTML" : "HTML content"})
                     </span>
                   </Label>
-                  <textarea
-                    {...register(langTab === "km" ? "content_km" : "content_en")}
-                    rows={14}
-                    className={`w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono ${
-                      langTab === "km" ? "font-khmer" : ""
-                    }`}
-                    placeholder={
-                      langTab === "km"
-                        ? "បញ្ចូលមាតិកា HTML..."
-                        : "Enter HTML content..."
-                    }
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Khmer Content */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇰🇭</span> Khmer
+                      </Label>
+                      <textarea
+                        {...register("content_km")}
+                        rows={14}
+                        className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono font-khmer"
+                        placeholder="បញ្ចូលមាតិកា HTML..."
+                      />
+                    </div>
+                    {/* English Content */}
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                        <span className="text-base">🇺🇸</span> English
+                      </Label>
+                      <textarea
+                        {...register("content_en")}
+                        rows={14}
+                        className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring font-mono"
+                        placeholder="Enter HTML content..."
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
