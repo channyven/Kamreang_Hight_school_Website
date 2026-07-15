@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createServerClient } from "@/lib/supabase";
 import { getAdminAuth } from "@/lib/firebase-admin";
 
@@ -22,15 +21,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
     }
 
-    const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE, idToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: SESSION_MAX_AGE,
-      path: "/",
-    });
-
     // Look up the user record using the service-role client (bypasses RLS)
     const supabase = createServerClient();
     const { data } = await supabase
@@ -38,7 +28,20 @@ export async function POST(request: NextRequest) {
       .select("*")
       .eq("firebase_uid", decodedToken.uid)
       .single();
-    return NextResponse.json({ success: true, user: data ?? null });
+
+    // Attach the cookie DIRECTLY to the response so the browser
+    // receives the Set-Cookie header.  Using cookies().set() in a
+    // route handler can silently fail because NextResponse.json()
+    // creates a fresh response object.
+    const response = NextResponse.json({ success: true, user: data ?? null });
+    response.cookies.set(SESSION_COOKIE, idToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+    });
+    return response;
   } catch (error) {
     console.error("Session create error:", error);
     return NextResponse.json({ error: "Failed to create session" }, { status: 500 });
@@ -46,7 +49,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE() {
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE);
-  return NextResponse.json({ success: true });
+  const response = NextResponse.json({ success: true });
+  response.cookies.delete(SESSION_COOKIE);
+  return response;
 }
