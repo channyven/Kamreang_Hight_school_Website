@@ -9,6 +9,7 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 5; // 5 days
 export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
+     
     if (!idToken) {
       return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
     }
@@ -18,12 +19,23 @@ export async function POST(request: NextRequest) {
     let decodedToken;
     try {
       decodedToken = await auth.verifyIdToken(idToken);
-    } catch {
-      return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
-    }
+    
+    } catch (error) {
+    console.error("Firebase token verification error:", error);
 
+    return NextResponse.json(
+        { error: "Invalid or expired token" },
+        { status: 401 }
+         );
+       }
+      // Create Firebase session cookie
+    const sessionCookie = await auth.createSessionCookie(idToken, {
+      expiresIn: SESSION_MAX_AGE * 1000,
+    });
+
+    // Save session cookie
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE, idToken, {
+    cookieStore.set(SESSION_COOKIE, sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -33,11 +45,15 @@ export async function POST(request: NextRequest) {
 
     // Look up the user record using the service-role client (bypasses RLS)
     const supabase = createServerClient();
-    const { data } = await supabase
-      .from("admin_users")
-      .select("*")
-      .eq("firebase_uid", decodedToken.uid)
-      .single();
+    const { data, error } = await supabase
+    .from("admin_users")
+    .select("*")
+    .eq("firebase_uid", decodedToken.uid)
+    .single();
+
+    if (error) {
+  console.error("Supabase error:", error);
+}
     return NextResponse.json({ success: true, user: data ?? null });
   } catch (error) {
     console.error("Session create error:", error);
