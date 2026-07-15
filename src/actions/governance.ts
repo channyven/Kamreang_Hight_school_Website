@@ -12,6 +12,7 @@ import { requireAdmin } from "@/lib/auth-guard";
 // silently hide inactive items from the admin list/edit pages otherwise.
 
 export async function getAllGovernanceItems(): Promise<GovernanceItem[]> {
+  try { await requireAdmin(); } catch { return []; }
   const supabase = createServerClient();
   const { data } = await supabase
     .from("governance_items")
@@ -22,6 +23,7 @@ export async function getAllGovernanceItems(): Promise<GovernanceItem[]> {
 }
 
 export async function getGovernanceItemById(id: string): Promise<GovernanceItem | null> {
+  try { await requireAdmin(); } catch { return null; }
   const supabase = createServerClient();
   const { data } = await supabase.from("governance_items").select("*").eq("id", id).maybeSingle();
   return data as GovernanceItem | null;

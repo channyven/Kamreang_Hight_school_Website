@@ -2,7 +2,7 @@ import { BaseService } from "./base.service";
 import type { NewsInput } from "@/schemas/validations";
 import type { News } from "@/types";
 
-function sanitizeInput(data: NewsInput): Record<string, unknown> {
+export function sanitizeInput(data: NewsInput): Record<string, unknown> {
   const record = { ...data } as Record<string, unknown>;
   for (const key of ["category_id", "featured_image", "publish_date"] as const) {
     if (record[key] === "") record[key] = null;

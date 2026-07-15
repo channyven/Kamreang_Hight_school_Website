@@ -1,70 +1,12 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
 import { createServerClient } from "@/lib/supabase";
-import { NewsService } from "@/services/news.service";
+import { NewsService, sanitizeInput } from "@/services/news.service";
 import { AuditService } from "@/services/audit.service";
 import { newsSchema, type NewsInput } from "@/schemas/validations";
 import type { ActionResult, SessionUser, News } from "@/types";
-
-// ─── Session helper ───────────────────────────────────────────
-// Decodes the Firebase ID token stored in the httpOnly __session
-// cookie (set by /api/auth/session) to extract the firebase_uid,
-// then looks up the corresponding admin_users record.
-// This does NOT verify the JWT signature; validation is delegated
-// to Firebase Auth at token-creation time and the httpOnly cookie
-// is inaccessible to XSS.
-
-async function getCurrentUser(): Promise<SessionUser | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("__session")?.value;
-    if (!token) return null;
-
-    const payloadBase64 = token.split(".")[1];
-    if (!payloadBase64) return null;
-    const payload = JSON.parse(
-      Buffer.from(payloadBase64, "base64url").toString("utf-8")
-    );
-    const firebaseUid: string | undefined = payload.sub;
-    if (!firebaseUid) return null;
-
-    const supabase = createServerClient();
-    const { data } = await supabase
-      .from("admin_users")
-      .select("*")
-      .eq("firebase_uid", firebaseUid)
-      .single();
-
-    if (!data || !data.is_active) return null;
-    return data as SessionUser;
-  } catch {
-    return null;
-  }
-}
-
-// ─── Helpers ───────────────────────────────────────────────────
-
-/** Transform empty strings to null so Supabase doesn't reject them */
-function sanitizeInput(
-  data: NewsInput
-): Record<string, unknown> {
-  const record = { ...data } as Record<string, unknown>;
-  for (const key of ["category_id", "featured_image", "publish_date"] as const) {
-    if (record[key] === "") record[key] = null;
-  }
-  // Ensure gallery_images is always an array
-  if (!Array.isArray(record.gallery_images)) {
-    record.gallery_images = [];
-  }
-  // Auto-set publish_date to now if status is published and no date was provided
-  if (data.status === "published" && (!data.publish_date || data.publish_date === "")) {
-    record.publish_date = new Date().toISOString();
-  }
-  return record;
-}
 
 // ─── CRUD Actions ─────────────────────────────────────────────
 
@@ -99,7 +41,8 @@ function isSlugConflict(error: { code?: string; message: string }): boolean {
 }
 
 export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
-  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+  let user: SessionUser;
+  try { user = await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
 
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
@@ -107,11 +50,10 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
   }
 
   const supabase = createServerClient();
-  const user = await getCurrentUser();
   let insertData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
-    created_by: user?.id ?? null,
-    updated_by: user?.id ?? null,
+    created_by: user.id,
+    updated_by: user.id,
   };
 
   // Attempt insert; if slug conflicts, retry with a suffixed slug
@@ -121,14 +63,12 @@ export async function createNews(data: NewsInput): Promise<ActionResult<void>> {
 
     if (!error) {
       // Audit log
-      if (user) {
-        await supabase.from("admin_audit_logs").insert({
-          user_id: user.id,
-          user_email: user.email,
-          action: "create",
-          table_name: "news",
-        });
-      }
+      await supabase.from("admin_audit_logs").insert({
+        user_id: user.id,
+        user_email: user.email,
+        action: "create",
+        table_name: "news",
+      });
 
       revalidatePath("/[locale]/news", "page");
       revalidatePath("/", "layout");
@@ -152,7 +92,8 @@ export async function updateNews(
   id: string,
   data: NewsInput
 ): Promise<ActionResult<void>> {
-  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+  let user: SessionUser;
+  try { user = await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
 
   const parsed = newsSchema.safeParse(data);
   if (!parsed.success) {
@@ -160,11 +101,10 @@ export async function updateNews(
   }
 
   const supabase = createServerClient();
-  const user = await getCurrentUser();
   let updateData: Record<string, unknown> = {
     ...sanitizeInput(parsed.data),
     updated_at: new Date().toISOString(),
-    updated_by: user?.id ?? null,
+    updated_by: user.id,
   };
 
   // Attempt update; if slug conflicts, retry with a suffixed slug
@@ -177,15 +117,13 @@ export async function updateNews(
 
     if (!error) {
       // Audit log
-      if (user) {
-        await supabase.from("admin_audit_logs").insert({
-          user_id: user.id,
-          user_email: user.email,
-          action: "update",
-          table_name: "news",
-          record_id: id,
-        });
-      }
+      await supabase.from("admin_audit_logs").insert({
+        user_id: user.id,
+        user_email: user.email,
+        action: "update",
+        table_name: "news",
+        record_id: id,
+      });
 
       revalidatePath("/[locale]/news", "page");
       revalidatePath("/", "layout");
@@ -206,24 +144,22 @@ export async function updateNews(
 }
 
 export async function deleteNews(id: string): Promise<ActionResult<void>> {
-  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+  let user: SessionUser;
+  try { user = await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
 
   const newsService = new NewsService();
   const auditService = new AuditService();
-  const user = await getCurrentUser();
 
   const error = await newsService.remove(id);
   if (error) return { success: false, error };
 
-  if (user) {
-    await auditService.log({
-      userId: user.id,
-      userEmail: user.email,
-      action: "delete",
-      tableName: "news",
-      recordId: id,
-    });
-  }
+  await auditService.log({
+    userId: user.id,
+    userEmail: user.email,
+    action: "delete",
+    tableName: "news",
+    recordId: id,
+  });
 
   revalidatePath("/[locale]/news", "page");
   revalidatePath("/", "layout");
@@ -237,29 +173,23 @@ export async function deleteNews(id: string): Promise<ActionResult<void>> {
 // This server action uses the service role to fetch all articles.
 
 export async function getAdminNewsList(): Promise<News[]> {
-  try {
-    const supabase = createServerClient();
-    const { data } = await supabase
-      .from("news")
-      .select("*, category:news_categories(*)")
-      .order("created_at", { ascending: false });
-    return (data ?? []) as News[];
-  } catch {
-    return [];
-  }
+  try { await requireAdmin(); } catch { return []; }
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("news")
+    .select("*, category:news_categories(*)")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as News[];
 }
 
 /** Fetch a single news item by ID using the service role (bypasses RLS) */
 export async function getAdminNewsById(id: string): Promise<News | null> {
-  try {
-    const supabase = createServerClient();
-    const { data } = await supabase
-      .from("news")
-      .select("*, category:news_categories(*)")
-      .eq("id", id)
-      .single();
-    return data as News | null;
-  } catch {
-    return null;
-  }
+  try { await requireAdmin(); } catch { return null; }
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("news")
+    .select("*, category:news_categories(*)")
+    .eq("id", id)
+    .single();
+  return data as News | null;
 }

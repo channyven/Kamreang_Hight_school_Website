@@ -63,7 +63,7 @@ INSERT INTO settings (key, value, description) VALUES
     "address_km": "ភូមិអូរដា ឃុំអូរដា ស្រុកកំរៀង ខេត្តបាត់ដំបង",
     "address_en": "Ou Da village, Ou Da commune, Kamrieng district, Battambang province",
     "phone": "+855 23 000 000",
-    "email": "info@school.edu.kh",
+    "email": "reachtalab@gmail.com",
     "map_embed_url": "",
     "facebook_url": "",
     "youtube_url": "",

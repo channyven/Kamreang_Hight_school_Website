@@ -3,8 +3,10 @@
 import { createServerClient } from "@/lib/supabase";
 import type { ActionResult } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export async function getMilestones() {
+  try { await requireAdmin(); } catch { return []; }
   const supabase = createServerClient();
   const { data } = await supabase
     .from("milestones")
@@ -29,6 +31,7 @@ export async function upsertMilestone(
     is_active: boolean;
   }
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const payload = {
     ...data,
@@ -57,6 +60,7 @@ export async function upsertMilestone(
 export async function deleteMilestone(
   id: string
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const supabase = createServerClient();
   const { error } = await supabase
     .from("milestones")

@@ -14,9 +14,9 @@ async function getContactInfo(locale: string) {
   return {
     address:
       (km ? settings.school_address_km : settings.school_address_en) ??
-      (km ? "ភ្នំពេញ, កម្ពុជា" : "Phnom Penh, Cambodia"),
-    phone: settings.school_phone ?? "+855 23 000 000",
-    email: settings.school_email ?? "info@school.edu.kh",
+      (km ? "ខេត្តបាត់ដំបង, កម្ពុជា" : "Battambang Province, Cambodia"),
+    phone: settings.school_phone ?? "095 85 85 45",
+    email: settings.school_email ?? "reachtalab@gmail.com",
     hours:
       (km ? settings.school_hours_km : settings.school_hours_en) ??
       (km ? "ច័ន្ទ - សុក្រ: ម៉ោង ៧:០០ - ១១:០០, ១៤:០០ - ១៧:០០" : "Mon - Fri: 7:00 - 11:00, 14:00 - 17:00"),

@@ -11,6 +11,7 @@ import { requireAdmin } from "@/lib/auth-guard";
  * Fetch a single document by ID.
  */
 export async function getDocumentById(id: string): Promise<AppDocument | null> {
+  try { await requireAdmin(); } catch { return null; }
   const supabase = createServerClient();
   const { data, error } = await supabase
     .from("downloads")
@@ -34,6 +35,7 @@ export async function getDocuments(params?: {
   category?: DocumentCategory | "all";
   search?: string;
 }): Promise<AppDocument[]> {
+  try { await requireAdmin(); } catch { return []; }
   const supabase = createServerClient();
   let query = supabase
     .from("downloads")
@@ -122,6 +124,7 @@ export async function updateDocument(
   id: string,
   data: DocumentInput
 ): Promise<ActionResult<void>> {
+  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = documentSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
