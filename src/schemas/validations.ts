@@ -56,7 +56,7 @@ export const achievementSchema = z.object({
   title_en: z.string().min(1, "English title is required").max(500),
   description_km: z.string().optional(),
   description_en: z.string().optional(),
-  achievement_type: z.enum(["academic", "sports", "arts", "community", "other"]).optional(),
+  achievement_type: z.enum(["student", "teacher", "school"]).optional(),
   award_level: z.enum(["national", "provincial", "district", "school"]).optional(),
   achievement_date: z.string().optional(),
   participant_name: z.string().max(300).optional(),

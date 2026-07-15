@@ -12,7 +12,7 @@ import {
   School,
   SearchX,
 } from "lucide-react";
-import { cn, getLocalizedText, formatShortDate } from "@/utils";
+import { cn, getLocalizedText, formatShortDate, convertGoogleDriveUrl } from "@/utils";
 import type { Achievement } from "@/types";
 
 // ─── Level tag colors ─────────────────────────────────────────
@@ -138,10 +138,22 @@ export default function AchievementsContent({ achievements, translations }: Prop
                   transition={{ duration: 0.35, delay: i * 0.035, ease: "easeOut" }}
                   className="group bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col"
                 >
-                  {/* Trophy icon */}
-                  <div className="w-10 h-10 rounded-lg bg-school-blue-50 flex items-center justify-center mb-3 group-hover:bg-school-blue-100 transition-colors">
-                    <Trophy className="w-5 h-5 text-school-blue-600" />
-                  </div>
+                  {/* Image or Trophy icon */}
+                  {item.image_url ? (
+                    <div className="relative w-full h-32 -mx-5 -mt-5 mb-4 overflow-hidden rounded-t-xl bg-gray-50">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={convertGoogleDriveUrl(item.image_url)}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-school-blue-50 flex items-center justify-center mb-3 group-hover:bg-school-blue-100 transition-colors">
+                      <Trophy className="w-5 h-5 text-school-blue-600" />
+                    </div>
+                  )}
 
                   {/* Level tag */}
                   {item.award_level && (

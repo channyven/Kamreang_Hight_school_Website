@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { ArrowRight, Trophy, Medal, Award, Star, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Achievement } from "@/types";
-import { getLocalizedText, formatShortDate } from "@/utils";
+import { getLocalizedText, formatShortDate, convertGoogleDriveUrl } from "@/utils";
 
 const LEVEL_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
   national:   { bg: "bg-red-50 border-red-200",    text: "text-red-700",   icon: <Award className="w-3.5 h-3.5" /> },
@@ -64,18 +64,30 @@ export default function AchievementsSection({ achievements }: AchievementsSectio
                 transition={{ duration: 0.4, delay: i * 0.06, ease: "easeOut" }}
                 className="group bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-default"
               >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center shrink-0 ring-1 ring-amber-200/50">
+                {/* Image or Trophy icon */}
+                {item.image_url ? (
+                  <div className="relative w-full h-36 -mx-5 -mt-5 mb-4 overflow-hidden rounded-t-xl bg-gray-50">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={convertGoogleDriveUrl(item.image_url)}
+                      alt={title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center shrink-0 ring-1 ring-amber-200/50 mb-3">
                     <Trophy className="w-5 h-5 text-amber-600" />
                   </div>
-                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                    {item.award_level && (
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${levelStyle.bg} ${levelStyle.text}`}>
-                        {levelStyle.icon}{t(item.award_level as "national" | "provincial" | "district" | "school_level")}
-                      </span>
-                    )}
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-transparent ${typeColor}`}>{typeLabel}</span>
-                  </div>
+                )}
+
+                <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                  {item.award_level && (
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${levelStyle.bg} ${levelStyle.text}`}>
+                      {levelStyle.icon}{t(item.award_level as "national" | "provincial" | "district" | "school_level")}
+                    </span>
+                  )}
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-transparent ${typeColor}`}>{typeLabel}</span>
                 </div>
                 <h3 className={`font-semibold text-gray-900 text-sm leading-snug mb-1.5 ${locale === "km" ? "font-khmer" : ""}`}>{title}</h3>
                 {desc && <p className={`text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 ${locale === "km" ? "font-khmer" : ""}`}>{desc}</p>}
