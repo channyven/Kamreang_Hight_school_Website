@@ -8,6 +8,7 @@ import Link from "next/link";
 import { formatRelativeDate } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
+import AdminMessagesTable from "@/components/admin/AdminMessagesTable";
 
 async function getDashboardData() {
   const supabase = createServerClient();
@@ -281,8 +282,8 @@ export default async function AdminDashboardPage() {
                             msg.status === "unread"
                               ? { background: "#fef2f2", color: "#dc2626" }
                               : msg.status === "replied"
-                              ? { background: "#dcfce7", color: "#15803d" }
-                              : { background: "#f4f6fb", color: "#8892a0" }
+                                ? { background: "#dcfce7", color: "#15803d" }
+                                : { background: "#f4f6fb", color: "#8892a0" }
                           }
                         >
                           {msg.status === "unread" ? "New" : msg.status === "replied" ? "Replied" : "Read"}

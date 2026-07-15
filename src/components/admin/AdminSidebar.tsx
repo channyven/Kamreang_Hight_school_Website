@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Newspaper, Trophy,
+  LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap, FileText, Landmark,
+  GraduationCap, Landmark,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { cn } from "@/utils";
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance"] },
+  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "about"] },
   { label: "Inbox", keys: ["messages"] },
   { label: "System", keys: ["users", "settings"] },
 ];
@@ -51,6 +51,7 @@ export default function AdminSidebar() {
       { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4 h-4" /> },
       { key: "documents", href: `/${locale}/admin/documents`, icon: <FileText className="w-4 h-4" /> },
       { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
+      { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4 h-4" /> },
       { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
       { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
       { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },

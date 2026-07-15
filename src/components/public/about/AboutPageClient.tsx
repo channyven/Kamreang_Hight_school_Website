@@ -22,7 +22,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { cn, getLocalizedText, getAvatarUrl } from "@/utils";
-import type { SchoolInfo, Leadership, Teacher, Statistics } from "@/types";
+import type { SchoolInfo, Leadership, Milestone, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";
 import {
@@ -54,6 +54,12 @@ function useCounter(target: number, active: boolean, duration = 2000) {
   }, [target, active, duration]);
 
   return count;
+}
+
+/** Check if a URL is a valid http/https URL — rejects file://, blob:, data:, etc. */
+function isValidUrl(url: string | null | undefined): url is string {
+  if (!url) return false;
+  return url.startsWith("http://") || url.startsWith("https://");
 }
 
 // ─── Data ──────────────────────────────────────────────────────
@@ -121,47 +127,7 @@ const STAT_HEADERS: Record<string, StatConfig> = {
   },
 };
 
-const MILESTONES = [
-  {
-    year: "2000",
-    title_en: "School Founded",
-    title_km: "បង្កើតសាលា",
-    desc_en:
-      "Kamrieng High School was founded through the initiative of the Kamrieng district governor and district education office, together with local authorities, to bring secondary education to this rural community.",
-    desc_km:
-      "វិទ្យាល័យកំរៀង ត្រូវបានបង្កើតឡើងតាមគំនិតផ្ដួចផ្ដើមរបស់លោក សុខ គង់ អភិបាលស្រុកកំរៀង និងលោក នូប ធឿន ប្រធានការិយាល័យអប់រំ យុវជន និងកីឡាស្រុកកំរៀង រួមជាមួយអាជ្ញាធរមូលដ្ឋាន។",
-    color: "#1e3a8a",
-    image: "/images/about/school%20founding.jpg",
-    caption_km: "ការបង្កើតសាលា",
-    caption_en: "School Founding",
-  },
-  {
-    year: "2022",
-    title_en: 'Recognized as a "Best School"',
-    title_km: "ទទួលស្គាល់ជា \"សាលាល្អ\"",
-    desc_en:
-      'The Ministry of Education, Youth and Sport formally recognized Kamrieng High School as a "Best School" (សាលាល្អ).',
-    desc_km:
-      'ក្រសួងអប់រំ យុវជន និងកីឡា បានទទួលស្គាល់វិទ្យាល័យកំរៀងជា "សាលាល្អ" ។',
-    color: "#f59e0b",
-    image: "/images/about/Best%20School%20Award.png",
-    caption_km: "ពានរង្វាន់សាលាល្អ",
-    caption_en: "Best School Award",
-  },
-  {
-    year: "2024–2025",
-    title_en: "Growing Enrollment",
-    title_km: "ការកើនឡើងនៃចំនួនសិស្ស",
-    desc_en:
-      "The school now serves 2,126 students across 42 classes, Grade 7 through 12, guided by 51 teaching staff.",
-    desc_km:
-      "បច្ចុប្បន្នសាលាមានសិស្សចំនួន ២,១២៦ នាក់ ក្នុង ៤២ ថ្នាក់ ចាប់ពីថ្នាក់ទី ៧ ដល់ទី ១២ ដឹកនាំដោយគ្រូចំនួន ៥១ នាក់។",
-    color: "#1e3a8a",
-    image: "/images/about/Enrollment%20Growth.png",
-    caption_km: "កំណើនសិស្ស",
-    caption_en: "Enrollment Growth",
-  },
-];
+
 
 // ─── Sub-components ────────────────────────────────────────────
 
@@ -291,7 +257,7 @@ function LeaderDetailDialog({
         {/* Header with photo and name */}
         <div className="bg-gradient-to-r from-school-blue-800 to-school-blue-700 px-6 pt-8 pb-6 text-center">
           <div className="relative w-24 h-24 mx-auto rounded-2xl overflow-hidden ring-4 ring-white/30 shadow-xl mb-4">
-            {leader.photo_url ? (
+            {isValidUrl(leader.photo_url) ? (
               <Image
                 src={leader.photo_url}
                 alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
@@ -319,7 +285,7 @@ function LeaderDetailDialog({
             )}
           </DialogTitle>
           {leader.name_km && leader.name_en && (
-            <p className={cn("text-sm text-white/70 mb-1", km && "font-khmer")}>
+            <p className="text-sm text-white/70 mb-1 font-khmer">
               {km ? leader.name_en : leader.name_km}
             </p>
           )}
@@ -394,6 +360,7 @@ interface AboutPageClientProps {
   schoolInfo: SchoolInfo[];
   leadership: Leadership[];
   teachers: Teacher[];
+  milestones: Milestone[];
   statistics: Statistics | null;
   locale: string;
 }
@@ -402,6 +369,7 @@ export default function AboutPageClient({
   schoolInfo,
   leadership,
   teachers,
+  milestones,
   statistics,
   locale,
 }: AboutPageClientProps) {
@@ -427,7 +395,7 @@ export default function AboutPageClient({
   const history = infoMap["history"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8f9ff] via-white to-[#f8f9ff]">
+    <div className="min-h-screen bg-gradient-to-b from-[#f8f9ff] via-white to-[#f8f9ff] overflow-x-hidden">
       {/* ─── HERO ─── */}
       <ScrollReveal variant="fade-in" duration={0.8}>
         <section className="relative pt-24 pb-20 overflow-hidden">
@@ -513,7 +481,7 @@ export default function AboutPageClient({
 
       {/* ─── STATISTICS ─── */}
       <section className="py-16 relative">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <ScrollReveal variant="fade-up">
             <SectionHeading
               khmer="ស្ថិតិសាលារៀន"
@@ -546,7 +514,7 @@ export default function AboutPageClient({
 
       {/* ─── VISION / MISSION / VALUES ─── */}
       <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <ScrollReveal variant="fade-up">
             <div className="text-center mb-16">
               <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-goldMain mb-3">
@@ -575,8 +543,8 @@ export default function AboutPageClient({
                   </div>
                   <div
                     className={cn(
-                      "text-[16px] leading-[1.8] text-gray-600 font-medium",
-                      km && "font-khmer"
+                      "prose prose-lg max-w-prose prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
+                      km ? "prose-khmer font-khmer" : "prose-english"
                     )}
                     dangerouslySetInnerHTML={{
                       __html: vision
@@ -602,8 +570,8 @@ export default function AboutPageClient({
                   </div>
                   <div
                     className={cn(
-                      "text-[16px] leading-[1.8] text-gray-600 font-medium",
-                      km && "font-khmer"
+                      "prose prose-lg max-w-prose prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
+                      km ? "prose-khmer font-khmer" : "prose-english"
                     )}
                     dangerouslySetInnerHTML={{
                       __html: mission
@@ -685,7 +653,7 @@ export default function AboutPageClient({
 
       {/* ─── HISTORY ─── */}
       <section className="py-16">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <ScrollReveal variant="fade-up">
             <SectionHeading
               khmer="ប្រវត្តិ​សាលា"
@@ -693,13 +661,13 @@ export default function AboutPageClient({
             />
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <ScrollReveal variant="fade-left" delay={0.1}>
-              <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <ScrollReveal variant="fade-left" delay={0.1} className="h-full">
+              <div className="h-full flex flex-col justify-center">
                 <div
                   className={cn(
-                    "text-base leading-relaxed mb-6 prose prose-sm max-w-none text-gray-600",
-                    km && "font-khmer"
+                    "prose prose-base max-w-prose mb-4 prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
+                    km ? "prose-khmer font-khmer" : "prose-english"
                   )}
                   dangerouslySetInnerHTML={{
                     __html: history
@@ -721,8 +689,8 @@ export default function AboutPageClient({
             </ScrollReveal>
 
             {/* Image: Real school photo */}
-            <ScrollReveal variant="fade-right" delay={0.2}>
-              <div className="relative rounded-2xl overflow-hidden group cursor-pointer min-h-[320px] shadow-lg">
+            <ScrollReveal variant="fade-right" delay={0.2} className="h-full">
+              <div className="relative rounded-2xl overflow-hidden group cursor-pointer h-full min-h-[260px] shadow-lg">
                 <Image
                   src="/images/about/4.png"
                   alt={km ? "រូបថតសាលា" : "School photo"}
@@ -763,7 +731,7 @@ export default function AboutPageClient({
           />
         </div>
 
-        <div className="container mx-auto px-6 relative">
+        <div className="max-w-7xl mx-auto px-6 relative">
           <ScrollReveal variant="fade-up">
             <SectionHeading
               khmer="ដំណាក់កាលសំខាន់ៗ"
@@ -778,11 +746,12 @@ export default function AboutPageClient({
               style={{ transform: "translateX(-50%)" }}
             />
 
-            {MILESTONES.map((m, i) => {
+            {(milestones ?? []).map((m, i) => {
               const isLeft = i % 2 === 0;
+              const m_color = m.color ?? "#1e3a8a";
               return (
                 <ScrollReveal
-                  key={m.year}
+                  key={m.id}
                   variant={isLeft ? "fade-left" : "fade-right"}
                   delay={i * 0.15}
                 >
@@ -803,14 +772,14 @@ export default function AboutPageClient({
                       <div
                         className="group relative bg-white rounded-2xl p-6 md:p-8 border transition-all duration-300 hover:shadow-xl"
                         style={{
-                          borderColor: `${m.color}20`,
-                          boxShadow: `0 4px 20px ${m.color}10`,
+                          borderColor: `${m_color}20`,
+                          boxShadow: `0 4px 20px ${m_color}10`,
                         }}
                       >
                         {/* Year badge */}
                         <div
                           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4 text-white"
-                          style={{ background: m.color }}
+                          style={{ background: m_color }}
                         >
                           <span>{m.year}</span>
                         </div>
@@ -829,13 +798,13 @@ export default function AboutPageClient({
                             km && "font-khmer"
                           )}
                         >
-                          {km ? m.desc_km : m.desc_en}
+                          {km ? (m.description_km ?? "") : (m.description_en ?? "")}
                         </p>
 
                         {/* Subtle hover indicator */}
                         <div
                           className="absolute bottom-0 left-0 right-0 h-1 rounded-b-2xl scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
-                          style={{ background: m.color }}
+                          style={{ background: m_color }}
                         />
                       </div>
                     </div>
@@ -844,8 +813,8 @@ export default function AboutPageClient({
                     <div
                       className="relative z-10 w-10 h-10 rounded-full border-[4px] border-white hidden md:flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-125"
                       style={{
-                        background: m.color,
-                        boxShadow: `0 0 0 6px ${m.color}15, 0 4px 15px ${m.color}30`,
+                        background: m_color,
+                        boxShadow: `0 0 0 6px ${m_color}15, 0 4px 15px ${m_color}30`,
                       }}
                     >
                       <div className="w-2 h-2 rounded-full bg-white" />
@@ -858,33 +827,35 @@ export default function AboutPageClient({
                         isLeft ? "md:pl-16" : "md:pr-16"
                       )}
                     >
-                      {m.image && (
+                      {(m.image_url ?? "") && (
                         <motion.div
                           className="relative rounded-2xl overflow-hidden shadow-lg border group/img"
-                          style={{ borderColor: `${m.color}20` }}
+                          style={{ borderColor: `${m_color}20` }}
                           whileHover={{ scale: 1.02, y: -4 }}
                           transition={{ type: "spring", stiffness: 200 }}
                         >
                           <div className="relative w-full h-48 md:h-52 overflow-hidden">
                             <Image
-                              src={m.image}
-                              alt={km ? m.caption_km : m.caption_en}
+                              src={m.image_url!}
+                              alt={km ? (m.caption_km ?? "") : (m.caption_en ?? "")}
                               fill
                               className="object-cover transition-transform duration-700 group-hover/img:scale-105"
                               sizes="(max-width: 768px) 100vw, 50vw"
                             />
                           </div>
                           {/* Image caption */}
-                          <div
-                            className="absolute bottom-0 left-0 right-0 px-4 py-3 backdrop-blur-sm"
-                            style={{
-                              background: `linear-gradient(to top, ${m.color}cc, transparent)`,
-                            }}
-                          >
-                            <p className="text-white text-xs font-semibold">
-                              {km ? m.caption_km : m.caption_en}
-                            </p>
-                          </div>
+                          {(m.caption_km || m.caption_en) && (
+                            <div
+                              className="absolute bottom-0 left-0 right-0 px-4 py-3 backdrop-blur-sm"
+                              style={{
+                                background: `linear-gradient(to top, ${m_color}cc, transparent)`,
+                              }}
+                            >
+                              <p className="text-white text-xs font-semibold">
+                                {km ? (m.caption_km ?? m.caption_en) : (m.caption_en ?? m.caption_km)}
+                              </p>
+                            </div>
+                          )}
                         </motion.div>
                       )}
                     </div>
@@ -898,7 +869,7 @@ export default function AboutPageClient({
 
       {/* ─── LEADERSHIP ─── */}
       <section className="py-16">
-        <div className="container mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <ScrollReveal variant="fade-up">
             <SectionHeading
               khmer="គណៈ​គ្រប់គ្រង​សាលា"
@@ -921,7 +892,7 @@ export default function AboutPageClient({
                   {/* Photo */}
                   <div className="flex items-center justify-center p-8 md:p-10 bg-gradient-to-br from-blue-50 to-blue-100/50">
                     <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-2xl overflow-hidden ring-4 ring-white shadow-xl shrink-0 transition-transform duration-300 group-hover:scale-[1.02]">
-                      {principal.photo_url ? (
+                      {isValidUrl(principal.photo_url) ? (
                         <Image
                           src={principal.photo_url}
                           alt={getLocalizedText(principal.name_km, principal.name_en, locale)}
@@ -996,7 +967,7 @@ export default function AboutPageClient({
                     className="group bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg border border-gray-100/80 hover:border-school-blue-100 w-full cursor-pointer"
                   >
                     <div className="relative w-24 h-24 mx-auto rounded-full mb-4 overflow-hidden ring-4 ring-blue-50 transition-all duration-500 group-hover:ring-school-gold-500/40">
-                      {leader.photo_url ? (
+                      {isValidUrl(leader.photo_url) ? (
                         <Image
                           src={leader.photo_url}
                           alt={getLocalizedText(leader.name_km, leader.name_en, locale)}

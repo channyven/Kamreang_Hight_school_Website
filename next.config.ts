@@ -4,6 +4,19 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  webpack: (config) => {
+    // Work around a Next.js 15 ChunkNamesPlugin/splitChunks bug where
+    // single-use vendor chunks get merged into the page chunk but are still
+    // recorded as separate `vendor-chunks/<pkg>` dependencies. The server
+    // runtime then fails with "Cannot find module './vendor-chunks/<pkg>.js'".
+    // Raising the request limits forces every vendor chunk to be emitted.
+    config.optimization.splitChunks = {
+      ...config.optimization.splitChunks,
+      maxInitialRequests: Infinity,
+      maxAsyncRequests: Infinity,
+    };
+    return config;
+  },
   images: {
     remotePatterns: [
       {
@@ -38,8 +51,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "drive.usercontent.google.com",
+hostname: "drive.usercontent.google.com",
         pathname: "/download/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
       },
     ],
   },

@@ -49,3 +49,6 @@ next-env.d.ts
 .firebaserc
 .claude/
 kamrieng-highschool/
+
+# Firebase Admin SDK service account key (sensitive credentials)
+*firebase-adminsdk*.json

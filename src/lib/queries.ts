@@ -1,9 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, GovernanceItem, Leadership, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
+  mockMilestones,
   mockTeachers,
   mockStats,
   mockGovernanceItems,
@@ -36,10 +37,11 @@ export const getAboutPageData = unstable_cache(
   async () => {
     try {
       const supabase = createServerClient();
-      const [{ data: info }, { data: leaders }, { data: teacherRows }] = await Promise.all([
+      const [{ data: info }, { data: leaders }, { data: teacherRows }, { data: milestoneRows }] = await Promise.all([
         supabase.from("school_info").select("*"),
         supabase.from("leadership").select("*").eq("is_active", true).order("sort_order"),
         supabase.from("teachers").select("*").eq("is_active", true).order("sort_order"),
+        supabase.from("milestones").select("*").eq("is_active", true).order("sort_order"),
       ]);
 
       // Check if Supabase data is still placeholder/seed content (e.g. "Phnom Penh High School")
@@ -48,7 +50,7 @@ export const getAboutPageData = unstable_cache(
         (row: Record<string, unknown>) =>
           typeof row.content_en === "string" &&
           (row.content_en.includes("Phnom Penh") ||
-          row.content_en.includes("established in 1960"))
+            row.content_en.includes("established in 1960"))
       );
 
       // Check if teachers have grade_levels — Supabase data likely doesn't
@@ -65,17 +67,21 @@ export const getAboutPageData = unstable_cache(
         teachers: teacherRows && teacherRows.length > 0 && hasGradeLevels
           ? (teacherRows as Teacher[])
           : mockTeachers,
+        milestones: milestoneRows && milestoneRows.length > 0
+          ? (milestoneRows as Milestone[])
+          : mockMilestones,
       };
     } catch {
       return {
         schoolInfo: mockSchoolInfo,
         leadership: mockLeadership,
         teachers: mockTeachers,
+        milestones: mockMilestones,
       };
     }
   },
   ["about-page-data"],
-  { tags: ["school_info", "leadership", "teachers"], revalidate: 60 }
+  { tags: ["school_info", "leadership", "teachers", "milestones"], revalidate: 60 }
 );
 
 export const getPublishedAchievements = unstable_cache(
