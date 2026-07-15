@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
 import { Save, Loader2, Settings, Users, FileText, Globe } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -215,12 +216,12 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                 ))}
-                <div className="space-y-1.5 md:col-span-2">
-                  <Label>Photo URL</Label>
-                  <Input
-                    value={leader.photo_url ?? ""}
-                    onChange={(e) => setLeadership((prev) => prev.map((l) => l.id === leader.id ? { ...l, photo_url: e.target.value } : l))}
-                    placeholder="https://..."
+                <div className="md:col-span-2">
+                  <ImageUploader
+                    value={leader.photo_url}
+                    onChange={(url) => setLeadership((prev) => prev.map((l) => l.id === leader.id ? { ...l, photo_url: url ?? "" } : l))}
+                    folder={`leadership/${leader.id}`}
+                    label="Photo"
                   />
                 </div>
               </div>

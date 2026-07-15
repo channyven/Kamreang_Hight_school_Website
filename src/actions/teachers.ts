@@ -1,10 +1,25 @@
 "use server";
 
 import { teacherSchema, type TeacherInput } from "@/schemas/validations";
-import type { ActionResult } from "@/types";
+import type { ActionResult, Teacher } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
 import { TeacherService } from "@/services";
+import { createServerClient } from "@/lib/supabase";
+
+export async function fetchTeachers(): Promise<Teacher[]> {
+  try { await requireAdmin(); } catch { return []; }
+  const supabase = createServerClient();
+  const { data } = await supabase.from("teachers").select("*").order("sort_order");
+  return (data ?? []) as Teacher[];
+}
+
+export async function fetchTeacher(id: string): Promise<Teacher | null> {
+  try { await requireAdmin(); } catch { return null; }
+  const supabase = createServerClient();
+  const { data } = await supabase.from("teachers").select("*").eq("id", id).maybeSingle();
+  return data as Teacher | null;
+}
 
 export async function createTeacher(
   data: TeacherInput
