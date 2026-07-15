@@ -19,9 +19,21 @@ export async function POST(request: NextRequest) {
     let decodedToken;
     try {
       decodedToken = await auth.verifyIdToken(idToken);
+<<<<<<< Updated upstream
     
     } catch (error) {
     console.error("Firebase token verification error:", error);
+=======
+    } catch (err) {
+      // Log the real reason server-side only (never expose to the client).
+      // Common codes: auth/argument-error = token from a different Firebase
+      // project than the service account; auth/id-token-expired = clock
+      // skew or stale token.
+      const e = err as { code?: string; message?: string };
+      console.error("Token verification failed:", e.code ?? "", e.message ?? err);
+      return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+    }
+>>>>>>> Stashed changes
 
     return NextResponse.json(
         { error: "Invalid or expired token" },
