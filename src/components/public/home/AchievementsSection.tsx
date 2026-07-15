@@ -62,11 +62,11 @@ export default function AchievementsSection({ achievements }: AchievementsSectio
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.06, ease: "easeOut" }}
-                className="group bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-default"
+                className="group bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-default flex flex-col overflow-hidden"
               >
                 {/* Image or Trophy icon */}
                 {item.image_url ? (
-                  <div className="relative w-full h-36 -mx-5 -mt-5 mb-4 overflow-hidden rounded-t-xl bg-gray-50">
+                  <div className="relative w-full h-40 bg-gray-50 shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={convertGoogleDriveUrl(item.image_url)}
@@ -76,27 +76,31 @@ export default function AchievementsSection({ achievements }: AchievementsSectio
                     />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center shrink-0 ring-1 ring-amber-200/50 mb-3">
-                    <Trophy className="w-5 h-5 text-amber-600" />
+                  <div className="relative w-full h-40 bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center shrink-0 group-hover:from-amber-100 group-hover:to-orange-100 transition-all duration-500">
+                    <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-amber-200/50">
+                      <Trophy className="w-6 h-6 text-amber-500" />
+                    </div>
                   </div>
                 )}
 
-                <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                  {item.award_level && (
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${levelStyle.bg} ${levelStyle.text}`}>
-                      {levelStyle.icon}{t(item.award_level as "national" | "provincial" | "district" | "school_level")}
-                    </span>
-                  )}
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-transparent ${typeColor}`}>{typeLabel}</span>
-                </div>
-                <h3 className={`font-semibold text-gray-900 text-sm leading-snug mb-1.5 ${locale === "km" ? "font-khmer" : ""}`}>{title}</h3>
-                {desc && <p className={`text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 ${locale === "km" ? "font-khmer" : ""}`}>{desc}</p>}
-                {item.achievement_date && (
-                  <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-                    <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-xs text-gray-400">{formatShortDate(item.achievement_date, locale)}</span>
+                <div className="p-5 pt-4 flex flex-col flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                    {item.award_level && (
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${levelStyle.bg} ${levelStyle.text}`}>
+                        {levelStyle.icon}{t(item.award_level as "national" | "provincial" | "district" | "school_level")}
+                      </span>
+                    )}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border border-transparent ${typeColor}`}>{typeLabel}</span>
                   </div>
-                )}
+                  <h3 className={`font-semibold text-gray-900 text-sm leading-snug mb-1.5 ${locale === "km" ? "font-khmer" : ""}`}>{title}</h3>
+                  {desc && <p className={`text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 ${locale === "km" ? "font-khmer" : ""}`}>{desc}</p>}
+                  {item.achievement_date && (
+                    <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+                      <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-xs text-gray-400">{formatShortDate(item.achievement_date, locale)}</span>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             );
           })}

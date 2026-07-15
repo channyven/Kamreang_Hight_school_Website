@@ -136,11 +136,11 @@ export default function AchievementsContent({ achievements, translations }: Prop
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.35, delay: i * 0.035, ease: "easeOut" }}
-                  className="group bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col"
+                  className="group bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden"
                 >
                   {/* Image or Trophy icon */}
                   {item.image_url ? (
-                    <div className="relative w-full h-32 -mx-5 -mt-5 mb-4 overflow-hidden rounded-t-xl bg-gray-50">
+                    <div className="relative w-full h-40 bg-gray-50 shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={convertGoogleDriveUrl(item.image_url)}
@@ -150,59 +150,63 @@ export default function AchievementsContent({ achievements, translations }: Prop
                       />
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-lg bg-school-blue-50 flex items-center justify-center mb-3 group-hover:bg-school-blue-100 transition-colors">
-                      <Trophy className="w-5 h-5 text-school-blue-600" />
+                    <div className="relative w-full h-40 bg-gradient-to-br from-school-blue-50 via-white to-school-gold-50 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-gold-100 transition-all duration-500">
+                      <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-school-blue-100/50">
+                        <Trophy className="w-6 h-6 text-school-blue-400" />
+                      </div>
                     </div>
                   )}
 
-                  {/* Level tag */}
-                  {item.award_level && (
-                    <span
-                      className={cn(
-                        "inline-block self-start px-2 py-0.5 rounded text-[11px] font-medium mb-2",
-                        LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK,
-                      )}
-                    >
-                      {t(item.award_level === "school" ? "school_level" : item.award_level)}
-                    </span>
-                  )}
-
-                  {/* Title */}
-                  <h3
-                    className={cn(
-                      "font-semibold text-gray-900 text-sm leading-snug mb-1",
-                      locale === "km" ? "font-khmer" : "",
+                  <div className="p-5 pt-4 flex flex-col flex-1">
+                    {/* Level tag */}
+                    {item.award_level && (
+                      <span
+                        className={cn(
+                          "inline-block self-start px-2 py-0.5 rounded text-[11px] font-medium mb-2",
+                          LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK,
+                        )}
+                      >
+                        {t(item.award_level === "school" ? "school_level" : item.award_level)}
+                      </span>
                     )}
-                  >
-                    {title}
-                  </h3>
 
-                  {/* Participant */}
-                  {item.participant_name && (
-                    <p className="text-xs text-school-blue-600/70 font-medium mb-1">
-                      {item.participant_name}
-                    </p>
-                  )}
-
-                  {/* Description */}
-                  {desc && (
-                    <p
+                    {/* Title */}
+                    <h3
                       className={cn(
-                        "text-xs text-gray-400 leading-relaxed line-clamp-2 mb-3 flex-1",
+                        "font-semibold text-gray-900 text-sm leading-snug mb-1",
                         locale === "km" ? "font-khmer" : "",
                       )}
                     >
-                      {desc}
-                    </p>
-                  )}
+                      {title}
+                    </h3>
 
-                  {/* Date */}
-                  {item.achievement_date && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-gray-400 pt-2 border-t border-gray-50 mt-auto">
-                      <Calendar className="w-3 h-3" />
-                      {formatShortDate(item.achievement_date, locale)}
-                    </div>
-                  )}
+                    {/* Participant */}
+                    {item.participant_name && (
+                      <p className="text-xs text-school-blue-600/70 font-medium mb-1">
+                        {item.participant_name}
+                      </p>
+                    )}
+
+                    {/* Description */}
+                    {desc && (
+                      <p
+                        className={cn(
+                          "text-xs text-gray-400 leading-relaxed line-clamp-2 mb-3 flex-1",
+                          locale === "km" ? "font-khmer" : "",
+                        )}
+                      >
+                        {desc}
+                      </p>
+                    )}
+
+                    {/* Date */}
+                    {item.achievement_date && (
+                      <div className="flex items-center gap-1.5 text-[11px] text-gray-400 pt-2 border-t border-gray-50 mt-auto">
+                        <Calendar className="w-3 h-3" />
+                        {formatShortDate(item.achievement_date, locale)}
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}
