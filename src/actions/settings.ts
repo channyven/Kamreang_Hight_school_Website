@@ -60,6 +60,7 @@ export async function updateLeadership(
     bio_km?: string;
     bio_en?: string;
     photo_url?: string;
+    phone?: string;
     sort_order: number;
     is_active: boolean;
   }

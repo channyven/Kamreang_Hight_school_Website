@@ -259,6 +259,7 @@ export default function AdminAboutPage() {
       bio_km: leader.bio_km,
       bio_en: leader.bio_en,
       photo_url: leader.photo_url,
+      phone: leader.phone,
       sort_order: leader.sort_order,
       is_active: leader.is_active,
     });
@@ -488,6 +489,7 @@ export default function AdminAboutPage() {
                         "name_en",
                         "position_km",
                         "position_en",
+                        "phone",
                       ] as const
                     ).map((field) => (
                       <div key={field} className="space-y-1.5">
