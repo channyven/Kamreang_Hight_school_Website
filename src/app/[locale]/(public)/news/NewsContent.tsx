@@ -18,12 +18,12 @@ import NewsGridClient from "./NewsGridClient";
 const PAGE_SIZE = 9;
 
 const FALLBACK_IMAGES = [
-  "/images/news/new1.png",
-  "/images/news/new2.png",
-  "/images/news/new4.png",
-  "/images/news/new3.png",
-  "/images/news/new5.png",
-  "/images/news/new6.png",
+  "/images/news/new1.webp",
+  "/images/news/new2.webp",
+  "/images/news/new4.webp",
+  "/images/news/new3.webp",
+  "/images/news/new5.webp",
+  "/images/news/new6.webp",
 ];
 
 interface NewsContentProps {

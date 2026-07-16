@@ -265,7 +265,7 @@ export default function HeroSection({ slides }: HeroSectionProps) {
           className="absolute inset-0"
         >
           {slide.image_url ? (
-            <Image src={slide.image_url} alt={slide.title_en} fill className="object-cover" priority={current === 0} />
+            <Image src={slide.image_url} alt={slide.title_en} fill sizes="100vw" className="object-cover" priority={current === 0} />
           ) : (
             <div className="absolute inset-0" style={{ background: slide.gradient ?? "linear-gradient(135deg, #061525 0%, #0c2d5e 100%)" }}>
               <KhmerPattern />

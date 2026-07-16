@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { defaultLocale } from "@/i18n/config";
 import { routing } from "@/i18n/routing";
+import { SESSION_COOKIE_NAME } from "@/lib/session-cookie";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -16,7 +17,7 @@ export default async function middleware(request: NextRequest) {
 
   // Protect admin routes — check for session cookie set after Firebase login
   if (ADMIN_PATH.test(pathname)) {
-    const sessionCookie = request.cookies.get("__session");
+    const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
     if (!sessionCookie?.value) {
       const locale = pathname.split("/")[1] ?? defaultLocale;
@@ -28,7 +29,7 @@ export default async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from the login page
   if (LOGIN_PATH.test(pathname)) {
-    const sessionCookie = request.cookies.get("__session");
+    const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
     if (sessionCookie?.value) {
       const locale = pathname.split("/")[1] ?? defaultLocale;
       return NextResponse.redirect(new URL(`/${locale}/admin`, request.url));

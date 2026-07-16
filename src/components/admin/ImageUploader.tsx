@@ -78,7 +78,7 @@ export default function ImageUploader({
 
         const result = await uploadImage(
           formData,
-          STORAGE_BUCKETS[bucket] as any,
+          STORAGE_BUCKETS[bucket],
           folder
         );
 

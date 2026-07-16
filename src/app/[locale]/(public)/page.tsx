@@ -8,14 +8,18 @@ import { getCurrentStatistics, getPublishedAchievements, getPublishedNews } from
 import { mockHeroSlides } from "@/lib/mock-data";
 import type { News } from "@/types";
 
+// Static-generate this page per locale, refreshing at most every 60s —
+// matches the revalidate window already used by the cached query functions.
+export const revalidate = 60;
+
 // Fallback images for the home page news cards only
 const HOME_NEWS_IMAGES = [
-  "/images/news/new1.png",
-  "/images/news/new2.png",
-  "/images/news/new4.png",
-  "/images/news/new3.png",
-  "/images/news/new5.png",
-  "/images/news/new6.png",
+  "/images/news/new1.webp",
+  "/images/news/new2.webp",
+  "/images/news/new4.webp",
+  "/images/news/new3.webp",
+  "/images/news/new5.webp",
+  "/images/news/new6.webp",
 ];
 
 function addFallbackImages(news: News[]): News[] {

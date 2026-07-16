@@ -4,6 +4,8 @@ import { getPublishedDocuments } from "@/lib/queries";
 import { CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
 import DocumentsClient from "./DocumentsClient";
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   return { title: "Documents" };
 }

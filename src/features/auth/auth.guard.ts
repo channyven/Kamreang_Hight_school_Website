@@ -1,11 +1,12 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@/lib/supabase";
 import { getAdminAuth } from "@/lib/firebase-admin";
+import { SESSION_COOKIE_NAME } from "@/lib/session-cookie";
 import type { SessionUser } from "@/types";
 
 export async function requireAdmin(): Promise<SessionUser> {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("__session");
+  const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
 
   if (!sessionCookie?.value) {
     throw new Error("Unauthorized");
@@ -14,7 +15,11 @@ export async function requireAdmin(): Promise<SessionUser> {
   const auth = getAdminAuth();
   let decodedToken;
   try {
-    decodedToken = await auth.verifyIdToken(sessionCookie.value);
+    // This is a Firebase *session cookie* (created via createSessionCookie
+    // in the login route), not an ID token — it must be verified with
+    // verifySessionCookie(), which checks the correct issuer. Using
+    // verifyIdToken() here rejects every valid, active admin session.
+    decodedToken = await auth.verifySessionCookie(sessionCookie.value);
   } catch {
     throw new Error("Unauthorized");
   }
