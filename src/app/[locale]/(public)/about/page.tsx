@@ -3,6 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { getAboutPageData, getCurrentStatistics } from "@/lib/queries";
 import AboutPageClient from "@/components/public/about/AboutPageClient";
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("about");
   return { title: t("title") };

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
@@ -9,16 +10,21 @@ import { Calendar, Eye, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPublishedNews } from "@/lib/queries";
 import ShareButton from "@/components/public/ShareButton";
-import PhotoGallery from "@/components/public/PhotoGallery";
+
+// Lazy-load the gallery/lightbox (and the framer-motion it pulls in) only
+// for articles that actually have gallery_images — most articles don't.
+const PhotoGallery = dynamic(() => import("@/components/public/PhotoGallery"));
+
+export const revalidate = 60;
 
 // Fallback images for news without a featured_image
 const FALLBACK_IMAGES = [
-  "/images/news/new1.png",
-  "/images/news/new2.png",
-  "/images/news/new4.png",
-  "/images/news/new3.png",
-  "/images/news/new5.png",
-  "/images/news/new6.png",
+  "/images/news/new1.webp",
+  "/images/news/new2.webp",
+  "/images/news/new4.webp",
+  "/images/news/new3.webp",
+  "/images/news/new5.webp",
+  "/images/news/new6.webp",
 ];
 
 function getNewsImage(item: { featured_image?: string | null; id: string }): string {
@@ -107,6 +113,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
             src={getNewsImage(news)}
             alt={title}
             fill
+            sizes="(max-width: 896px) 100vw, 896px"
             className="object-cover"
             priority
             unoptimized={news.featured_image?.includes("google.com") || news.featured_image?.includes("firebasestorage") || false}
@@ -155,6 +162,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                         src={getNewsImage(item)}
                         alt={rTitle}
                         fill
+                        sizes="(max-width: 768px) 100vw, 290px"
                         className="object-cover group-hover:scale-105 transition-transform"
                         unoptimized={item.featured_image?.includes("google.com") || item.featured_image?.includes("firebasestorage") || false}
                       />

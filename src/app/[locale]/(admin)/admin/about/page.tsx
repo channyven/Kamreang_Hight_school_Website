@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { upsertSchoolInfo, updateLeadership } from "@/actions/settings";
 import { upsertMilestone, deleteMilestone } from "@/actions/milestones";
 import ImageUploader from "@/components/admin/ImageUploader";
-import type { SchoolInfo, Leadership, Milestone } from "@/types";
+import type { Leadership, Milestone } from "@/types";
 import dynamic from "next/dynamic";
 
 // Dynamically import react-quill-new to avoid SSR issues
@@ -59,14 +59,12 @@ const QUILL_FORMATS = [
 // ─── Content Section Card ──────────────────────────────────────
 
 function ContentCard({
-  section,
   label,
   info,
   saving,
   onContentChange,
   onSave,
 }: {
-  section: string;
   label: string;
   info: { km: string; en: string };
   saving: boolean;
@@ -261,6 +259,7 @@ export default function AdminAboutPage() {
       bio_km: leader.bio_km,
       bio_en: leader.bio_en,
       photo_url: leader.photo_url,
+      phone: leader.phone,
       sort_order: leader.sort_order,
       is_active: leader.is_active,
     });
@@ -411,7 +410,6 @@ export default function AdminAboutPage() {
           {sections.map((section) => (
             <ContentCard
               key={section}
-              section={section}
               label={SECTION_LABELS[section]}
               info={schoolInfo[section] ?? { km: "", en: "" }}
               saving={saving}
@@ -491,6 +489,7 @@ export default function AdminAboutPage() {
                         "name_en",
                         "position_km",
                         "position_en",
+                        "phone",
                       ] as const
                     ).map((field) => (
                       <div key={field} className="space-y-1.5">
@@ -821,7 +820,7 @@ export default function AdminAboutPage() {
                   </p>
                 </div>
               ) : (
-                milestones.map((milestone, i) => (
+                milestones.map((milestone) => (
                   <div
                     key={milestone.id}
                     className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md"

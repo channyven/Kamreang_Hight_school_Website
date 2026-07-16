@@ -7,7 +7,6 @@ import { useLocale } from "next-intl";
 import { Plus, Search, Edit, Trash2, Loader2, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import type { HeroSlide } from "@/types";
 import { getLocalizedText } from "@/utils";

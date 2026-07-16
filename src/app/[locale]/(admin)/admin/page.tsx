@@ -8,7 +8,6 @@ import Link from "next/link";
 import { formatRelativeDate } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
-import AdminMessagesTable from "@/components/admin/AdminMessagesTable";
 
 async function getDashboardData() {
   const supabase = createServerClient();
