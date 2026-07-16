@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useRef,
   type ReactNode,
 } from "react";
 import {
@@ -38,6 +39,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Stores resolve/reject callbacks for the sign-in promise.
+   * This bridges the gap between `signInWithEmail` / `signInWithGoogle`
+   * and the `onAuthStateChanged` listener that actually sets the session.
+   * Without this, the login page would redirect before the __session cookie
+   * was written, causing the middleware to bounce the user back to login.
+   */
+  const pendingSession = useRef<{
+    resolve: (user: SessionUser) => void;
+    reject: (error: Error) => void;
+  } | null>(null);
+
   const setSessionCookie = useCallback(
     async (fbUser: FirebaseUser | null): Promise<SessionUser | null> => {
       if (!fbUser) {
@@ -61,7 +74,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    let cancelled = false;
+    let unsubscribe: (() => void) | null = null;
+    /** True once Firebase has determined the *initial* auth state. */
+    let initialAuthReady = false;
+    /** True when fbUser was null before initialAuthReady was set. */
+    let waitingForInitialAuth = false;
+
+    /**
+     * Firebase can briefly fire `onAuthStateChanged` with null while it is
+     * still reading the persisted auth state from IndexedDB.  If we set
+     * `loading = false` at that point, the admin layout immediately redirects
+     * back to /login long before the real signed-in user is reported.
+     *
+     * We solve this by registering onAuthStateChanged IMMEDIATELY (so we
+     * never miss a login event), but DELAYING the `loading = false` transition
+     * for the null-user case until authStateReady() confirms the initial
+     * state is truly null.
+     */
+    auth
+      .authStateReady()
+      .then(() => {
+        if (cancelled) return;
+        initialAuthReady = true;
+        // If the null callback already fired, resolve loading now
+        if (waitingForInitialAuth) {
+          pendingSession.current = null;
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        // authStateReady() itself failed — release loading anyway
+        if (!cancelled) {
+          if (waitingForInitialAuth) {
+            pendingSession.current = null;
+            setLoading(false);
+          }
+          initialAuthReady = true;
+        }
+      });
+
+    unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
 
       if (fbUser) {
@@ -69,30 +122,101 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const sessionUser = await setSessionCookie(fbUser);
           if (!sessionUser) throw new Error("No account found in the system");
           setUser(sessionUser);
-        } catch {
+          // Resolve the pending sign-in promise so the login page can redirect
+          pendingSession.current?.resolve(sessionUser);
+        } catch (err) {
           setUser(null);
           await signOut(auth);
+          // Reject the pending sign-in promise with a meaningful error
+          const error = err instanceof Error ? err : new Error("Login failed");
+          pendingSession.current?.reject(error);
         }
+        // Authenticated user → always resolve loading
+        pendingSession.current = null;
+        setLoading(false);
       } else {
         setUser(null);
         try { await setSessionCookie(null); } catch { /* non-critical */ }
-      }
 
-      setLoading(false);
+        if (initialAuthReady) {
+          // Firebase confirmed the initial state is null (no saved session)
+          pendingSession.current = null;
+          setLoading(false);
+        } else {
+          // Firebase hasn't finished restoring the initial auth state yet.
+          // Don't resolve loading yet — wait for authStateReady().
+          waitingForInitialAuth = true;
+        }
+      }
     });
 
-    return unsubscribe;
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, [setSessionCookie]);
+
+  /** Safety timeout to prevent hanging if onAuthStateChanged never fires */
+  const SESSION_TIMEOUT_MS = 15_000;
 
   const signInWithEmail = useCallback(
     async (email: string, password: string) => {
-      await signInWithEmailAndPassword(auth, email, password);
+      return new Promise<void>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          pendingSession.current = null;
+          reject(new Error("Session setup timed out — please try again"));
+        }, SESSION_TIMEOUT_MS);
+
+        /**
+         * Wrap resolve/reject so they always clear the timeout first.
+         * This prevents the timeout from firing after the session is set,
+         * which could wipe `pendingSession.current` under a subsequent login.
+         */
+        pendingSession.current = {
+          resolve: () => {
+            clearTimeout(timeoutId);
+            resolve();
+          },
+          reject: (error) => {
+            clearTimeout(timeoutId);
+            reject(error);
+          },
+        };
+
+        signInWithEmailAndPassword(auth, email, password).catch((error) => {
+          clearTimeout(timeoutId);
+          pendingSession.current = null;
+          reject(error);
+        });
+      });
     },
     []
   );
 
   const signInWithGoogle = useCallback(async () => {
-    await signInWithPopup(auth, googleProvider);
+    return new Promise<void>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        pendingSession.current = null;
+        reject(new Error("Session setup timed out — please try again"));
+      }, SESSION_TIMEOUT_MS);
+
+      pendingSession.current = {
+        resolve: () => {
+          clearTimeout(timeoutId);
+          resolve();
+        },
+        reject: (error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        },
+      };
+
+      signInWithPopup(auth, googleProvider).catch((error) => {
+        clearTimeout(timeoutId);
+        pendingSession.current = null;
+        reject(error);
+      });
+    });
   }, []);
 
   const logout = useCallback(async () => {

@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -172,6 +172,25 @@ export const getGovernanceItems = unstable_cache(
   },
   ["governance-items"],
   { tags: ["governance_items"], revalidate: 60 }
+);
+
+export const getHeroSlides = unstable_cache(
+  async (): Promise<HeroSlide[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("hero_slides")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .limit(5);
+      return (data ?? []) as HeroSlide[];
+    } catch {
+      return [];
+    }
+  },
+  ["hero-slides"],
+  { tags: ["hero_slides"], revalidate: 30 }
 );
 
 export const getCurrentStatistics = unstable_cache(

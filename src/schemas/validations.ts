@@ -120,6 +120,26 @@ export const teacherSchema = z.object({
 });
 export type TeacherInput = z.infer<typeof teacherSchema>;
 
+// ─── Hero Slide ────────────────────────────────────────────────
+
+export const heroSlideSchema = z.object({
+  title_km: z.string().min(1, "Khmer title is required").max(300),
+  title_en: z.string().min(1, "English title is required").max(300),
+  subtitle_km: z.string().max(500).optional(),
+  subtitle_en: z.string().max(500).optional(),
+  image_url: z.string().optional().or(z.literal("")),
+  gradient: z.string().optional().or(z.literal("")),
+  cta_primary_km: z.string().max(100).optional(),
+  cta_primary_en: z.string().max(100).optional(),
+  cta_secondary_km: z.string().max(100).optional(),
+  cta_secondary_en: z.string().max(100).optional(),
+  cta_primary_href: z.string().max(200).optional(),
+  cta_secondary_href: z.string().max(200).optional(),
+  sort_order: z.coerce.number().int().min(1).max(99).default(1),
+  is_active: z.boolean().default(true),
+});
+export type HeroSlideInput = z.infer<typeof heroSlideSchema>;
+
 // ─── Governance Item ──────────────────────────────────────────
 
 export const governanceItemSchema = z.object({
