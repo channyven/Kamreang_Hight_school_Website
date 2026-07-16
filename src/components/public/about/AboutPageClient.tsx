@@ -20,19 +20,13 @@ import {
   Telescope,
   Star,
   HeartHandshake,
-  X,
   Search,
 } from "lucide-react";
 import { cn, getLocalizedText, getAvatarUrl } from "@/utils";
 import type { SchoolInfo, Leadership, Milestone, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import TeacherProfileDialog from "@/components/public/teachers/TeacherProfileDialog";
 
 // ─── Animated Counter Hook ────────────────────────────────────
 
@@ -249,133 +243,6 @@ function SectionHeading({
   );
 }
 
-// ─── Leader Detail Dialog ─────────────────────────────────────
-
-// ─── Info Row (simple label:value line) ──────────────────────
-
-function InfoRow({ label, value, km }: { label: string; value: string; km: boolean }) {
-  return (
-    <div className="flex items-baseline gap-3">
-      <span className={cn("text-[10px] uppercase tracking-wider font-semibold w-[72px] shrink-0 text-right", km && "font-khmer")} style={{ color: "#a0a5b0" }}>
-        {label}
-      </span>
-      <span className={cn("text-xs font-medium", km && "font-khmer")} style={{ color: "#2c3038" }}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function LeaderDetailDialog({
-  leader,
-  open,
-  onOpenChange,
-  km,
-  locale,
-}: {
-  leader: Leadership | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  km: boolean;
-  locale: string;
-}) {
-  if (!leader) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 gap-0">
-        {/* Header with photo and name */}
-        <div className="bg-gradient-to-r from-school-blue-800 to-school-blue-700 px-6 pt-8 pb-6 text-center">
-          <div className="relative w-24 h-24 mx-auto rounded-2xl overflow-hidden ring-4 ring-white/30 shadow-xl mb-4">
-            {isValidUrl(leader.photo_url) ? (
-              <Image
-                src={leader.photo_url}
-                alt={leader.name_en}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            ) : (
-              <Image
-                src={getAvatarUrl(leader.name_en, 96)}
-                alt={leader.name_en}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            )}
-          </div>
-          <DialogTitle className={cn("text-xl font-bold text-white mb-0.5", km && "font-khmer")}>
-            <span>{leader.name_en}</span>
-            {leader.gender && (
-              <span className="text-lg text-white/80">{leader.gender}</span>
-            )}
-          </DialogTitle>
-          {(leader.position_km || leader.position_en) && (
-            <DialogDescription className={cn("inline-flex items-center gap-1.5 text-xs text-white/80 bg-white/15 rounded-full px-4 py-1.5 mt-1", km && "font-khmer")}>
-              {getLocalizedText(leader.position_km, leader.position_en, locale)}
-            </DialogDescription>
-          )}
-        </div>
-
-        {/* Details body */}
-        <div className="px-6 py-5 space-y-3">
-          {/* Phone */}
-          {leader.phone && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80">
-              <div className="w-9 h-9 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Phone className="w-4 h-4 text-gray-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-0.5">
-                  {km ? "ទូរស័ព្ទ" : "Phone"}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  {leader.phone}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Title */}
-          {(leader.title_km || leader.title_en) && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-school-blue-50/50">
-              <div className="w-9 h-9 rounded-lg bg-school-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <GraduationCap className="w-4 h-4 text-school-blue-700" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-school-blue-500 mb-0.5">
-                  {km ? "តួនាទី" : "Position"}
-                </p>
-                <p className={cn("text-sm font-medium text-gray-800", km && "font-khmer")}>
-                  {getLocalizedText(leader.title_km, leader.title_en, locale)}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Bio */}
-          {(leader.bio_km || leader.bio_en) && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-50/60">
-              <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Quote className="w-4 h-4 text-amber-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-500 mb-0.5">
-                  {km ? "ជីវប្រវត្តិ" : "Biography"}
-                </p>
-                <p className={cn("text-sm leading-relaxed text-gray-600 italic", km && "font-khmer")}>
-                  &ldquo;{getLocalizedText(leader.bio_km, leader.bio_en, locale)}&rdquo;
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 // ─── Staff Card ────────────────────────────────────────────
 
 function StaffCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
@@ -427,95 +294,12 @@ function StaffCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
         </p>
       </button>
 
-      {/* ─── Detail Dialog ─── */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto p-0 gap-0 border-none rounded-3xl shadow-2xl bg-white scrollbar-none">
-          <DialogTitle className="sr-only">
-            {teacher.name_km}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {km ? teacher.subject_km : teacher.subject_en}
-          </DialogDescription>
-
-          {/* ─── Large Professional Photo ─── */}
-          <div className="relative w-full h-[420px] overflow-hidden">
-            {teacher.photo_url ? (
-              <Image
-                src={teacher.photo_url}
-                alt={teacher.name_km}
-                fill
-                className="object-cover object-top"
-                sizes="520px"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-school-blue-800 to-school-navy">
-                <div className="relative w-28 h-28 rounded-full bg-white/10 flex items-center justify-center ring-4 ring-white/5">
-                  <Image
-                    src={getAvatarUrl(teacher.name_km, 120)}
-                    alt={teacher.name_km}
-                    width={112}
-                    height={112}
-                    className="rounded-full"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Soft gradient bottom overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/25 backdrop-blur-sm flex items-center justify-center text-white/70 hover:bg-black/50 hover:text-white transition-all z-10"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Minimal overlay: Name + Gender + Subject·Role + Phone */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 pb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className={cn("text-xl md:text-2xl font-bold text-white tracking-tight", km && "font-khmer")}>
-                  {teacher.name_km || teacher.name_en}
-                </h3>
-                {teacher.gender && (
-                  <span className="text-xs font-medium text-white/80">
-                    {teacher.gender === "Male" ? "♂" : "♀"}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-white/80">
-                <span className="text-school-goldMain font-semibold">
-                  {teacher.subject_km || teacher.subject_en}
-                </span>
-                <span className="text-white/40">·</span>
-                <span>
-                  {teacher.department_km || teacher.department_en || (km ? "គ្រូបង្រៀន" : "Teacher")}
-                </span>
-                {teacher.phone && (
-                  <>
-                    <span className="text-white/40 mx-0.5">·</span>
-                    <span>{teacher.phone}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── Minimal Details List (no backgrounds/padding) ─── */}
-          <div className="p-4 space-y-1.5">
-            <InfoRow label={km ? "មុខងារ" : "Role"} value={km ? (teacher.department_km || teacher.subject_km || "គ្រូបង្រៀន") : (teacher.department_en || teacher.subject_en || "Teacher")} km={km} />
-            <InfoRow label={km ? "ទូរស័ព្ទ" : "Phone"} value={teacher.phone || (km ? "គ្មាន" : "—")} km={km} />
-            <InfoRow label={km ? "គុណវុឌ្ឍិ" : "Qualification"} value={km ? (teacher.qualification_km || "—") : (teacher.qualification_en || "—")} km={km} />
-            <InfoRow label={km ? "មុខវិជ្ជា" : "Subject"} value={km ? (teacher.subject_km || "—") : (teacher.subject_en || "—")} km={km} />
-            <InfoRow label={km ? "ថ្នាក់បង្រៀន" : "Teach Grade"} value={teacher.grade_levels?.length ? (km ? `ថ្នាក់ទី ${[...teacher.grade_levels].sort((a, b) => a - b).join(", ")}` : `Grade ${[...teacher.grade_levels].sort((a, b) => a - b).join(", ")}`) : "—"} km={km} />
-            {teacher.years_experience && (
-              <InfoRow label={km ? "បទពិសោធន៍" : "Experience"} value={km ? `${teacher.years_experience} ឆ្នាំ` : `${teacher.years_experience} year${teacher.years_experience !== 1 ? "s" : ""}`} km={km} />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TeacherProfileDialog
+        teacher={teacher}
+        open={open}
+        onOpenChange={setOpen}
+        km={km}
+      />
     </>
   );
 }
@@ -554,7 +338,7 @@ export default function AboutPageClient({
     [leadership]
   );
   const principal = leaders[0];
-  const [selectedLeader, setSelectedLeader] = useState<Leadership | null>(null);
+  const [principalOpen, setPrincipalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'leadership' | 'teachers'>('all');
   const [staffSearchQuery, setStaffSearchQuery] = useState('');
 
@@ -1071,7 +855,7 @@ export default function AboutPageClient({
             <ScrollReveal variant="fade-up" delay={0.1}>
               <button
                 type="button"
-                onClick={() => setSelectedLeader(principal)}
+                onClick={() => setPrincipalOpen(true)}
                 className="relative bg-white rounded-3xl overflow-hidden mb-10 shadow-[0_8px_30px_rgba(30,58,138,0.10)] hover:shadow-[0_12px_40px_rgba(30,58,138,0.15)] transition-all duration-500 w-full text-left cursor-pointer group"
               >
                 {/* Top accent strip */}
@@ -1144,74 +928,77 @@ export default function AboutPageClient({
 
           {/* ─── CLICKABLE STATS + SEARCH ─── */}
           <ScrollReveal variant="fade-up" delay={0.2}>
-            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-              {/* Total Staff */}
-              <button
-                type="button"
-                onClick={() => setActiveFilter('all')}
-                className={cn(
-                  "relative rounded-xl px-4 py-2.5 text-center border transition-all duration-200 cursor-pointer min-w-[100px]",
-                  activeFilter === 'all'
-                    ? "bg-school-blue-800 border-school-blue-800 text-white shadow-md shadow-school-blue-800/20"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-school-blue-300 hover:shadow-sm"
-                )}
-              >
-                <p className="text-lg font-bold tabular-nums leading-none">
-                  {teachers.filter(t => t.is_active).length + leadership.filter(l => l.is_active).length}
-                </p>
-                <p className={cn("text-[10px] mt-1 opacity-70 font-medium", km && "font-khmer")}>
-                  {km ? "បុគ្គលិកសរុប" : "Total Staff"}
-                </p>
-              </button>
+            <div className="flex flex-col items-center gap-6 mb-12">
+              {/* Filter stat buttons */}
+              <div className="flex flex-wrap items-stretch justify-center gap-4 sm:gap-6">
+                {/* Total Staff */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('all')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'all'
+                      ? "bg-school-blue-800 border-school-blue-800 text-white shadow-md shadow-school-blue-800/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-school-blue-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {teachers.filter(t => t.is_active).length + leadership.filter(l => l.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "បុគ្គលិកសរុប" : "Total Staff"}
+                  </p>
+                </button>
 
-              {/* Leadership */}
-              <button
-                type="button"
-                onClick={() => setActiveFilter('leadership')}
-                className={cn(
-                  "relative rounded-xl px-4 py-2.5 text-center border transition-all duration-200 cursor-pointer min-w-[100px]",
-                  activeFilter === 'leadership'
-                    ? "bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/20"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-amber-300 hover:shadow-sm"
-                )}
-              >
-                <p className="text-lg font-bold tabular-nums leading-none">
-                  {leadership.filter(l => l.is_active).length}
-                </p>
-                <p className={cn("text-[10px] mt-1 opacity-70 font-medium", km && "font-khmer")}>
-                  {km ? "គណៈគ្រប់គ្រង" : "Leadership"}
-                </p>
-              </button>
+                {/* Leadership */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('leadership')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'leadership'
+                      ? "bg-amber-500 border-amber-500 text-white shadow-md shadow-amber-500/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-amber-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {leadership.filter(l => l.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "គណៈគ្រប់គ្រង" : "Leadership"}
+                  </p>
+                </button>
 
-              {/* Teachers */}
-              <button
-                type="button"
-                onClick={() => setActiveFilter('teachers')}
-                className={cn(
-                  "relative rounded-xl px-4 py-2.5 text-center border transition-all duration-200 cursor-pointer min-w-[100px]",
-                  activeFilter === 'teachers'
-                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-emerald-300 hover:shadow-sm"
-                )}
-              >
-                <p className="text-lg font-bold tabular-nums leading-none">
-                  {teachers.filter(t => t.is_active).length}
-                </p>
-                <p className={cn("text-[10px] mt-1 opacity-70 font-medium", km && "font-khmer")}>
-                  {km ? "គ្រូបង្រៀន" : "Teachers"}
-                </p>
-              </button>
+                {/* Teachers */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('teachers')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'teachers'
+                      ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-emerald-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {teachers.filter(t => t.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "គ្រូបង្រៀន" : "Teachers"}
+                  </p>
+                </button>
+              </div>
 
               {/* Search */}
-              <div className="relative min-w-[180px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <div className="relative w-full max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
                   value={staffSearchQuery}
                   onChange={(e) => setStaffSearchQuery(e.target.value)}
-                  placeholder={km ? "ស្វែងរកគ្រូ..." : "Search staff..."}
+                  placeholder={km ? "ស្វែងរកឈ្មោះគ្រូ..." : "Search staff by name..."}
                   className={cn(
-                    "w-full pl-8 pr-3 py-2.5 rounded-xl border border-gray-200 bg-white text-xs transition-all outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400",
+                    "w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm transition-all outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400 shadow-sm",
                     km && "font-khmer"
                   )}
                 />
@@ -1239,7 +1026,7 @@ export default function AboutPageClient({
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                 {filteredStaff.map((teacher) => (
                   <StaffCard key={teacher.id} teacher={teacher} km={km} />
                 ))}
@@ -1249,14 +1036,32 @@ export default function AboutPageClient({
         </div>
       </section>
 
-      {/* ─── LEADER DIALOG ─── */}
-      <LeaderDetailDialog
-        leader={selectedLeader}
-        open={selectedLeader !== null}
-        onOpenChange={(open) => { if (!open) setSelectedLeader(null); }}
-        km={km}
-        locale={locale}
-      />
+      {/* ─── PRINCIPAL DIALOG (same style as teachers) ─── */}
+      {principal && (
+        <TeacherProfileDialog
+          teacher={{
+            id: principal.id,
+            name_km: principal.name_km,
+            name_en: principal.name_en,
+            subject_km: principal.title_km,
+            subject_en: principal.title_en,
+            department_km: principal.position_km,
+            department_en: principal.position_en,
+            qualification_km: principal.bio_km,
+            qualification_en: principal.bio_en,
+            photo_url: principal.photo_url,
+            phone: principal.phone,
+            gender: principal.gender,
+            is_active: principal.is_active,
+            sort_order: principal.sort_order,
+            created_at: principal.created_at,
+            updated_at: principal.updated_at,
+          }}
+          open={principalOpen}
+          onOpenChange={setPrincipalOpen}
+          km={km}
+        />
+      )}
 
       {/* ─── ORGANIZATION & TEACHERS ─── */}
       <OrganizationSection teachers={teachers} locale={locale} />

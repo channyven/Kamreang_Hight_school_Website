@@ -3,17 +3,12 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Loader2, Search, Phone, BookMarked, X } from "lucide-react";
+import { Loader2, Search, Phone, BookMarked } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn, getAvatarUrl } from "@/utils";
 import type { Teacher } from "@/types";
 import { orgChartData } from "@/lib/mock-data";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import TeacherProfileDialog from "@/components/public/teachers/TeacherProfileDialog";
 
 // react-organizational-chart bundles Emotion for its connector lines, which
 // touches `document` at module-evaluation time — that crashes Next.js SSR
@@ -65,7 +60,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
   return (
     <section className="py-16 bg-gradient-to-b from-white to-[#f8f9ff]">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-10">
+        <div className="text-center mb-14">
           <h2 className={cn("text-3xl md:text-4xl font-extrabold mb-3 tracking-tight", km && "font-khmer")} style={{ color: "#0d1c2f" }}>
             {km ? "រចនាសម្ព័ន្ធ និងគ្រូបង្រៀន" : "Organization & Teachers"}
           </h2>
@@ -75,7 +70,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
         </div>
 
         <Tabs defaultValue="by-grade">
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-12">
             <TabsList className="bg-[#eff4ff] p-1.5 h-auto rounded-xl shadow-sm">
               <TabsTrigger
                 value="org-chart"
@@ -101,7 +96,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
 
           {/* ─── TEACHER BY GRADE TAB ─── */}
           <TabsContent value="by-grade" className="mt-0 outline-none">
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <div className="flex flex-wrap justify-center gap-4 mb-10">
               {GRADES.map((grade) => {
                 const count = active.filter((t) => (t.grade_levels ?? []).includes(grade)).length;
                 return (
@@ -124,7 +119,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
             </div>
 
             {/* Search bar */}
-            <div className="relative max-w-xs mx-auto mb-6">
+            <div className="relative max-w-sm mx-auto mb-10">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <input
                 type="text"
@@ -156,7 +151,7 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
                   </p>
                 )}
                 {/* 5 per row */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
                   {filteredGradeTeachers.map((teacher) => (
                     <TeacherCard key={teacher.id} teacher={teacher} km={km} />
                   ))}
@@ -174,21 +169,6 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
         </Tabs>
       </div>
     </section>
-  );
-}
-
-// ─── Info Row (simple label:value line) ──────────────────────
-
-function InfoRow({ label, value, km }: { label: string; value: string; km: boolean }) {
-  return (
-    <div className="flex items-baseline gap-3">
-      <span className={cn("text-[10px] uppercase tracking-wider font-semibold w-[72px] shrink-0 text-right", km && "font-khmer")} style={{ color: "#a0a5b0" }}>
-        {label}
-      </span>
-      <span className={cn("text-xs font-medium", km && "font-khmer")} style={{ color: "#2c3038" }}>
-        {value}
-      </span>
-    </div>
   );
 }
 
@@ -250,96 +230,12 @@ function TeacherCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
         </div>
       </button>
 
-      {/* ─── Enhanced Detail Dialog ─── */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto p-0 gap-0 border-none rounded-3xl shadow-2xl bg-white scrollbar-none">
-          <DialogTitle className="sr-only">
-            {teacher.name_km}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {km ? teacher.subject_km : teacher.subject_en}
-          </DialogDescription>
-
-          {/* ─── Large Professional Photo ─── */}
-          <div className="relative w-full h-[420px] overflow-hidden">
-            {teacher.photo_url ? (
-              <Image
-                src={teacher.photo_url}
-                alt={teacher.name_km}
-                fill
-                className="object-cover object-top"
-                sizes="520px"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-school-blue-800 to-school-navy">
-                <div className="relative w-28 h-28 rounded-full bg-white/10 flex items-center justify-center ring-4 ring-white/5">
-                  <Image
-                    src={getAvatarUrl(teacher.name_km, 120)}
-                    alt={teacher.name_km}
-                    width={112}
-                    height={112}
-                    className="rounded-full"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Soft gradient bottom overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/25 backdrop-blur-sm flex items-center justify-center text-white/70 hover:bg-black/50 hover:text-white transition-all z-10"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Minimal overlay: Name + Gender + Subject·Role·Phone */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 pb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className={cn("text-xl md:text-2xl font-bold text-white tracking-tight", km && "font-khmer")}>
-                  {teacher.name_km}
-                </h3>
-                {teacher.gender && (
-                  <span className="text-xs font-medium text-white/80">
-                    {teacher.gender === "Male" ? "♂" : "♀"}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-white/80">
-                <span className="text-school-goldMain font-semibold">
-                  {km ? teacher.subject_km : teacher.subject_en}
-                </span>
-                <span className="text-white/40">·</span>
-                <span>
-                  {km ? (teacher.department_km || "គ្រូបង្រៀន") : (teacher.department_en || "Teacher")}
-                </span>
-                {teacher.phone && (
-                  <>
-                    <span className="text-white/40 mx-0.5">·</span>
-                    <span>{teacher.phone}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── Minimal Details List (no backgrounds/padding) ─── */}
-          <div className="p-4 space-y-1.5">
-            <InfoRow label={km ? "មុខងារ" : "Role"} value={km ? (teacher.department_km || teacher.subject_km || "គ្រូបង្រៀន") : (teacher.department_en || teacher.subject_en || "Teacher")} km={km} />
-            <InfoRow label={km ? "ទូរស័ព្ទ" : "Phone"} value={teacher.phone || (km ? "គ្មាន" : "—")} km={km} />
-            <InfoRow label={km ? "គុណវុឌ្ឍិ" : "Qualification"} value={km ? (teacher.qualification_km || "—") : (teacher.qualification_en || "—")} km={km} />
-            <InfoRow label={km ? "មុខវិជ្ជា" : "Subject"} value={km ? (teacher.subject_km || "—") : (teacher.subject_en || "—")} km={km} />
-            <InfoRow label={km ? "ថ្នាក់បង្រៀន" : "Teach Grade"} value={teacher.grade_levels?.length ? (km ? `ថ្នាក់ទី ${[...teacher.grade_levels].sort((a, b) => a - b).join(", ")}` : `Grade ${[...teacher.grade_levels].sort((a, b) => a - b).join(", ")}`) : "—"} km={km} />
-            {teacher.years_experience && (
-              <InfoRow label={km ? "បទពិសោធន៍" : "Experience"} value={km ? `${teacher.years_experience} ឆ្នាំ` : `${teacher.years_experience} year${teacher.years_experience !== 1 ? "s" : ""}`} km={km} />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TeacherProfileDialog
+        teacher={teacher}
+        open={open}
+        onOpenChange={setOpen}
+        km={km}
+      />
     </>
   );
 }
