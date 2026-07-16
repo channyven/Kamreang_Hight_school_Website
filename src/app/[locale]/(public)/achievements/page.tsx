@@ -5,6 +5,8 @@ import { getLocalizedText, formatShortDate } from "@/utils";
 import { Trophy, Star } from "lucide-react";
 import { getPublishedAchievements } from "@/lib/queries";
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("achievements");
   return { title: t("title") };

@@ -5,6 +5,8 @@ import { Newspaper, Sparkles } from "lucide-react";
 import { getPublishedNews, getNewsCategories } from "@/lib/queries";
 import NewsContent from "./NewsContent";
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("news");
   return { title: t("title") };

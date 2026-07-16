@@ -402,7 +402,7 @@ export default function AboutPageClient({
           {/* Banner Image Background */}
           <div className="absolute inset-0">
             <Image
-              src="/images/about/banner%20about%20page.png"
+              src="/images/about/banner%20about%20page.webp"
               alt="School banner"
               fill
               className="object-cover"
@@ -692,7 +692,7 @@ export default function AboutPageClient({
             <ScrollReveal variant="fade-right" delay={0.2} className="h-full">
               <div className="relative rounded-2xl overflow-hidden group cursor-pointer h-full min-h-[260px] shadow-lg">
                 <Image
-                  src="/images/about/4.png"
+                  src="/images/about/4.webp"
                   alt={km ? "រូបថតសាលា" : "School photo"}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"

@@ -5,6 +5,8 @@ import { getGovernanceIcon } from "@/lib/governance-icons";
 import { getGovernanceItems } from "@/lib/queries";
 import type { GovernanceItem } from "@/types";
 
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("governance");
   return { title: t("title") };
