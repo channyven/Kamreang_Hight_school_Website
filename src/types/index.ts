@@ -154,6 +154,83 @@ export const DOCUMENT_CATEGORIES: { key: DocumentCategory; labelEn: string; labe
   { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
 ];
 
+export type ReportFileCategory = "report" | "result" | "form" | "policy" | "other";
+
+export const REPORT_FILE_CATEGORIES: { key: ReportFileCategory; labelEn: string; labelKm: string }[] = [
+  { key: "report", labelEn: "Report", labelKm: "របាយការណ៍" },
+  { key: "result", labelEn: "Result", labelKm: "លទ្ធផល" },
+  { key: "form", labelEn: "Form", labelKm: "បែបបទ" },
+  { key: "policy", labelEn: "Policy", labelKm: "គោលនយោបាយ" },
+  { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
+];
+
+/** A downloadable report file in the admin-managed library. */
+export interface ReportFile {
+  id: string;
+  title_km: string;
+  title_en: string;
+  description_km?: string | null;
+  description_en?: string | null;
+  file_url: string;
+  file_name: string;
+  category: ReportFileCategory;
+  academic_year?: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Shape of the editable annual Operations Report content (JSONB). */
+export interface OperationsReportContent {
+  general?: {
+    principal_km?: string;
+    principal_en?: string;
+    total_staff?: number;
+    total_students?: number;
+    total_classes?: number;
+    land_area_sqm?: number;
+    established_year?: number;
+    summary_km?: string;
+    summary_en?: string;
+  };
+  teaching_hours?: {
+    weekly_hours?: number;
+    notes_km?: string;
+    notes_en?: string;
+  };
+  student_stats?: {
+    items?: { label_km: string; label_en: string; value: number; suffix?: string }[];
+    notes_km?: string;
+    notes_en?: string;
+  };
+  staff_status?: { label_km: string; label_en: string; count: number }[];
+  facilities?: {
+    items?: { label_km: string; label_en: string; detail_km: string; detail_en: string }[];
+    notes_km?: string;
+    notes_en?: string;
+  };
+  budget?: {
+    currency?: string;
+    items?: { label_km: string; label_en: string; amount: number }[];
+    notes_km?: string;
+    notes_en?: string;
+  };
+  challenges?: { title_km: string; title_en: string; detail_km: string; detail_en: string }[];
+  future_direction?: { km: string; en: string }[];
+}
+
+export interface SchoolReport {
+  id: string;
+  academic_year: string;
+  content: OperationsReportContent;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AuditLog {
   id: string;
   user_id?: string;
