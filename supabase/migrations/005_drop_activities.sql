@@ -3,6 +3,7 @@
 -- ============================================================
 
 -- Redefine increment_view_count without the activities branch
+-- (search_path pinned to avoid privilege escalation)
 CREATE OR REPLACE FUNCTION increment_view_count(p_table TEXT, p_id UUID)
 RETURNS VOID AS $$
 BEGIN
@@ -10,7 +11,7 @@ BEGIN
     UPDATE news SET view_count = view_count + 1 WHERE id = p_id;
   END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Tables (CASCADE drops their triggers, RLS policies, and indexes)
 DROP TABLE IF EXISTS activities CASCADE;

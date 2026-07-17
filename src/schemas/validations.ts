@@ -101,6 +101,33 @@ export const documentSchema = z.object({
 });
 export type DocumentInput = z.infer<typeof documentSchema>;
 
+// ─── Report File ──────────────────────────────────────────────
+
+export const reportFileSchema = z.object({
+  title_km: z.string().min(1, "Khmer title is required").max(500),
+  title_en: z.string().min(1, "English title is required").max(500),
+  description_km: z.string().max(1000).optional().or(z.literal("")),
+  description_en: z.string().max(1000).optional().or(z.literal("")),
+  file_url: z.string().url("Must be a valid URL").min(1, "File URL is required"),
+  file_name: z.string().min(1, "File name is required").max(300),
+  category: z.enum(["report", "result", "form", "policy", "other"]).default("report"),
+  academic_year: z.string().max(20).optional().or(z.literal("")),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type ReportFileInput = z.infer<typeof reportFileSchema>;
+
+// ─── Operations Report (annual, JSONB content) ───────────────
+
+export const operationsReportSchema = z.object({
+  academic_year: z
+    .string()
+    .regex(/^\d{4}-\d{4}$/, "Format must be YYYY-YYYY (e.g. 2024-2025)"),
+  is_published: z.boolean().default(false),
+  content: z.record(z.any()).default({}),
+});
+export type OperationsReportInput = z.infer<typeof operationsReportSchema>;
+
 // ─── Teacher ──────────────────────────────────────────────────
 
 export const teacherSchema = z.object({

@@ -9,6 +9,8 @@ import {
   mockStats,
   mockGovernanceItems,
 } from "@/lib/mock-data";
+import { schoolReport, mapDbReportToFrontend } from "@/lib/report-data";
+import type { SchoolReport as FrontendSchoolReport } from "@/lib/report-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
 // pages doesn't pay a fresh Supabase round-trip on every request (each one
@@ -190,4 +192,26 @@ export const getCurrentStatistics = unstable_cache(
   },
   ["current-statistics"],
   { tags: ["statistics"], revalidate: 60 }
+);
+
+export const getPublishedSchoolReport = unstable_cache(
+  async (): Promise<FrontendSchoolReport> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("school_reports")
+        .select("*")
+        .eq("is_published", true)
+        .order("academic_year", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) return mapDbReportToFrontend(data as never);
+    } catch {
+      // fall through to local fallback
+    }
+    return schoolReport;
+  },
+  ["published-school-report"],
+  { tags: ["school_reports"], revalidate: 300 }
 );

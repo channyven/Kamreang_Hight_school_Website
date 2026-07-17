@@ -438,38 +438,16 @@ BEGIN
   END LOOP;
 END $$;
 
--- Auto-generate slug from title
-CREATE OR REPLACE FUNCTION generate_slug(title TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN lower(
-    regexp_replace(
-      regexp_replace(title, '[^a-zA-Z0-9\s-]', '', 'g'),
-      '\s+', '-', 'g'
-    )
-  );
-END;
-$$ LANGUAGE plpgsql;
-
--- Increment download count
-CREATE OR REPLACE FUNCTION increment_download_count(download_id UUID)
-RETURNS VOID AS $$
-BEGIN
-  UPDATE downloads SET download_count = download_count + 1 WHERE id = download_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Increment view count
+-- Increment view count (SECURITY DEFINER — pinned search_path to
+-- prevent privilege escalation via schema shadowing)
 CREATE OR REPLACE FUNCTION increment_view_count(p_table TEXT, p_id UUID)
 RETURNS VOID AS $$
 BEGIN
   IF p_table = 'news' THEN
     UPDATE news SET view_count = view_count + 1 WHERE id = p_id;
-  ELSIF p_table = 'activities' THEN
-    UPDATE activities SET view_count = view_count + 1 WHERE id = p_id;
   END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- ─────────────────────────────────────────────────────────────
 -- ROW LEVEL SECURITY
