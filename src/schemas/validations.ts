@@ -56,7 +56,7 @@ export const achievementSchema = z.object({
   title_en: z.string().min(1, "English title is required").max(500),
   description_km: z.string().optional(),
   description_en: z.string().optional(),
-  achievement_type: z.enum(["academic", "sports", "arts", "community", "other"]).optional(),
+  achievement_type: z.enum(["student", "teacher", "school"]).optional(),
   award_level: z.enum(["national", "provincial", "district", "school"]).optional(),
   achievement_date: z.string().optional(),
   participant_name: z.string().max(300).optional(),
@@ -105,7 +105,7 @@ export type DocumentInput = z.infer<typeof documentSchema>;
 
 export const teacherSchema = z.object({
   name_km: z.string().min(1, "Khmer name is required").max(200),
-  name_en: z.string().min(1, "English name is required").max(200),
+  name_en: z.string().max(200).optional().or(z.literal("")),
   subject_km: z.string().max(200).optional(),
   subject_en: z.string().max(200).optional(),
   department_km: z.string().max(200).optional(),
@@ -113,6 +113,8 @@ export const teacherSchema = z.object({
   qualification_km: z.string().max(300).optional(),
   qualification_en: z.string().max(300).optional(),
   photo_url: z.string().optional(),
+  phone: z.string().optional(),
+  gender: z.string().optional(),
   years_experience: z.coerce.number().int().min(0).optional(),
   grade_levels: z.array(z.coerce.number().int().min(7).max(12)).default([]),
   is_active: z.boolean().default(true),

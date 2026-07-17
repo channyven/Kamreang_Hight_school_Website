@@ -3,17 +3,12 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Loader2, GraduationCap, BookOpen,  Layers,  Search, Phone } from "lucide-react";
+import { Loader2, Search, Phone, BookMarked } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn, getAvatarUrl } from "@/utils";
 import type { Teacher } from "@/types";
 import { orgChartData } from "@/lib/mock-data";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import TeacherProfileDialog from "@/components/public/teachers/TeacherProfileDialog";
 
 // react-organizational-chart bundles Emotion for its connector lines, which
 // touches `document` at module-evaluation time — that crashes Next.js SSR
@@ -43,47 +38,44 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
   }, [active]);
   const [selectedGrade, setSelectedGrade] = useState(defaultGrade);
   const [searchQuery, setSearchQuery] = useState("");
+
   const gradeTeachers = useMemo(
     () => active.filter((t) => (t.grade_levels ?? []).includes(selectedGrade)),
     [active, selectedGrade]
   );
 
-  const filteredTeachers = useMemo(() => {
+  const filteredGradeTeachers = useMemo(() => {
     return gradeTeachers.filter((t) => {
       if (!searchQuery.trim()) return true;
       const q = searchQuery.trim().toLowerCase();
-      const nameKm = (t.name_km ?? "").toLowerCase();
-      const nameEn = (t.name_en ?? "").toLowerCase();
-      const subjectKm = (t.subject_km ?? "").toLowerCase();
-      const subjectEn = (t.subject_en ?? "").toLowerCase();
       return (
-        nameKm.includes(q) ||
-        nameEn.includes(q) ||
-        subjectKm.includes(q) ||
-        subjectEn.includes(q)
+        (t.name_km ?? "").toLowerCase().includes(q) ||
+        (t.name_en ?? "").toLowerCase().includes(q) ||
+        (t.subject_km ?? "").toLowerCase().includes(q) ||
+        (t.subject_en ?? "").toLowerCase().includes(q)
       );
     });
   }, [gradeTeachers, searchQuery]);
 
   return (
-    <section className="py-8 bg-white">
+    <section className="py-16 bg-gradient-to-b from-white to-[#f8f9ff]">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-8">
-          <h2 className={cn("text-3xl md:text-4xl font-extrabold mb-2 tracking-tight", km && "font-khmer")} style={{ color: "#0d1c2f" }}>
+        <div className="text-center mb-14">
+          <h2 className={cn("text-3xl md:text-4xl font-extrabold mb-3 tracking-tight", km && "font-khmer")} style={{ color: "#0d1c2f" }}>
             {km ? "រចនាសម្ព័ន្ធ និងគ្រូបង្រៀន" : "Organization & Teachers"}
           </h2>
           <p className="text-[10px] md:text-[11px] tracking-[0.4em] uppercase font-bold opacity-60" style={{ color: "#737781" }}>
-            ORGANIZATION &amp; TEACHERS
+            {km ? "រចនាសម្ព័ន្ធ និងគ្រូបង្រៀន" : "ORGANIZATION & TEACHERS"}
           </p>
         </div>
 
-        <Tabs defaultValue="org-chart">
-          <div className="flex justify-center mb-8">
-            <TabsList className="bg-[#eff4ff] p-1.5 h-auto rounded-xl">
+        <Tabs defaultValue="by-grade">
+          <div className="flex justify-center mb-12">
+            <TabsList className="bg-[#eff4ff] p-1.5 h-auto rounded-xl shadow-sm">
               <TabsTrigger
                 value="org-chart"
                 className={cn(
-                  "rounded-lg px-6 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
+                  "rounded-lg px-5 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
                   km && "font-khmer"
                 )}
               >
@@ -92,23 +84,19 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
               <TabsTrigger
                 value="by-grade"
                 className={cn(
-                  "rounded-lg px-6 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
+                  "rounded-lg px-5 py-2.5 text-sm font-bold data-[state=active]:bg-school-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all",
                   km && "font-khmer"
                 )}
               >
-                {km ? "គ្រូបង្រៀនតាមថ្នាក់" : "Teacher by Grade"}
+                <BookMarked className="w-4 h-4 mr-1.5 inline-block" />
+                {km ? "គ្រូតាមថ្នាក់" : "Teacher by Grade"}
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="org-chart" className="mt-0 outline-none">
-            <div className="bg-white rounded-3xl border border-[#e6eeff]/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
-              <OrgChart data={orgChartData} km={km} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="by-grade" className="mt-0">
-            <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+          {/* ─── TEACHER BY GRADE TAB ─── */}
+          <TabsContent value="by-grade" className="mt-0 outline-none">
+            <div className="flex flex-wrap justify-center gap-4 mb-10">
               {GRADES.map((grade) => {
                 const count = active.filter((t) => (t.grade_levels ?? []).includes(grade)).length;
                 return (
@@ -117,21 +105,21 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
                     type="button"
                     onClick={() => setSelectedGrade(grade)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer",
+                      "px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer",
                       selectedGrade === grade
-                        ? "bg-school-blue-800 text-white"
+                        ? "bg-school-blue-800 text-white shadow-md shadow-school-blue-800/20"
                         : "bg-[#eff4ff] text-school-blue-800 hover:bg-school-blue-100"
                     )}
                   >
                     {km ? `ថ្នាក់ទី ${grade}` : `Grade ${grade}`}
-                    <span className="ml-1 opacity-70">({count})</span>
+                    <span className="ml-1.5 opacity-70">({count})</span>
                   </button>
                 );
               })}
             </div>
 
             {/* Search bar */}
-            <div className="relative max-w-xs mx-auto mb-4">
+            <div className="relative max-w-sm mx-auto mb-10">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <input
                 type="text"
@@ -140,46 +128,51 @@ export default function OrganizationSection({ teachers, locale }: OrganizationSe
                 placeholder={km ? "ស្វែងរកតាមឈ្មោះ ឬមុខវិជ្ជា..." : "Search by name or subject..."}
                 aria-label={km ? "ស្វែងរកគ្រូបង្រៀន" : "Search teachers"}
                 className={cn(
-                  "w-full pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 bg-white text-xs transition-all duration-200 outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400",
+                  "w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 bg-white text-xs transition-all duration-200 outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400",
                   km && "font-khmer"
                 )}
               />
             </div>
 
-            {/* Teacher grid */}
-            {filteredTeachers.length === 0 ? (
+            {/* Teacher grid - 5 per row */}
+            {filteredGradeTeachers.length === 0 ? (
               <p className={cn("text-center text-xs py-6", km && "font-khmer")} style={{ color: "#737781" }}>
                 {searchQuery.trim()
-                  ? km
-                    ? "មិនមានគ្រូបង្រៀនត្រូវនឹងការស្វែងរកទេ"
-                    : "No teachers match your search."
-                  : km
-                    ? "មិនទាន់មានគ្រូបង្រៀនកំណត់សម្រាប់ថ្នាក់នេះទេ"
-                    : "No teachers assigned to this grade yet."}
+                  ? km ? "មិនមានគ្រូបង្រៀនត្រូវនឹងការស្វែងរកទេ" : "No teachers match your search."
+                  : km ? "មិនទាន់មានគ្រូបង្រៀនកំណត់សម្រាប់ថ្នាក់នេះទេ" : "No teachers assigned to this grade yet."}
               </p>
             ) : (
               <>
-                {/* Result count */}
                 {searchQuery.trim() && (
                   <p className={cn("text-[10px] text-center mb-3 text-gray-400", km && "font-khmer")}>
                     {km
-                      ? `បានរកឃើញ ${filteredTeachers.length} នាក់`
-                      : `Found ${filteredTeachers.length} teacher${filteredTeachers.length !== 1 ? "s" : ""}`}
+                      ? `បានរកឃើញ ${filteredGradeTeachers.length} នាក់`
+                      : `Found ${filteredGradeTeachers.length} teacher${filteredGradeTeachers.length !== 1 ? "s" : ""}`}
                   </p>
                 )}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
-                  {filteredTeachers.map((teacher) => (
+                {/* 5 per row */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                  {filteredGradeTeachers.map((teacher) => (
                     <TeacherCard key={teacher.id} teacher={teacher} km={km} />
                   ))}
                 </div>
               </>
             )}
           </TabsContent>
+
+          {/* ─── ORGANIZATION CHART TAB ─── */}
+          <TabsContent value="org-chart" className="mt-0 outline-none">
+            <div className="bg-white rounded-3xl border border-[#e6eeff]/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+              <OrgChart data={orgChartData} km={km} />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </section>
   );
 }
+
+// ─── Teacher Card Component ───────────────────────────────────
 
 function TeacherCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
   const [open, setOpen] = useState(false);
@@ -189,173 +182,60 @@ function TeacherCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group bg-white rounded-xl p-2.5 text-center border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md w-full cursor-pointer"
+        className="group bg-white rounded-xl p-3 text-center border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg w-full cursor-pointer"
         style={{ borderColor: "#e6eeff", boxShadow: "0px 1px 6px rgba(30,78,140,0.04)" }}
       >
-        <div className="relative w-10 h-10 mx-auto rounded-full mb-1.5 overflow-hidden ring-1.5 ring-[#eff4ff] transition-all duration-200 group-hover:ring-[#fdbc13]/30">
+        <div className="relative w-20 h-20 mx-auto rounded-full mb-3 overflow-hidden ring-2 ring-[#eff4ff] transition-all duration-300 group-hover:ring-[#fdbc13]/40 group-hover:shadow-md">
           {teacher.photo_url ? (
             <Image
               src={teacher.photo_url}
-              alt={km ? teacher.name_km : teacher.name_en}
+              alt={teacher.name_km}
               fill
-              className="object-cover"
-              sizes="40px"
+              className="object-cover transition-transform duration-300 group-hover:scale-110"
+              sizes="80px"
             />
           ) : (
             <Image
-              src={getAvatarUrl(km ? teacher.name_km : teacher.name_en, 40)}
-              alt={km ? teacher.name_km : teacher.name_en}
+              src={getAvatarUrl(teacher.name_km, 80)}
+              alt={teacher.name_km}
               fill
               className="object-cover"
-              sizes="40px"
+              sizes="80px"
             />
           )}
         </div>
         <h4
           className={cn(
-            "font-semibold text-[11px] leading-tight truncate transition-colors group-hover:text-[#00376f]",
+            "font-semibold text-sm leading-tight truncate transition-colors group-hover:text-[#00376f] flex items-center justify-center gap-0.5",
             km && "font-khmer"
           )}
           style={{ color: "#0d1c2f" }}
         >
-          {km ? teacher.name_km : teacher.name_en}
+          <span>{teacher.name_km}</span>
+          {teacher.gender && (
+            <span className="inline-block text-[9px] opacity-50">
+              {teacher.gender === "Male" ? "♂" : "♀"}
+            </span>
+          )}
         </h4>
-        <p className={cn("text-[10px] leading-snug truncate", km && "font-khmer")} style={{ color: "#434750" }}>
+        <p className={cn("text-xs leading-snug truncate mt-0.5", km && "font-khmer")} style={{ color: "#434750" }}>
           {km ? teacher.subject_km : teacher.subject_en}
         </p>
-        {teacher.years_experience ? (
-          <span
-            className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded-full mt-0.5"
-            style={{ background: "#eff4ff", color: "#00376f" }}
-          >
-            {teacher.years_experience}y
-          </span>
-        ) : null}
+        <div className="flex items-center justify-center gap-1.5 mt-1 flex-wrap">
+          {teacher.qualification_km && (
+            <span className="inline-block text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 truncate max-w-[60px]">
+              {teacher.qualification_km}
+            </span>
+          )}
+        </div>
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-0 gap-0 border-none bg-school-navy text-white rounded-[2.5rem] shadow-2xl scrollbar-none">
-          <DialogTitle className="sr-only">
-            {km ? teacher.name_km : teacher.name_en}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {km ? teacher.subject_km : teacher.subject_en}
-          </DialogDescription>
-          {/* Top Photo Section */}
-          <div className="relative aspect-[4/5] w-full group/photo">
-            {teacher.photo_url ? (
-              <Image
-                src={teacher.photo_url}
-                alt={km ? teacher.name_km : teacher.name_en}
-                fill
-                className="object-cover"
-                sizes="500px"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#1e3a8a] to-school-navy flex items-center justify-center">
-                <div className="relative w-40 h-40 rounded-full bg-white/10 flex items-center justify-center ring-8 ring-white/5">
-                  <Image
-                    src={getAvatarUrl(km ? teacher.name_km : teacher.name_en, 160)}
-                    alt={km ? teacher.name_km : teacher.name_en}
-                    width={160}
-                    height={160}
-                    className="rounded-full"
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* Name/Role Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-school-navy via-school-navy/20 to-transparent flex flex-col justify-end p-10 pb-12">
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className={cn("text-4xl font-extrabold tracking-tight", km && "font-khmer")}>
-                  {km ? teacher.name_km : teacher.name_en}
-                </h3>
-                {teacher.gender && (
-                  <div className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center opacity-60">
-                    <span className="text-[10px]">{teacher.gender === "Male" ? "♂" : "♀"}</span>
-                  </div>
-                )}
-              </div>
-              <p className={cn("text-school-goldMain font-bold text-base mb-4", km && "font-khmer")}>
-                {km ? teacher.subject_km : teacher.subject_en}
-              </p>
-              {teacher.phone && (
-                <div className="flex items-center gap-3 text-white/50 text-sm font-medium">
-                  <Phone className="w-4 h-4 text-school-goldMain" />
-                  <span>{teacher.phone}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Details Body */}
-          <div className="px-8 pb-12 pt-2 grid grid-cols-2 gap-5">
-            {/* Educational Attainment */}
-            <div className="bg-white/5 rounded-[1.5rem] p-5 flex items-start gap-4 border border-white/5 transition-colors hover:bg-white/10">
-              <div className="w-11 h-11 rounded-2xl bg-school-goldMain/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <GraduationCap className="w-5 h-5 text-school-goldMain" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-black mb-1">
-                  {km ? "គុណវុឌ្ឍិ" : "Educational Attainment"}
-                </p>
-                <p className={cn("text-[15px] font-bold leading-tight", km && "font-khmer")}>
-                  {km ? teacher.qualification_km || "ថ្នាក់បរិញ្ញាបត្រ" : teacher.qualification_en || "Master's Degree"}
-                </p>
-              </div>
-            </div>
-
-            {/* Specialization */}
-            <div className="bg-white/5 rounded-[1.5rem] p-5 flex items-start gap-4 border border-white/5 transition-colors hover:bg-white/10">
-              <div className="w-11 h-11 rounded-2xl bg-school-goldMain/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <BookOpen className="w-5 h-5 text-school-goldMain" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-black mb-1">
-                  {km ? "ជំនាញ" : "Specialization"}
-                </p>
-                <p className={cn("text-[15px] font-bold leading-tight", km && "font-khmer")}>
-                  {km ? teacher.department_km || "ប្រវត្តិវិទ្យា" : teacher.department_en || "History"}
-                </p>
-              </div>
-            </div>
-
-            {/* Subject Currently Taught */}
-            <div className="bg-white/5 rounded-[1.5rem] p-5 flex items-start gap-4 border border-white/5 transition-colors hover:bg-white/10">
-              <div className="w-11 h-11 rounded-2xl bg-school-goldMain/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <BookOpen className="w-5 h-5 text-school-goldMain" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-black mb-1">
-                  {km ? "មុខវិជ្ជាបង្រៀន" : "Subject Currently Taught"}
-                </p>
-                <p className={cn("text-[15px] font-bold leading-tight", km && "font-khmer")}>
-                  {km ? teacher.subject_km : teacher.subject_en}
-                </p>
-              </div>
-            </div>
-
-            {/* Class Level Taught */}
-            <div className="bg-white/5 rounded-[1.5rem] p-5 flex items-start gap-4 border border-white/5 transition-colors hover:bg-white/10">
-              <div className="w-11 h-11 rounded-2xl bg-school-goldMain/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Layers className="w-5 h-5 text-school-goldMain" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-white/40 font-black mb-1">
-                  {km ? "ថ្នាក់បង្រៀន" : "Class Level Taught"}
-                </p>
-                <p className={cn("text-[15px] font-bold leading-tight", km && "font-khmer")}>
-                  {km 
-                    ? `ថ្នាក់ទី ${teacher.grade_levels?.sort((a, b) => a - b).join(", ") || 7}` 
-                    : `Grade ${teacher.grade_levels?.sort((a, b) => a - b).join(", ") || 7}`}
-                </p>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TeacherProfileDialog
+        teacher={teacher}
+        open={open}
+        onOpenChange={setOpen}
+        km={km}
+      />
     </>
   );
 }
