@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap, Landmark, Images,
+  GraduationCap, Landmark, Heart,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { cn, adminHref } from "@/utils";
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "about", "hero_slides"] },
+  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "donate", "about"] },
   { label: "Inbox", keys: ["messages"] },
   { label: "System", keys: ["users", "settings"] },
 ];
@@ -44,18 +44,18 @@ export default function AdminSidebar() {
 
   const allNavItems: NavItem[] = useMemo(
     () => [
-      { key: "dashboard", href: adminHref(locale), icon: <LayoutDashboard className="w-4 h-4" /> },
-      { key: "statistics", href: adminHref(locale, "statistics"), icon: <BarChart3 className="w-4 h-4" /> },
-      { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
-      { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
-      { key: "teachers", href: adminHref(locale, "teachers"), icon: <GraduationCap className="w-4 h-4" /> },
-      { key: "documents", href: adminHref(locale, "documents"), icon: <FileText className="w-4 h-4" /> },
-      { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
-      { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
-      { key: "hero_slides", href: adminHref(locale, "hero-slides"), icon: <Images className="w-4 h-4" /> },
-      { key: "messages", href: adminHref(locale, "messages"), icon: <MessageSquare className="w-4 h-4" /> },
-      { key: "users", href: adminHref(locale, "users"), icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
-      { key: "settings", href: adminHref(locale, "settings"), icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
+      { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4 h-4" /> },
+      { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4 h-4" /> },
+      { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4 h-4" /> },
+      { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4 h-4" /> },
+      { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4 h-4" /> },
+      { key: "documents", href: `/${locale}/admin/documents`, icon: <FileText className="w-4 h-4" /> },
+      { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
+      { key: "donate", href: `/${locale}/admin/donate`, icon: <Heart className="w-4 h-4" /> },
+      { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4 h-4" /> },
+      { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
+      { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
+      { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
     ],
     [locale]
   );

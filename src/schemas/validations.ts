@@ -154,6 +154,56 @@ export const governanceItemSchema = z.object({
 });
 export type GovernanceItemInput = z.infer<typeof governanceItemSchema>;
 
+// ─── Bank Account (Donate page) ───────────────────────────────
+
+export const bankAccountSchema = z.object({
+  bank_name_km: z.string().min(1, "Khmer bank name is required").max(200),
+  bank_name_en: z.string().min(1, "English bank name is required").max(200),
+  account_name_km: z.string().min(1, "Khmer account name is required").max(200),
+  account_name_en: z.string().min(1, "English account name is required").max(200),
+  account_number: z.string().min(1, "Account number is required").max(50),
+  currency: z.string().max(50).default("USD / KHR"),
+  logo_color: z.string().max(20).default("#00376f"),
+  logo_url: z.string().max(2000).optional(),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type BankAccountInput = z.infer<typeof bankAccountSchema>;
+
+// ─── Donation Purpose ("Why Donate" card) ─────────────────────
+
+export const donationPurposeSchema = z.object({
+  icon: z.string().min(1, "Icon is required").max(20),
+  title_km: z.string().min(1, "Khmer title is required").max(200),
+  title_en: z.string().min(1, "English title is required").max(200),
+  desc_km: z.string().max(500).optional(),
+  desc_en: z.string().max(500).optional(),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type DonationPurposeInput = z.infer<typeof donationPurposeSchema>;
+
+// ─── Donation QR code (Donate page) ───────────────────────────
+
+export const donateQrUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "QR code image is required")
+  .max(2000, "URL is too long")
+  .url("Invalid image URL")
+  .refine((u) => u.startsWith("http://") || u.startsWith("https://"), {
+    message: "URL must start with http:// or https://",
+  });
+
+export const donationQrSchema = z.object({
+  label_km: z.string().max(200).optional(),
+  label_en: z.string().max(200).optional(),
+  image_url: donateQrUrlSchema,
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type DonationQrInput = z.infer<typeof donationQrSchema>;
+
 // ─── User (Admin create/edit) ─────────────────────────────────
 
 export const createUserSchema = z.object({
