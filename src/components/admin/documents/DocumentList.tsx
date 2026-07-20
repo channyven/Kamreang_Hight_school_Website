@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatRelativeDate, formatFileSize } from "@/utils";
+import { formatRelativeDate, formatFileSize, adminHref } from "@/utils";
 import type { AppDocument } from "@/types";
 import Link from "next/link";
 
@@ -136,7 +136,7 @@ export default function DocumentList({ documents, loading, onDelete }: DocumentL
                     className="h-8 w-8"
                     asChild
                   >
-                    <Link href={`/${locale}/admin/documents/${doc.id}`}>
+                    <Link href={adminHref(locale, `documents/${doc.id}`)}>
                       <Pencil className="w-4 h-4 text-blue-400 hover:text-blue-600" />
                     </Link>
                   </Button>

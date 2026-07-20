@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { Loader2, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { loginSchema, type LoginInput } from "@/schemas/validations";
+import { adminHref } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,7 @@ export default function LoginPage() {
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
   const getRedirectPath = (locale: string) =>
-    redirect || `/${locale}/admin`;
+    redirect || adminHref(locale);
 
   const onSubmit = async (data: LoginInput) => {
     try {

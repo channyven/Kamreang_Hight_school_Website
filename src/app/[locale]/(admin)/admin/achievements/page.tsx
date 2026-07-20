@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import type { Achievement } from "@/types";
-import { formatShortDate, getLocalizedText, convertGoogleDriveUrl } from "@/utils";
+import { formatShortDate, getLocalizedText, convertGoogleDriveUrl, adminHref } from "@/utils";
 import { toast } from "sonner";
 import { deleteAchievement } from "@/actions/achievements";
 
@@ -73,7 +73,7 @@ export default function AdminAchievementsPage() {
           <p className="text-gray-500 text-sm mt-1">{items.length} achievements</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/achievements/new`}>
+          <Link href={adminHref(locale, "achievements/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Achievement"}
           </Link>
@@ -163,7 +163,7 @@ export default function AdminAchievementsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/achievements/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                            <Link href={adminHref(locale, `achievements/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, title)}>
                             <Trash2 className="w-4 h-4 text-red-500" />

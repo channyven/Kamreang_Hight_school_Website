@@ -29,6 +29,7 @@ interface AuthContextValue {
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   hasPermission: (key: keyof RolePermissions) => boolean;
 }
 
@@ -159,6 +160,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /** Safety timeout to prevent hanging if onAuthStateChanged never fires */
   const SESSION_TIMEOUT_MS = 15_000;
 
+  /**
+   * Refresh the current user's session data from the server.
+   * Call this after any profile update so the whole admin UI reflects
+   * the latest name, avatar, role, etc. without requiring a page reload.
+   */
+  const refreshUser = useCallback(async () => {
+    if (!firebaseUser) return;
+    try {
+      const idToken = await firebaseUser.getIdToken(true);
+      const res = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken, firebase_uid: firebaseUser.uid }),
+      });
+      if (!res.ok) return;
+      const { user: freshUser } = await res.json();
+      if (freshUser) {
+        setUser(freshUser as SessionUser);
+      }
+    } catch {
+      // Non-critical – the old data will still be in the UI
+    }
+  }, [firebaseUser]);
+
   const signInWithEmail = useCallback(
     async (email: string, password: string) => {
       return new Promise<void>((resolve, reject) => {
@@ -244,6 +269,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithEmail,
         signInWithGoogle,
         logout,
+        refreshUser,
         hasPermission,
       }}
     >

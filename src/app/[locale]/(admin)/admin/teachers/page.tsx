@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { Teacher } from "@/types";
-import { getLocalizedText } from "@/utils";
+import { getLocalizedText, adminHref } from "@/utils";
 import { toast } from "sonner";
 import { deleteTeacher, fetchTeachers } from "@/actions/teachers";
 
@@ -49,7 +49,7 @@ export default function AdminTeachersPage() {
           <p className="text-gray-500 text-sm mt-1">{items.length} teachers</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/teachers/new`}>
+          <Link href={adminHref(locale, "teachers/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Teacher"}
           </Link>
@@ -122,7 +122,7 @@ export default function AdminTeachersPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/teachers/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                            <Link href={adminHref(locale, `teachers/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, name ?? "")}>
                             <Trash2 className="w-4 h-4 text-red-500" />

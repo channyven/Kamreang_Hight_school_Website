@@ -46,7 +46,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { generateUniqueSlug, convertGoogleDriveUrl } from "@/utils";
+import { generateUniqueSlug, convertGoogleDriveUrl, adminHref } from "@/utils";
 import PhotoGallery from "@/components/admin/PhotoGallery";
 import { createNews, updateNews, getAdminNewsById } from "@/actions/news";
 import type { NewsCategory } from "@/types";
@@ -150,7 +150,7 @@ export default function NewsFormPage({ params }: PageProps) {
 
     if (result.success) {
       toast.success(isNew ? "Article created!" : "Article updated!");
-      router.push(`/${locale}/admin/news`);
+      router.push(adminHref(locale, "news"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -196,7 +196,7 @@ export default function NewsFormPage({ params }: PageProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm" className="-ml-2 text-gray-500 hover:text-gray-900">
-            <Link href={`/${locale}/admin/news`}>
+            <Link href={adminHref(locale, "news")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {locale === "km" ? "ត្រឡប់" : "Back"}
             </Link>
@@ -229,7 +229,7 @@ export default function NewsFormPage({ params }: PageProps) {
 
         {!isNew && (
           <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link href={`/${locale}/news/${watch("slug")}`} target="_blank">
+            <Link              href={`/${locale}/news/${watch("slug")}`} target="_blank">
               <Eye className="w-4 h-4 mr-1.5" />
               {locale === "km" ? "មើលព័ត៌មាន" : "Preview"}
             </Link>

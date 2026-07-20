@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, Heart, LogIn } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 
 interface NavLink {
@@ -153,7 +153,7 @@ export default function Navbar() {
 
             {/* Admin sign-in */}
             <Link
-              href={`/${locale}/admin`}
+              href={adminHref(locale)}
               aria-label={t("admin")}
               title={t("admin")}
               className={cn(
@@ -209,7 +209,7 @@ export default function Navbar() {
               ))}
               <div className="pt-2 border-t">
                 <Button asChild size="sm" className="w-full bg-school-blue-800">
-                  <Link href={`/${locale}/admin`} onClick={() => setMobileOpen(false)}>
+                  <Link href={adminHref(locale)} onClick={() => setMobileOpen(false)}>
                     {t("admin")}
                   </Link>
                 </Button>

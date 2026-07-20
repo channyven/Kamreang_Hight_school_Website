@@ -172,3 +172,45 @@ export const updateUserSchema = z.object({
   is_active: z.boolean().optional(),
 });
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+/**
+ * Profile-specific schema for admins editing their own profile.
+ * Stricter validation with localized-friendly messages.
+ */
+export const profileUpdateSchema = z.object({
+  full_name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be under 100 characters")
+    .regex(/^[\p{L}\s\-'.]*$/u, "Name can only contain letters, spaces, hyphens, apostrophes, and periods"),
+  avatar_url: z
+    .string()
+    .url("Please enter a valid URL (https://...)")
+    .optional()
+    .or(z.literal("")),
+});
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+
+// ─── Password Change ──────────────────────────────────────────
+
+export const changePasswordSchema = z
+  .object({
+    current_password: z.string().min(1, "Current password is required"),
+    new_password: z
+      .string()
+      .min(8, "New password must be at least 8 characters")
+      .max(128, "New password must be under 128 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirm_password: z.string().min(1, "Please confirm your new password"),
+  })
+  .refine((data) => data.new_password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  })
+  .refine((data) => data.current_password !== data.new_password, {
+    message: "New password must be different from your current password",
+    path: ["new_password"],
+  });
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

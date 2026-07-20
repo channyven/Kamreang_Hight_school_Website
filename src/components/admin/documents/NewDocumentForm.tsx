@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { adminHref } from "@/utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { DocumentInput } from "@/schemas/validations";
@@ -50,7 +51,7 @@ export default function NewDocumentForm() {
     if (result.success) {
       toast.success(locale === "km" ? "ឯកសារត្រូវបានបង្កើត!" : "Document created!");
       reset();
-      router.push(`/${locale}/admin/documents`);
+      router.push(adminHref(locale, "documents"));
     } else {
       toast.error(result.error ?? (locale === "km" ? "បង្កើតឯកសារមិនបានសម្រេច" : "Failed to create document"));
     }
@@ -61,7 +62,7 @@ export default function NewDocumentForm() {
       {/* Page Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/documents`}>
+          <Link href={adminHref(locale, "documents")}>
             <ArrowLeft className="w-4 h-4 mr-1" />
             {locale === "km" ? "ត្រឡប់" : "Back"}
           </Link>

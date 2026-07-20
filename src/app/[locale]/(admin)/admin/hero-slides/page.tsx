@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import type { HeroSlide } from "@/types";
-import { getLocalizedText } from "@/utils";
+import { getLocalizedText, adminHref } from "@/utils";
 import { toast } from "sonner";
 import {
   getAdminHeroSlides,
@@ -108,7 +108,7 @@ export default function AdminHeroSlidesPage() {
           </p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/hero-slides/new`}>
+          <Link href={adminHref(locale, "hero-slides/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
           </Link>
@@ -230,7 +230,7 @@ export default function AdminHeroSlidesPage() {
                     </div>
 
                     <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                      <Link href={`/${locale}/admin/hero-slides/${slide.id}`}>
+                      <Link href={adminHref(locale, `hero-slides/${slide.id}`)}>
                         <Edit className="w-4 h-4 text-blue-500" />
                       </Link>
                     </Button>

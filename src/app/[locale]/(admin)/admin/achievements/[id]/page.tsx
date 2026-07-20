@@ -33,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import { createAchievement, updateAchievement } from "@/actions/achievements";
 import { supabase } from "@/lib/supabase";
-import { convertGoogleDriveUrl } from "@/utils";
+import { convertGoogleDriveUrl, adminHref } from "@/utils";
 import ImagePreview from "@/components/admin/ImagePreview";
 
 interface PageProps { params: Promise<{ id: string }>; }
@@ -111,7 +111,7 @@ export default function AchievementFormPage({ params }: PageProps) {
       : await updateAchievement(id, data);
     if (result.success) {
       toast.success(isNew ? "Achievement created!" : "Achievement updated!");
-      router.push(`/${locale}/admin/achievements`);
+      router.push(adminHref(locale, "achievements"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -136,7 +136,7 @@ export default function AchievementFormPage({ params }: PageProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm" className="-ml-2 text-gray-500 hover:text-gray-900">
-            <Link href={`/${locale}/admin/achievements`}>
+            <Link href={adminHref(locale, "achievements")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {locale === "km" ? "ត្រឡប់" : "Back"}
             </Link>

@@ -12,7 +12,7 @@ import {
   GraduationCap, Landmark, Images,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -44,18 +44,18 @@ export default function AdminSidebar() {
 
   const allNavItems: NavItem[] = useMemo(
     () => [
-      { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4 h-4" /> },
-      { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4 h-4" /> },
-      { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4 h-4" /> },
-      { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4 h-4" /> },
-      { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4 h-4" /> },
-      { key: "documents", href: `/${locale}/admin/documents`, icon: <FileText className="w-4 h-4" /> },
-      { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
-      { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4 h-4" /> },
-      { key: "hero_slides", href: `/${locale}/admin/hero-slides`, icon: <Images className="w-4 h-4" /> },
-      { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
-      { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
-      { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
+      { key: "dashboard", href: adminHref(locale), icon: <LayoutDashboard className="w-4 h-4" /> },
+      { key: "statistics", href: adminHref(locale, "statistics"), icon: <BarChart3 className="w-4 h-4" /> },
+      { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
+      { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
+      { key: "teachers", href: adminHref(locale, "teachers"), icon: <GraduationCap className="w-4 h-4" /> },
+      { key: "documents", href: adminHref(locale, "documents"), icon: <FileText className="w-4 h-4" /> },
+      { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
+      { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
+      { key: "hero_slides", href: adminHref(locale, "hero-slides"), icon: <Images className="w-4 h-4" /> },
+      { key: "messages", href: adminHref(locale, "messages"), icon: <MessageSquare className="w-4 h-4" /> },
+      { key: "users", href: adminHref(locale, "users"), icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
+      { key: "settings", href: adminHref(locale, "settings"), icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
     ],
     [locale]
   );
@@ -70,7 +70,7 @@ export default function AdminSidebar() {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
+      if (href === adminHref(locale)) return pathname === adminHref(locale);
       return pathname.startsWith(href);
     },
     [locale, pathname]
@@ -106,7 +106,7 @@ export default function AdminSidebar() {
       {!collapsed && (
         <div className="px-3 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
           >
@@ -118,7 +118,7 @@ export default function AdminSidebar() {
       {collapsed && (
         <div className="px-2 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
             title="Create New Post"

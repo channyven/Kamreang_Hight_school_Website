@@ -2,10 +2,11 @@
 
 import { createServerClient } from "@/lib/supabase";
 import { createUserSchema, updateUserSchema } from "@/schemas/validations";
-import type { ActionResult } from "@/types";
+import type { ActionResult, SessionUser } from "@/types";
 import type { z } from "zod";
 import { requireAdmin } from "@/lib/auth-guard";
 import { getAdminAuth } from "@/lib/firebase-admin";
+import { AuditService } from "@/services/audit.service";
 
 type CreateUserInput = z.infer<typeof createUserSchema>;
 type UpdateUserInput = z.infer<typeof updateUserSchema>;
@@ -58,18 +59,43 @@ export async function updateUser(
   id: string,
   data: UpdateUserInput
 ): Promise<ActionResult<void>> {
-  try { await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
+  let adminUser: SessionUser;
+  try { adminUser = await requireAdmin(); } catch { return { success: false, error: "Unauthorized" }; }
   const parsed = updateUserSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
   const supabase = createServerClient();
+
+  // Fetch old data for audit trail before updating
+  const { data: oldUser } = await supabase
+    .from("admin_users")
+    .select("full_name, avatar_url, email, role, is_active")
+    .eq("id", id)
+    .single();
+
   const { error } = await supabase
     .from("admin_users")
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) return { success: false, error: error.message };
+
+  // Log the update to audit trail
+  try {
+    const audit = new AuditService();
+    await audit.log({
+      userId: adminUser!.id,
+      userEmail: adminUser!.email,
+      action: "update",
+      tableName: "admin_users",
+      recordId: id,
+      oldData: oldUser ?? undefined,
+      newData: parsed.data as Record<string, unknown>,
+    });
+  } catch {
+    // Non-critical: audit failure shouldn't block the update
+  }
 
   return { success: true };
 }

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { GovernanceItem, GovernanceSection } from "@/types";
-import { getLocalizedText, cn } from "@/utils";
+import { getLocalizedText, cn, adminHref } from "@/utils";
 import { getGovernanceIcon } from "@/lib/governance-icons";
 import { toast } from "sonner";
 import { deleteGovernanceItem, getAllGovernanceItems } from "@/actions/governance";
@@ -65,7 +65,7 @@ export default function AdminGovernancePage() {
           </p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/governance/new?section=${section}`}>
+          <Link href={adminHref(locale, `governance/new?section=${section}`)}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Item"}
           </Link>
@@ -133,8 +133,7 @@ export default function AdminGovernancePage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/governance/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">                             <Link href={adminHref(locale, `governance/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, text ?? "")}>
                             <Trash2 className="w-4 h-4 text-red-500" />

@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import { createHeroSlide, updateHeroSlide, getAdminHeroSlideById } from "@/actions/hero-slides";
 import { heroSlideSchema, type HeroSlideInput } from "@/schemas/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { convertGoogleDriveUrl } from "@/utils";
+import { convertGoogleDriveUrl, adminHref } from "@/utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -102,7 +102,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
           ? (locale === "km" ? "ស្លាយត្រូវបានបង្កើត" : "Slide created!")
           : (locale === "km" ? "ស្លាយត្រូវបានកែប្រែ" : "Slide updated!")
       );
-      router.push(`/${locale}/admin/hero-slides`);
+      router.push(adminHref(locale, "hero-slides"));
     } else {
       toast.error(result.error ?? (locale === "km" ? "បរាជ័យ" : "Failed to save"));
     }
@@ -127,7 +127,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
       <div className="flex items-center justify-between gap-4 bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm" className="-ml-2 text-gray-500 hover:text-gray-900">
-            <Link href={`/${locale}/admin/hero-slides`}>
+            <Link href={adminHref(locale, "hero-slides")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {locale === "km" ? "ត្រឡប់" : "Back"}
             </Link>
