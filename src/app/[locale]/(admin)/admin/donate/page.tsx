@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { BankAccount, DonationPurpose, DonationQr } from "@/types";
-import { getLocalizedText, cn } from "@/utils";
+import { getLocalizedText, cn, adminHref } from "@/utils";
 import { getDonateIcon } from "@/lib/donate-icons";
 import { toast } from "sonner";
 import {
@@ -129,7 +129,7 @@ export default function AdminDonatePage() {
           </p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/donate/${isBankTab ? "bank" : isQrTab ? "qr" : "purpose"}/new`}>
+          <Link href={adminHref(locale, `donate/${isBankTab ? "bank" : isQrTab ? "qr" : "purpose"}/new`)}>
             <Plus className="w-4 h-4 mr-2" />
             {isBankTab
               ? (locale === "km" ? "បន្ថែមគណនីធនាគារ" : "Add Bank Account")
@@ -210,7 +210,7 @@ export default function AdminDonatePage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
                             <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                              <Link href={`/${locale}/admin/donate/qr/${qr.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                              <Link href={adminHref(locale, `donate/qr/${qr.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDeleteQr(qr.id, label ?? "")}>
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -282,7 +282,7 @@ export default function AdminDonatePage() {
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
                             <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                              <Link href={`/${locale}/admin/donate/bank/${acc.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                              <Link href={adminHref(locale, `donate/bank/${acc.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDeleteAccount(acc.id, bankName ?? "")}>
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -333,7 +333,7 @@ export default function AdminDonatePage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/donate/purpose/${p.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                            <Link href={adminHref(locale, `donate/purpose/${p.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDeletePurpose(p.id, title ?? "")}>
                             <Trash2 className="w-4 h-4 text-red-500" />

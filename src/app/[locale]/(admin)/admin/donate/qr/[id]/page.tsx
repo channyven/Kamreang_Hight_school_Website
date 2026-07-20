@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ImageUploader from "@/components/admin/ImageUploader";
+import { adminHref } from "@/utils";
 import { donationQrSchema, type DonationQrInput } from "@/schemas/validations";
 import { createDonationQr, updateDonationQr, getDonationQrById } from "@/actions/donate";
 
@@ -52,7 +53,7 @@ export default function DonationQrFormPage({ params }: PageProps) {
           ? (locale === "km" ? "កូដ QR ត្រូវបានបន្ថែម!" : "QR code added!")
           : (locale === "km" ? "កូដ QR ត្រូវបានកែប្រែ!" : "QR code updated!")
       );
-      router.push(`/${locale}/admin/donate?tab=qr-code`);
+      router.push(adminHref(locale, "donate?tab=qr-code"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -64,7 +65,7 @@ export default function DonationQrFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/donate?tab=qr-code`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, "donate?tab=qr-code")}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមកូដ QR" : "Add QR Code") : (locale === "km" ? "កែកូដ QR" : "Edit QR Code")}

@@ -133,7 +133,10 @@ export default function AdminGovernancePage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">                             <Link href={adminHref(locale, `governance/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                            <Link href={adminHref(locale, `governance/${item.id}`)}>
+                              <Edit className="w-4 h-4 text-blue-500" />
+                            </Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, text ?? "")}>
                             <Trash2 className="w-4 h-4 text-red-500" />

@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { donationPurposeSchema, type DonationPurposeInput } from "@/schemas/validations";
 import { createDonationPurpose, updateDonationPurpose, getDonationPurposeById } from "@/actions/donate";
 import { DONATE_ICON_NAMES, getDonateIcon } from "@/lib/donate-icons";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -56,7 +56,7 @@ export default function DonationPurposeFormPage({ params }: PageProps) {
           ? (locale === "km" ? "កាតត្រូវបានបន្ថែម!" : "Card added!")
           : (locale === "km" ? "កាតត្រូវបានកែប្រែ!" : "Card updated!")
       );
-      router.push(`/${locale}/admin/donate?tab=why-donate`);
+      router.push(adminHref(locale, "donate?tab=why-donate"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -68,7 +68,7 @@ export default function DonationPurposeFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/donate?tab=why-donate`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, "donate?tab=why-donate")}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមកាត" : "Add Card") : (locale === "km" ? "កែកាត" : "Edit Card")}

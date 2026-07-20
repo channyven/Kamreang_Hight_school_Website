@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Statistics } from "@/types";
 import { toast } from "sonner";
 import { getAdminStatisticsList, deleteStatistics, setCurrentStatistics } from "@/actions/statistics";
-import { formatNumber } from "@/utils";
+import { formatNumber, adminHref } from "@/utils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, Legend,
@@ -186,7 +186,7 @@ export default function AdminStatisticsPage() {
           </p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/statistics/new`}>
+          <Link href={adminHref(locale, "statistics/new")}>
             <Plus className="w-4 h-4 mr-2" />{L.addYear}
           </Link>
         </Button>
@@ -270,7 +270,7 @@ export default function AdminStatisticsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                          <Link href={`/${locale}/admin/statistics/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                          <Link href={adminHref(locale, `statistics/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, item.academic_year)}>
                           <Trash2 className="w-4 h-4 text-red-500" />

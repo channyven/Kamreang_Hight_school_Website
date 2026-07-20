@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { adminHref } from "@/utils";
 import { statisticsSchema, type StatisticsInput } from "@/schemas/validations";
 import { createStatistics, updateStatistics, getAdminStatisticsById } from "@/actions/statistics";
 import type { Statistics } from "@/types";
@@ -60,7 +61,7 @@ export default function StatisticsFormPage({ params }: PageProps) {
     const result = isNew ? await createStatistics(data) : await updateStatistics(id, data);
     if (result.success) {
       toast.success(t(locale, "បានរក្សាទុកស្ថិតិ", isNew ? "Statistics created!" : "Statistics updated!"));
-      router.push(`/${locale}/admin/statistics`);
+      router.push(adminHref(locale, "statistics"));
     } else {
       toast.error(result.error ?? t(locale, "បរាជ័យក្នុងការរក្សាទុក", "Failed to save"));
     }
@@ -75,7 +76,7 @@ export default function StatisticsFormPage({ params }: PageProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/statistics`}>
+          <Link href={adminHref(locale, "statistics")}>
             <ArrowLeft className="w-4 h-4 mr-1" />{t(locale, "ត្រឡប់", "Back")}
           </Link>
         </Button>

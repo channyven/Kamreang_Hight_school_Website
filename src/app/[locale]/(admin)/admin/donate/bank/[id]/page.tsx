@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ImageUploader from "@/components/admin/ImageUploader";
+import { adminHref } from "@/utils";
 import { bankAccountSchema, type BankAccountInput } from "@/schemas/validations";
 import { createBankAccount, updateBankAccount, getBankAccountById } from "@/actions/donate";
 
@@ -54,7 +55,7 @@ export default function BankAccountFormPage({ params }: PageProps) {
           ? (locale === "km" ? "គណនីធនាគារត្រូវបានបន្ថែម!" : "Bank account added!")
           : (locale === "km" ? "គណនីធនាគារត្រូវបានកែប្រែ!" : "Bank account updated!")
       );
-      router.push(`/${locale}/admin/donate?tab=bank-accounts`);
+      router.push(adminHref(locale, "donate?tab=bank-accounts"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -66,7 +67,7 @@ export default function BankAccountFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/donate?tab=bank-accounts`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, "donate?tab=bank-accounts")}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមគណនីធនាគារ" : "Add Bank Account") : (locale === "km" ? "កែគណនីធនាគារ" : "Edit Bank Account")}

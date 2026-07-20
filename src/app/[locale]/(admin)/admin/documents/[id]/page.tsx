@@ -83,7 +83,7 @@ export default function EditDocumentPage({ params }: PageProps) {
               ? "រកមិនឃើញឯកសារ"
               : "Document not found"
           );
-          router.push(`/${locale}/admin/documents`);
+          router.push(adminHref(locale, "documents"));
         }
       } catch (err) {
         console.error("Failed to fetch document:", err);
@@ -106,7 +106,7 @@ export default function EditDocumentPage({ params }: PageProps) {
       toast.success(
         locale === "km" ? "ឯកសារត្រូវបានកែប្រែ!" : "Document updated!"
       );
-      router.push(`/${locale}/admin/documents`);
+      router.push(adminHref(locale, "documents"));
     } else {
       toast.error(
         result.error ??
