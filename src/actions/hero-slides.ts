@@ -35,6 +35,24 @@ export async function createHeroSlide(data: HeroSlideInput): Promise<ActionResul
   }
 
   const supabase = createServerClient();
+
+  // Enforce maximum 5 slides limit
+  const { count, error: countError } = await supabase
+    .from("hero_slides")
+    .select("*", { count: "exact", head: true });
+
+  if (countError) {
+    return { success: false, error: countError.message };
+  }
+
+  if (count && count >= 5) {
+    return {
+      success: false,
+      error:
+        "Maximum 5 slides allowed. Please delete some existing slides first.",
+    };
+  }
+
   const { error } = await supabase.from("hero_slides").insert({
     ...data,
     sort_order: data.sort_order ?? 99,

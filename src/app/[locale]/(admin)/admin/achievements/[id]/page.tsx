@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import { createAchievement, updateAchievement } from "@/actions/achievements";
 import { supabase } from "@/lib/supabase";
+import { convertGoogleDriveUrl } from "@/utils";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -26,8 +27,26 @@ export default function AchievementFormPage({ params }: PageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(!isNew);
 
-  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, control, watch, setValue, formState: { errors, isSubmitting } } =
     useForm<AchievementInput>({ resolver: zodResolver(achievementSchema), defaultValues: { status: "draft", is_featured: false } });
+
+  const watchImageUrl = watch("image_url");
+  const [previewError, setPreviewError] = useState(false);
+
+  // Auto-convert Google Drive URLs whenever the value changes
+  useEffect(() => {
+    if (watchImageUrl) {
+      const converted = convertGoogleDriveUrl(watchImageUrl);
+      if (converted !== watchImageUrl) {
+        setValue("image_url", converted);
+      }
+    }
+  }, [watchImageUrl, setValue]);
+
+  // Reset preview error whenever image URL changes
+  useEffect(() => {
+    setPreviewError(false);
+  }, [watchImageUrl]);
 
   useEffect(() => {
     if (!isNew) {
@@ -152,8 +171,35 @@ export default function AchievementFormPage({ params }: PageProps) {
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
-              <h2 className="font-semibold text-gray-900">Image</h2>
-              <Input {...register("image_url")} placeholder="Image URL" />
+              <h2 className="font-semibold text-gray-900">
+                {locale === "km" ? "រូបភាព" : "Image"}
+              </h2>
+              <Input
+                {...register("image_url")}
+                placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link"}
+                className="text-sm"
+              />
+              {watchImageUrl && (
+                <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-100">
+                  <img
+                    key={watchImageUrl}
+                    src={watchImageUrl}
+                    alt="Preview"
+                    className={`object-cover w-full h-full transition-opacity duration-300 ${previewError ? 'opacity-0' : 'opacity-100'}`}
+                    onLoad={() => setPreviewError(false)}
+                    onError={() => setPreviewError(true)}
+                  />
+                  {previewError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                      <p className="text-[11px] text-gray-400 px-3 text-center">
+                        {locale === "km"
+                          ? "មិនអាចផ្ទុករូបភាព"
+                          : "Could not load image"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button type="submit" className="w-full bg-school-blue-800 hover:bg-school-blue-900" disabled={isSubmitting} size="lg">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { Plus, Search, Edit, Trash2, Loader2, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
 
 export default function AdminHeroSlidesPage() {
   const locale = useLocale();
+  const router = useRouter();
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -104,14 +106,30 @@ export default function AdminHeroSlidesPage() {
             {locale === "km" ? "គ្រប់គ្រងស្លាយពិពណ៌នា" : "Hero Slideshow"}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            {slides.length} {locale === "km" ? "ស្លាយ" : "slides"}
+            {slides.length}/5 {locale === "km" ? "ស្លាយ" : "slides"}
+            {slides.length >= 5 && (
+              <span className="ml-2 text-amber-600 text-xs">
+                ({locale === "km" ? "ឈានដល់កំណត់" : "limit reached"})
+              </span>
+            )}
           </p>
         </div>
-        <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/hero-slides/new`}>
-            <Plus className="w-4 h-4 mr-2" />
-            {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
-          </Link>
+        <Button
+          className="bg-school-blue-800 hover:bg-school-blue-900"
+          onClick={() => {
+            if (slides.length >= 5) {
+              toast.error(
+                locale === "km"
+                  ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុបស្លាយដែលមានស្រាប់ខ្លះជាមុនសិន។"
+                  : "Maximum 5 slides allowed. Please delete some existing slides first."
+              );
+            } else {
+              router.push(`/${locale}/admin/hero-slides/new`);
+            }
+          }}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
         </Button>
       </div>
 
