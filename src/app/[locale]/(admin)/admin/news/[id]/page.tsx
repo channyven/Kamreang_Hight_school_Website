@@ -76,6 +76,7 @@ export default function NewsFormPage({ params }: PageProps) {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [pendingImageUrl, setPendingImageUrl] = useState("");
+  const [previewError, setPreviewError] = useState(false);
 
   const {
     register,
@@ -97,6 +98,22 @@ export default function NewsFormPage({ params }: PageProps) {
   const excerptEn = watch("excerpt_en");
   const excerptKm = watch("excerpt_km");
   const currentStatus = watch("status");
+  const featuredImageUrl = watch("featured_image");
+
+  // Auto-convert Google Drive URLs for featured_image
+  useEffect(() => {
+    if (featuredImageUrl) {
+      const converted = convertGoogleDriveUrl(featuredImageUrl);
+      if (converted !== featuredImageUrl) {
+        setValue("featured_image", converted);
+      }
+    }
+  }, [featuredImageUrl, setValue]);
+
+  // Reset preview error when featured image URL changes
+  useEffect(() => {
+    setPreviewError(false);
+  }, [featuredImageUrl]);
 
   // Auto-generate slug from English title
   useEffect(() => {
@@ -544,28 +561,33 @@ export default function NewsFormPage({ params }: PageProps) {
                   </span>
                 )}
               </div>
-              <div className="p-5">
+              <div className="p-5 space-y-3">
                 <Input
-                  {...register("featured_image", {
-                    onBlur: (e) => {
-                      const converted = convertGoogleDriveUrl(e.target.value);
-                      if (converted !== e.target.value) {
-                        setValue("featured_image", converted);
-                      }
-                    },
-                  })}
+                  {...register("featured_image")}
                   placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link"}
-                  onPaste={(e) => {
-                    setTimeout(() => {
-                      const input = e.target as HTMLInputElement;
-                      const converted = convertGoogleDriveUrl(input.value);
-                      if (converted !== input.value) {
-                        setValue("featured_image", converted);
-                      }
-                    }, 0);
-                  }}
                   className="text-sm"
                 />
+                {featuredImageUrl && (
+                  <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-100">
+                    <img
+                      key={featuredImageUrl}
+                      src={featuredImageUrl}
+                      alt="Featured image preview"
+                      className={`object-cover w-full h-full transition-opacity duration-300 ${previewError ? 'opacity-0' : 'opacity-100'}`}
+                      onLoad={() => setPreviewError(false)}
+                      onError={() => setPreviewError(true)}
+                    />
+                    {previewError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                        <p className="text-[11px] text-gray-400 px-3 text-center">
+                          {locale === "km"
+                            ? "មិនអាចផ្ទុករូបភាព"
+                            : "Could not load image"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

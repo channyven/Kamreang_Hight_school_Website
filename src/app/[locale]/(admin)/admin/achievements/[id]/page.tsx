@@ -33,8 +33,6 @@ import { Badge } from "@/components/ui/badge";
 import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import { createAchievement, updateAchievement } from "@/actions/achievements";
 import { supabase } from "@/lib/supabase";
-import { convertGoogleDriveUrl, adminHref } from "@/utils";
-import ImagePreview from "@/components/admin/ImagePreview";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -64,23 +62,26 @@ export default function AchievementFormPage({ params }: PageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(!isNew);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<AchievementInput>({
-    resolver: zodResolver(achievementSchema),
-    defaultValues: {
-      status: "draft",
-      is_featured: false,
-    },
-  });
+  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } =
+    useForm<AchievementInput>({ resolver: zodResolver(achievementSchema), defaultValues: { status: "draft", is_featured: false } });
 
-  const currentStatus = watch("status");
-  const imageUrl = watch("image_url");
+  const watchImageUrl = watch("image_url");
+  const [previewError, setPreviewError] = useState(false);
+
+  // Auto-convert Google Drive URLs whenever the value changes
+  useEffect(() => {
+    if (watchImageUrl) {
+      const converted = convertGoogleDriveUrl(watchImageUrl);
+      if (converted !== watchImageUrl) {
+        setValue("image_url", converted);
+      }
+    }
+  }, [watchImageUrl, setValue]);
+
+  // Reset preview error whenever image URL changes
+  useEffect(() => {
+    setPreviewError(false);
+  }, [watchImageUrl]);
 
   useEffect(() => {
     if (!isNew) {
@@ -386,67 +387,9 @@ export default function AchievementFormPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* ── Image ── */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
-                <ImageIcon className="w-4 h-4 text-school-blue-800" />
-                <h2 className="font-semibold text-gray-900 text-sm">
-                  {locale === "km" ? "រូបភាព" : "Image"}
-                </h2>
-                {imageUrl && (
-                  <span className="ml-auto text-[10px] text-emerald-500 font-medium">
-                    ✓ {locale === "km" ? "មាន" : "Set"}
-                  </span>
-                )}
-              </div>
-              <div className="p-5 space-y-3">
-                {/* Image Preview */}
-                {imageUrl && <ImagePreview url={imageUrl} />}
-
-                {/* Google Drive link paste */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-gray-500">
-                    {locale === "km" ? "បិទភ្ជាប់តំណ Google Drive" : "Paste Google Drive link"}
-                  </Label>
-                  <div className="relative">
-                    <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" />
-                    <input
-                      type="text"
-                      value={imageUrl ?? ""}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (!val) {
-                          setValue("image_url", "");
-                          return;
-                        }
-                        setValue("image_url", val);
-                      }}
-                      onBlur={(e) => {
-                        const converted = convertGoogleDriveUrl(e.target.value);
-                        if (converted !== e.target.value) {
-                          setValue("image_url", converted);
-                        }
-                      }}
-                      onPaste={(e) => {
-                        setTimeout(() => {
-                          const input = e.target as HTMLInputElement;
-                          const converted = convertGoogleDriveUrl(input.value);
-                          if (converted !== input.value) {
-                            setValue("image_url", converted);
-                          }
-                        }, 0);
-                      }}
-                      placeholder={locale === "km" ? "បិទភ្ជាប់តំណរូបភាព..." : "Paste image link..."}
-                      className="w-full rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    />
-                  </div>
-                  <p className="text-[11px] text-gray-400">
-                    {locale === "km"
-                      ? "💡 បិទភ្ជាប់តំណ Google Drive — វានឹងបម្លែងដោយស្វ័យប្រវត្តិ"
-                      : "💡 Paste a Google Drive share link — it will auto-convert"}
-                  </p>
-                </div>
-              </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+              <h2 className="font-semibold text-gray-900">Image</h2>
+              <Input {...register("image_url")} placeholder="Image URL" />
             </div>
 
             {/* ── Submit ── */}

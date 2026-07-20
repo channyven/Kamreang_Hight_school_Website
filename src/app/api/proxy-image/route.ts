@@ -52,6 +52,40 @@ export async function GET(request: NextRequest) {
     clearTimeout(timeout);
 
     if (!response.ok) {
+      // If the download endpoint fails, try Google's thumbnail endpoint as a fallback.
+      // The thumbnail returns a 302 redirect that fetch() follows to lh3.googleusercontent.com.
+      const fileIdMatch = urlParam.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
+      if (fileIdMatch && urlParam.includes("drive.usercontent.google.com/download")) {
+        const fallbackTimeout = setTimeout(() => controller.abort(), 15000);
+        const fallbackUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w2000`;
+        const fallbackResponse = await fetch(fallbackUrl, {
+          signal: controller.signal,
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          },
+        });
+        clearTimeout(fallbackTimeout);
+
+        if (fallbackResponse.ok) {
+          const fallbackContentType = fallbackResponse.headers.get("content-type") || "";
+          if (fallbackContentType.startsWith("image/")) {
+            const fallbackHeaders: Record<string, string> = {
+              "Content-Type": fallbackContentType,
+              "Cache-Control": "public, max-age=86400, s-maxage=86400",
+              "Access-Control-Allow-Origin": "*",
+            };
+            const fallbackDisposition = fallbackResponse.headers.get("content-disposition");
+            if (fallbackDisposition && fallbackDisposition.startsWith("attachment")) {
+              fallbackHeaders["Content-Disposition"] = "inline";
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return new NextResponse(fallbackResponse.body as any, { status: 200, headers: fallbackHeaders });
+          }
+        }
+        console.error(`Proxy fallback also failed for ${urlParam}`);
+      }
+
       console.error(`Proxy fetch failed: ${response.status} for ${urlParam}`);
       return new NextResponse(`Upstream fetch failed: ${response.status}`, {
         status: response.status,

@@ -24,10 +24,16 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { createHeroSlide, updateHeroSlide, getAdminHeroSlideById } from "@/actions/hero-slides";
+import { createHeroSlide, updateHeroSlide, getAdminHeroSlideById, getAdminHeroSlides } from "@/actions/hero-slides";
 import { heroSlideSchema, type HeroSlideInput } from "@/schemas/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+<<<<<<< HEAD
 import { convertGoogleDriveUrl, adminHref } from "@/utils";
+=======
+import { convertGoogleDriveUrl } from "@/utils";
+import ImageUploader from "@/components/admin/ImageUploader";
+import { STORAGE_BUCKETS } from "@/lib/supabase";
+>>>>>>> feat/hero-slideshow-page
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -52,6 +58,9 @@ export default function HeroSlideFormPage({ params }: PageProps) {
 
   const [loading, setLoading] = useState(!isNew);
   const [showGradientPicker, setShowGradientPicker] = useState(false);
+  const [imageTab, setImageTab] = useState<"upload" | "link">("upload");
+  const [drivePreviewError, setDrivePreviewError] = useState(false);
+  const [slideLimitReached, setSlideLimitReached] = useState(false);
 
   const {
     register,
@@ -73,6 +82,34 @@ export default function HeroSlideFormPage({ params }: PageProps) {
   const watchImageUrl = watch("image_url");
   const watchGradient = watch("gradient");
   const isActive = watch("is_active");
+
+  // Auto-convert Google Drive URLs to our proxy format whenever the value changes
+  useEffect(() => {
+    if (watchImageUrl) {
+      const converted = convertGoogleDriveUrl(watchImageUrl);
+      if (converted !== watchImageUrl) {
+        setValue("image_url", converted);
+      }
+    }
+  }, [watchImageUrl, setValue]);
+
+  // Check slide limit on mount (only for new slides)
+  useEffect(() => {
+    if (isNew) {
+      getAdminHeroSlides().then((slides) => {
+        if (slides.length >= 5) {
+          setSlideLimitReached(true);
+        }
+      });
+    }
+  }, [isNew]);
+
+  // Reset preview error when Google Drive URL changes
+  useEffect(() => {
+    setDrivePreviewError(false);
+  }, [watchImageUrl]);
+
+
 
   useEffect(() => {
     if (!isNew) {
@@ -116,6 +153,32 @@ export default function HeroSlideFormPage({ params }: PageProps) {
           <p className="text-sm text-gray-400">
             {locale === "km" ? "កំពុងផ្ទុក..." : "Loading..."}
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (slideLimitReached) {
+    return (
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-8 text-center">
+          <p className="text-4xl mb-4">⚠️</p>
+          <h2 className="text-xl font-bold text-amber-800 mb-2">
+            {locale === "km"
+              ? "ឈានដល់ចំនួនកំណត់"
+              : "Limit Reached"}
+          </h2>
+          <p className="text-amber-700 mb-6 max-w-md mx-auto">
+            {locale === "km"
+              ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុប ឬបិទស្លាយដែលមានស្រាប់មួយចំនួនជាមុនសិន។"
+              : "You can only have up to 5 hero slides. Please delete or deactivate some existing slides first."}
+          </p>
+          <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
+            <Link href={`/${locale}/admin/hero-slides`}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {locale === "km" ? "ត្រឡប់ទៅបញ្ជីស្លាយ" : "Back to Slides"}
+            </Link>
+          </Button>
         </div>
       </div>
     );
@@ -386,7 +449,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* ── Image URL ── */}
+            {/* ── Image ── */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
                 <ImageIcon className="w-4 h-4 text-school-blue-800" />
@@ -399,41 +462,84 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                   </span>
                 )}
               </div>
-              <div className="p-5 space-y-3">
-                <Input
-                  {...register("image_url", {
-                    onBlur: (e) => {
-                      const converted = convertGoogleDriveUrl(e.target.value);
-                      if (converted !== e.target.value) {
-                        setValue("image_url", converted);
-                      }
-                    },
-                  })}
-                  placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link"}
-                  onPaste={(e) => {
-                    setTimeout(() => {
-                      const input = e.target as HTMLInputElement;
-                      const converted = convertGoogleDriveUrl(input.value);
-                      if (converted !== input.value) {
-                        setValue("image_url", converted);
-                      }
-                    }, 0);
-                  }}
-                  className="text-sm"
-                />
-                {watchImageUrl && (
-                  <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-100">
-                    <img
-                      src={watchImageUrl}
-                      alt="Preview"
-                      className="object-cover w-full h-full"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
+              <div className="p-5 space-y-4">
+                {/* Tab selector */}
+                <div className="flex gap-1 p-1 rounded-lg bg-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setImageTab("upload")}
+                    className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-all ${
+                      imageTab === "upload"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {locale === "km" ? "បង្ហោះរូបភាព" : "Upload Image"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageTab("link")}
+                    className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-all ${
+                      imageTab === "link"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {locale === "km" ? "តំណ Google Drive" : "Google Drive Link"}
+                  </button>
+                </div>
+
+                {/* Upload tab */}
+                {imageTab === "upload" && (
+                  <ImageUploader
+                    value={watchImageUrl}
+                    onChange={(url) => setValue("image_url", url ?? "")}
+                    bucket="SCHOOL_IMAGES"
+                    folder="hero-slides"
+                  />
+                )}
+
+                {/* Google Drive Link tab */}
+                {imageTab === "link" && (
+                  <div className="space-y-3">
+                    <Input
+                      {...register("image_url")}
+                      placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link"}
+                      className="text-sm"
                     />
+                    {watchImageUrl && (
+                      <div className="relative w-full h-28 rounded-lg overflow-hidden border border-gray-100 bg-gray-50">
+                        <img
+                          key={watchImageUrl}
+                          src={watchImageUrl}
+                          alt="Preview"
+                          className={`w-full h-full object-contain transition-opacity duration-300 ${drivePreviewError ? 'opacity-0' : 'opacity-100'}`}
+                          onLoad={() => setDrivePreviewError(false)}
+                          onError={() => setDrivePreviewError(true)}
+                        />
+                        {drivePreviewError && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                            <p className="text-[11px] text-gray-400 px-3 text-center">
+                              {locale === "km"
+                                ? "មិនអាចផ្ទុករូបភាព - សូមពិនិត្យមើលការកំណត់ការចែករំលែកឯកសារ"
+                                : "Could not load image — check file sharing settings"}
+                            </p>
+                            <p className="text-[10px] text-gray-300 px-3 text-center break-all">
+                              {watchImageUrl}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <p className="text-[11px] text-gray-400">
+                      {locale === "km"
+                        ? "បើកការចែករំលែកឯកសារ Anyone with the link នៅក្នុង Google Drive"
+                        : "Set file sharing to 'Anyone with the link' in Google Drive"}
+                    </p>
                   </div>
                 )}
-                <p className="text-[11px] text-gray-400">
+
+                <p className="text-[11px] text-gray-400 border-t border-gray-100 pt-3">
                   {locale === "km"
                     ? "បើទុកទទេ នឹងប្រើពណ៌ជម្រាល (gradient)"
                     : "Leave empty to use gradient background"}
