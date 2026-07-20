@@ -133,7 +133,16 @@
     "hero_slides": "Hero Slides",
     "audit_logs": "Audit Logs",
     "logout": "Sign Out",
-    "profile": "Profile"
+    "profile": "Profile",
+    "portal_name": "Admin Portal",
+    "create_new_post": "Create New Post",
+    "nav_group_overview": "Overview",
+    "nav_group_content": "Content",
+    "nav_group_inbox": "Inbox",
+    "nav_group_system": "System",
+    "role_administrator": "Administrator",
+    "role_director": "Director",
+    "role_editor": "Content Editor"
   },
   "auth": {
     "login": "Sign In",

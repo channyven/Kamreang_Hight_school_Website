@@ -12,19 +12,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/AuthContext";
-import { getInitials, adminHref } from "@/utils";
+import { getInitials, adminHref, cn } from "@/utils";
 import type { Locale } from "@/i18n/config";
-
-const ROLE_LABELS: Record<string, string> = {
-  administrator: "Administrator",
-  director: "Director",
-  editor: "Content Editor",
-};
 
 export default function AdminTopBar() {
   const { user, logout } = useAuth();
   const locale = useLocale() as Locale;
   const t = useTranslations("admin");
+
+  const roleLabel =
+    user?.role === "administrator"
+      ? t("role_administrator")
+      : user?.role === "director"
+        ? t("role_director")
+        : user?.role === "editor"
+          ? t("role_editor")
+          : user?.role;
 
   return (
     <header
@@ -53,7 +56,10 @@ export default function AdminTopBar() {
           <input
             type="text"
             placeholder={locale === "km" ? "ស្វែងរក..." : "Search…"}
-            className="flex-1 bg-transparent outline-none text-sm placeholder:text-current"
+            className={cn(
+              "flex-1 bg-transparent outline-none text-sm placeholder:text-current",
+              locale === "km" && "font-khmer"
+            )}
             style={{ color: "#434750" }}
           />
         </div>
@@ -64,7 +70,10 @@ export default function AdminTopBar() {
         <Link
           href={`/${locale}`}
           target="_blank"
-          className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium transition-colors mr-1"
+          className={cn(
+            "hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium transition-colors mr-1",
+            locale === "km" && "font-khmer"
+          )}
           style={{ color: "#8892a0" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#00376f")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "#8892a0")}
@@ -127,13 +136,16 @@ export default function AdminTopBar() {
                   <p className="text-sm font-semibold leading-none" style={{ color: "#0d1c2f" }}>
                     {user.full_name}
                   </p>
-                  <p className="text-[11px] leading-none mt-0.5" style={{ color: "#8892a0" }}>
-                    {ROLE_LABELS[user.role] ?? user.role}
+                  <p
+                    className={cn("text-[11px] leading-none mt-0.5", locale === "km" && "font-khmer")}
+                    style={{ color: "#8892a0" }}
+                  >
+                    {roleLabel}
                   </p>
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className={cn("w-48", locale === "km" && "font-khmer")}>
               <DropdownMenuItem asChild>
                 <Link href={adminHref(locale, "profile")}>{t("profile")}</Link>
               </DropdownMenuItem>

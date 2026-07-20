@@ -23,15 +23,15 @@ interface NavItem {
 }
 
 interface NavGroup {
-  label: string;
+  labelKey: string;
   keys: string[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
-  { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "donate", "hero_slides", "about"] },
-  { label: "Inbox", keys: ["messages"] },
-  { label: "System", keys: ["users", "settings"] },
+  { labelKey: "nav_group_overview", keys: ["dashboard", "statistics"] },
+  { labelKey: "nav_group_content", keys: ["news", "achievements", "teachers", "documents", "governance", "donate", "hero_slides", "about"] },
+  { labelKey: "nav_group_inbox", keys: ["messages"] },
+  { labelKey: "nav_group_system", keys: ["users", "settings"] },
 ];
 
 export default function AdminSidebar() {
@@ -95,9 +95,13 @@ export default function AdminSidebar() {
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white leading-tight">Admin Portal</p>
+            <p className={cn("text-sm font-bold text-white leading-tight", locale === "km" && "font-khmer")}>
+              {t("portal_name")}
+            </p>
             <p className="text-xs leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
+              {locale === "km"
+                ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
+                : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School")}
             </p>
           </div>
         )}
@@ -108,11 +112,14 @@ export default function AdminSidebar() {
         <div className="px-3 pt-4 pb-2">
           <Link
             href={adminHref(locale, "news/new")}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
+            className={cn(
+              "flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95",
+              locale === "km" && "font-khmer"
+            )}
             style={{ background: "#fdbc13", color: "#0d1b38" }}
           >
             <Plus className="w-4 h-4" />
-            Create New Post
+            {t("create_new_post")}
           </Link>
         </div>
       )}
@@ -122,7 +129,7 @@ export default function AdminSidebar() {
             href={adminHref(locale, "news/new")}
             className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
-            title="Create New Post"
+            title={t("create_new_post")}
           >
             <Plus className="w-4 h-4" />
           </Link>
@@ -135,13 +142,16 @@ export default function AdminSidebar() {
           const groupItems = visibleItems.filter((i) => group.keys.includes(i.key));
           if (groupItems.length === 0) return null;
           return (
-            <div key={group.label} className="mb-4">
+            <div key={group.labelKey} className="mb-4">
               {!collapsed && (
                 <p
-                  className="text-[10px] font-semibold uppercase tracking-widest px-3 mb-1"
+                  className={cn(
+                    "text-[10px] font-semibold uppercase tracking-widest px-3 mb-1",
+                    locale === "km" && "font-khmer normal-case tracking-normal"
+                  )}
                   style={{ color: "rgba(255,255,255,0.3)" }}
                 >
-                  {group.label}
+                  {t(group.labelKey as Parameters<typeof t>[0])}
                 </p>
               )}
               <div className="space-y-0.5">
@@ -174,7 +184,9 @@ export default function AdminSidebar() {
                       )}
                       <span className="shrink-0">{item.icon}</span>
                       {!collapsed && (
-                        <span>{t(item.key as Parameters<typeof t>[0])}</span>
+                        <span className={cn(locale === "km" && "font-khmer")}>
+                          {t(item.key as Parameters<typeof t>[0])}
+                        </span>
                       )}
                     </Link>
                   );
@@ -218,7 +230,7 @@ export default function AdminSidebar() {
           onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
         >
           <LogOut className="w-4 h-4 shrink-0" />
-          {!collapsed && <span>{t("logout")}</span>}
+          {!collapsed && <span className={cn(locale === "km" && "font-khmer")}>{t("logout")}</span>}
         </button>
       </div>
 

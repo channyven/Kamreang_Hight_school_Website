@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { achievementSchema, type AchievementInput } from "@/schemas/validations";
 import { createAchievement, updateAchievement } from "@/actions/achievements";
 import { supabase } from "@/lib/supabase";
+import { adminHref, convertGoogleDriveUrl } from "@/utils";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -62,7 +63,7 @@ export default function AchievementFormPage({ params }: PageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(!isNew);
 
-  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } =
     useForm<AchievementInput>({ resolver: zodResolver(achievementSchema), defaultValues: { status: "draft", is_featured: false } });
 
   const watchImageUrl = watch("image_url");
@@ -118,6 +119,7 @@ export default function AchievementFormPage({ params }: PageProps) {
     }
   };
 
+  const currentStatus = watch("status");
   const statusMeta = STATUS_OPTIONS.find((s) => s.value === currentStatus);
 
   if (loading) {

@@ -4,7 +4,7 @@
     "about": "អំពីសាលា",
     "governance": "អភិបាលកិច្ច",
     "news": "ព័ត៌មាន",
-    "achievements": "សិទ្ធិសម្រេច",
+    "achievements": "សមិទ្ធផល",
     "contact": "ទំនាក់ទំនង",
     "document": "ឯកសារ",
     "donate": "បរិច្ចាគ",
@@ -37,7 +37,7 @@
     "no_results": "រកមិនឃើញ"
   },
   "achievements": {
-    "title": "សិទ្ធិសម្រេច",
+    "title": "សមិទ្ធផល",
     "subtitle": "ជោគជ័យរបស់សាលា",
     "view_all": "មើលទាំងអស់",
     "student": "សិស្ស",
@@ -133,7 +133,16 @@
     "hero_slides": "ស្លាយពិពណ៌នា",
     "audit_logs": "កំណត់ហេតុ",
     "logout": "ចេញ",
-    "profile": "ប្រវត្តិ"
+    "profile": "ប្រវត្តិ",
+    "portal_name": "ច្រកចូលអ្នកគ្រប់គ្រង",
+    "create_new_post": "បង្ហោះអត្ថបទថ្មី",
+    "nav_group_overview": "ទិដ្ឋភាពទូទៅ",
+    "nav_group_content": "មាតិកា",
+    "nav_group_inbox": "ប្រអប់សំបុត្រ",
+    "nav_group_system": "ប្រព័ន្ធ",
+    "role_administrator": "អភិបាល",
+    "role_director": "នាយក",
+    "role_editor": "អ្នកកែសម្រួលមាតិកា"
   },
   "auth": {
     "login": "ចូលប្រព័ន្ធ",

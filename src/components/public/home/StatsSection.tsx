@@ -149,7 +149,7 @@ export default function StatsSection({ stats }: StatsSectionProps) {
           })}
         </div>
 
-        <div className="mt-6 sm:mt-8 max-w-2xl mx-auto">
+        <div className="mt-6 sm:mt-8">
           <GenderCard male={stats.male_students ?? 0} female={stats.female_students ?? 0} total={stats.total_students ?? 0} />
         </div>
       </div>

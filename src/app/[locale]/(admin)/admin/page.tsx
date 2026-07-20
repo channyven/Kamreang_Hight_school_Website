@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { formatRelativeDate, adminHref } from "@/utils";
+import { formatRelativeDate, adminHref, cn } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
 
@@ -235,10 +235,18 @@ export default async function AdminDashboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: "1px solid #eaeff6" }}>
-                    {["Sender", "Subject", "Status", "Received"].map((col) => (
+                    {[
+                      locale === "km" ? "អ្នកផ្ញើ" : "Sender",
+                      locale === "km" ? "ប្រធានបទ" : "Subject",
+                      locale === "km" ? "ស្ថានភាព" : "Status",
+                      locale === "km" ? "ទទួលបាន" : "Received",
+                    ].map((col) => (
                       <th
                         key={col}
-                        className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wide"
+                        className={cn(
+                          "text-left px-5 py-3 text-xs font-semibold uppercase tracking-wide",
+                          locale === "km" && "font-khmer normal-case tracking-normal"
+                        )}
                         style={{ color: "#8892a0" }}
                       >
                         {col}
@@ -276,7 +284,10 @@ export default async function AdminDashboardPage() {
                       </td>
                       <td className="px-5 py-3.5">
                         <span
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          className={cn(
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                            locale === "km" && "font-khmer"
+                          )}
                           style={
                             msg.status === "unread"
                               ? { background: "#fef2f2", color: "#dc2626" }
@@ -285,7 +296,11 @@ export default async function AdminDashboardPage() {
                                 : { background: "#f4f6fb", color: "#8892a0" }
                           }
                         >
-                          {msg.status === "unread" ? "New" : msg.status === "replied" ? "Replied" : "Read"}
+                          {msg.status === "unread"
+                            ? (locale === "km" ? "ថ្មី" : "New")
+                            : msg.status === "replied"
+                              ? (locale === "km" ? "បានឆ្លើយតប" : "Replied")
+                              : (locale === "km" ? "បានអាន" : "Read")}
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-xs" style={{ color: "#8892a0" }}>
