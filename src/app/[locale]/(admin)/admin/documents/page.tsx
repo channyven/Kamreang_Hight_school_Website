@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { adminHref } from "@/utils";
 import { toast } from "sonner";
 import { getDocuments, deleteDocument } from "@/actions/Document";
 import { supabase } from "@/lib/supabase";
@@ -75,7 +76,7 @@ export default function AdminDocumentsPage() {
 
   // ─── Navigate to new document page ───────────────────────
   const handleCreateNew = () => {
-    router.push(`/${locale}/admin/documents/new`);
+    router.push(adminHref(locale, "documents/new"));
   };
 
   // ─── Subscribe to realtime changes ────────────────────────

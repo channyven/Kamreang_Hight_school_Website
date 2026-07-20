@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, Heart, LogIn } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 
 interface NavLink {
@@ -104,8 +104,8 @@ export default function Navbar() {
                   isActive(link.href)
                     ? "bg-school-blue-800 text-white"
                     : isTransparent
-                    ? "text-white/90 hover:text-white hover:bg-white/10"
-                    : "text-gray-700 hover:text-school-blue-800 hover:bg-gray-100"
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : "text-gray-700 hover:text-school-blue-800 hover:bg-gray-100"
                 )}
               >
                 {t(link.key as Parameters<typeof t>[0])}
@@ -141,8 +141,8 @@ export default function Navbar() {
                     loc === locale
                       ? "bg-school-gold-500 text-white"
                       : isTransparent
-                      ? "text-white/80 hover:bg-white/10"
-                      : "text-gray-600 hover:bg-gray-100"
+                        ? "text-white/80 hover:bg-white/10"
+                        : "text-gray-600 hover:bg-gray-100"
                   )}
                   title={localeNames[loc]}
                 >
@@ -153,7 +153,7 @@ export default function Navbar() {
 
             {/* Admin sign-in */}
             <Link
-              href={`/${locale}/admin`}
+              href={adminHref(locale)}
               aria-label={t("admin")}
               title={t("admin")}
               className={cn(
@@ -209,7 +209,7 @@ export default function Navbar() {
               ))}
               <div className="pt-2 border-t">
                 <Button asChild size="sm" className="w-full bg-school-blue-800">
-                  <Link href={`/${locale}/admin`} onClick={() => setMobileOpen(false)}>
+                  <Link href={adminHref(locale)} onClick={() => setMobileOpen(false)}>
                     {t("admin")}
                   </Link>
                 </Button>

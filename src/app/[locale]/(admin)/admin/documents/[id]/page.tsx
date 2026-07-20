@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { adminHref } from "@/utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -129,7 +130,7 @@ export default function EditDocumentPage({ params }: PageProps) {
       {/* Page Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/documents`}>
+          <Link href={adminHref(locale, "documents")}>
             <ArrowLeft className="w-4 h-4 mr-1" />
             {locale === "km" ? "ត្រឡប់" : "Back"}
           </Link>

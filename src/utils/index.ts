@@ -210,6 +210,10 @@ export function getAvatarUrl(
   return `https://ui-avatars.com/api/?name=${safeName}&background=${bg}&color=${fg}&size=${size}&font-size=0.5&bold=true&format=png`;
 }
 
+// ─── Admin path helper (security-by-obscurity) ───────────────
+
+export { ADMIN_PATH, adminHref } from "@/lib/admin-path";
+
 // ─── Misc ─────────────────────────────────────────────────────
 
 export function generateUniqueSlug(base: string, existing: string[]): string {

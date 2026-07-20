@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/AuthContext";
-import { getInitials } from "@/utils";
+import { getInitials, adminHref } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -135,7 +135,7 @@ export default function AdminTopBar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/admin/profile`}>{t("profile")}</Link>
+                <Link href={adminHref(locale, "profile")}>{t("profile")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logout} className="text-red-600 gap-2">

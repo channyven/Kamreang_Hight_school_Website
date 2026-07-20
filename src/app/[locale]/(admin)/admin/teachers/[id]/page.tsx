@@ -7,6 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Loader2, Phone, User } from "lucide-react";
+import { adminHref } from "@/utils";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ export default function TeacherFormPage({ params }: PageProps) {
 
   const onSubmit = async (data: TeacherInput) => {
     const result = isNew ? await createTeacher(data) : await updateTeacher(id, data);
-    if (result.success) { toast.success(isNew ? "Teacher created!" : "Teacher updated!"); router.push(`/${locale}/admin/teachers`); }
+    if (result.success) { toast.success(isNew ? "Teacher created!" : "Teacher updated!"); router.push(adminHref(locale, "teachers")); }
     else toast.error(result.error ?? "Failed to save");
   };
 
@@ -54,7 +55,7 @@ export default function TeacherFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/teachers`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, "teachers")}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមគ្រូបង្រៀន" : "New Teacher") : (locale === "km" ? "កែគ្រូបង្រៀន" : "Edit Teacher")}

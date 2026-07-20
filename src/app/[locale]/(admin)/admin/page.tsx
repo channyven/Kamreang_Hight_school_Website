@@ -5,7 +5,7 @@ import {
   TrendingUp, TrendingDown, ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { formatRelativeDate } from "@/utils";
+import { formatRelativeDate, adminHref } from "@/utils";
 import type { Message, AuditLog } from "@/types";
 import VisitorChartWrapper from "@/components/admin/VisitorChartWrapper";
 
@@ -52,7 +52,7 @@ export default async function AdminDashboardPage() {
       value: data.newsCount,
       icon: Newspaper,
       trend: +12,
-      href: `/${locale}/admin/news`,
+      href: adminHref(locale, "news"),
       iconBg: "#e8f0fe",
       iconColor: "#1a56db",
     },
@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
       value: data.unreadMessages,
       icon: MessageSquare,
       trend: data.unreadMessages > 0 ? -data.unreadMessages : 0,
-      href: `/${locale}/admin/messages`,
+      href: adminHref(locale, "messages"),
       iconBg: "#fef2f2",
       iconColor: "#dc2626",
     },
@@ -80,7 +80,7 @@ export default async function AdminDashboardPage() {
             <p className="text-sm mt-0.5" style={{ color: "#8892a0" }}>{dateLabel}</p>
           </div>
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="hidden sm:flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold transition-all hover:opacity-90 shrink-0"
             style={{ background: "#00376f", color: "#fff" }}
           >
@@ -215,7 +215,7 @@ export default async function AdminDashboardPage() {
               {locale === "km" ? "សារទំនក់ទំនងថ្មីៗ" : "Recent Messages"}
             </h2>
             <Link
-              href={`/${locale}/admin/messages`}
+              href={adminHref(locale, "messages")}
               className="text-sm font-medium flex items-center gap-1 transition-colors"
               style={{ color: "#00376f" }}
             >

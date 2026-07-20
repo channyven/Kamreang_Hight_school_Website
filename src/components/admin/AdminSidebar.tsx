@@ -12,7 +12,7 @@ import {
   GraduationCap, Landmark, Heart,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -70,7 +70,7 @@ export default function AdminSidebar() {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
+      if (href === adminHref(locale)) return pathname === adminHref(locale);
       return pathname.startsWith(href);
     },
     [locale, pathname]
@@ -106,7 +106,7 @@ export default function AdminSidebar() {
       {!collapsed && (
         <div className="px-3 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
           >
@@ -118,7 +118,7 @@ export default function AdminSidebar() {
       {collapsed && (
         <div className="px-2 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
             title="Create New Post"

@@ -55,3 +55,4 @@ data/
 
 # Firebase Admin SDK service account key (sensitive credentials)
 *firebase-adminsdk*.json
+.firebase-service-account.json
