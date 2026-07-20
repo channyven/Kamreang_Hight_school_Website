@@ -27,13 +27,8 @@ import { useRouter } from "next/navigation";
 import { createHeroSlide, updateHeroSlide, getAdminHeroSlideById, getAdminHeroSlides } from "@/actions/hero-slides";
 import { heroSlideSchema, type HeroSlideInput } from "@/schemas/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-<<<<<<< HEAD
 import { convertGoogleDriveUrl, adminHref } from "@/utils";
-=======
-import { convertGoogleDriveUrl } from "@/utils";
 import ImageUploader from "@/components/admin/ImageUploader";
-import { STORAGE_BUCKETS } from "@/lib/supabase";
->>>>>>> feat/hero-slideshow-page
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -141,7 +136,16 @@ export default function HeroSlideFormPage({ params }: PageProps) {
       );
       router.push(adminHref(locale, "hero-slides"));
     } else {
-      toast.error(result.error ?? (locale === "km" ? "បរាជ័យ" : "Failed to save"));
+      // Translate limit error for Khmer locale
+      if (result.error?.includes("Maximum 5")) {
+        toast.error(
+          locale === "km"
+            ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុប ឬបិទស្លាយដែលមានស្រាប់ខ្លះជាមុនសិន។"
+            : result.error
+        );
+      } else {
+        toast.error(result.error ?? (locale === "km" ? "បរាជ័យ" : "Failed to save"));
+      }
     }
   };
 

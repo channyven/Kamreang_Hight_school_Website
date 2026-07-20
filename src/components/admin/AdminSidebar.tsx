@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap, Landmark, Heart,
+  GraduationCap, Landmark, Heart, Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { cn, adminHref } from "@/utils";
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "donate", "about"] },
+  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "donate", "hero_slides", "about"] },
   { label: "Inbox", keys: ["messages"] },
   { label: "System", keys: ["users", "settings"] },
 ];
@@ -52,6 +52,7 @@ export default function AdminSidebar() {
       { key: "documents", href: adminHref(locale, "documents"), icon: <FileText className="w-4 h-4" /> },
       { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
       { key: "donate", href: adminHref(locale, "donate"), icon: <Heart className="w-4 h-4" /> },
+      { key: "hero_slides", href: adminHref(locale, "hero-slides"), icon: <ImageIcon className="w-4 h-4" /> },
       { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
       { key: "messages", href: adminHref(locale, "messages"), icon: <MessageSquare className="w-4 h-4" /> },
       { key: "users", href: adminHref(locale, "users"), icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },

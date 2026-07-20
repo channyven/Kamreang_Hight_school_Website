@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { Plus, Search, Edit, Trash2, Loader2, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,6 @@ import {
 
 export default function AdminHeroSlidesPage() {
   const locale = useLocale();
-  const router = useRouter();
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -114,8 +112,30 @@ export default function AdminHeroSlidesPage() {
             )}
           </p>
         </div>
-        <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/hero-slides/new`}>
+        <Button
+          asChild
+          className={
+            slides.length >= 5
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-school-blue-800 hover:bg-school-blue-900"
+          }
+          disabled={slides.length >= 5}
+        >
+          <Link
+            href={slides.length >= 5 ? "#" : `/${locale}/admin/hero-slides/new`}
+            onClick={
+              slides.length >= 5
+                ? (e) => {
+                    e.preventDefault();
+                    toast.error(
+                      locale === "km"
+                        ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុប ឬបិទស្លាយដែលមានស្រាប់ខ្លះជាមុនសិន។"
+                        : "You can only have up to 5 hero slides. Please delete or deactivate some existing slides first."
+                    );
+                  }
+                : undefined
+            }
+          >
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
           </Link>

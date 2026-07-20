@@ -45,7 +45,7 @@ export async function createHeroSlide(data: HeroSlideInput): Promise<ActionResul
     return { success: false, error: countError.message };
   }
 
-  if (count && count >= 5) {
+  if (count !== null && count >= 5) {
     return {
       success: false,
       error:
