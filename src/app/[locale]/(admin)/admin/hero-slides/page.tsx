@@ -112,34 +112,28 @@ export default function AdminHeroSlidesPage() {
             )}
           </p>
         </div>
-        <Button
-          asChild
-          className={
-            slides.length >= 5
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-school-blue-800 hover:bg-school-blue-900"
-          }
-          disabled={slides.length >= 5}
-        >
-          <Link
-            href={slides.length >= 5 ? "#" : `/${locale}/admin/hero-slides/new`}
-            onClick={
-              slides.length >= 5
-                ? (e) => {
-                    e.preventDefault();
-                    toast.error(
-                      locale === "km"
-                        ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុប ឬបិទស្លាយដែលមានស្រាប់ខ្លះជាមុនសិន។"
-                        : "You can only have up to 5 hero slides. Please delete or deactivate some existing slides first."
-                    );
-                  }
-                : undefined
+        {slides.length >= 5 ? (
+          <Button
+            className="bg-gray-400 cursor-not-allowed hover:bg-gray-400"
+            onClick={() =>
+              toast.error(
+                locale === "km"
+                  ? "អ្នកអាចមានស្លាយបានត្រឹមតែ 5 ប៉ុណ្ណោះ។ សូមលុប ឬបិទស្លាយដែលមានស្រាប់ខ្លះជាមុនសិន។"
+                  : "You can only have up to 5 hero slides. Please delete or deactivate some existing slides first."
+              )
             }
           >
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
+            <Link href={adminHref(locale, "hero-slides/new")}>
+              <Plus className="w-4 h-4 mr-2" />
+              {locale === "km" ? "បន្ថែមស្លាយ" : "New Slide"}
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* Search */}

@@ -178,7 +178,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
               : "You can only have up to 5 hero slides. Please delete or deactivate some existing slides first."}
           </p>
           <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-            <Link href={`/${locale}/admin/hero-slides`}>
+            <Link href={adminHref(locale, "hero-slides")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               {locale === "km" ? "ត្រឡប់ទៅបញ្ជីស្លាយ" : "Back to Slides"}
             </Link>
