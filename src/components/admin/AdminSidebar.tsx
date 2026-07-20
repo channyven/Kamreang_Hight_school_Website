@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap, Landmark, Images,
+  GraduationCap, Landmark, Images, Phone,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { cn } from "@/utils";
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "about", "hero_slides"] },
+  { label: "Content", keys: ["news", "achievements", "teachers", "documents", "governance", "about", "hero_slides", "contact"] },
   { label: "Inbox", keys: ["messages"] },
   { label: "System", keys: ["users", "settings"] },
 ];
@@ -53,6 +53,7 @@ export default function AdminSidebar() {
       { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
       { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4 h-4" /> },
       { key: "hero_slides", href: `/${locale}/admin/hero-slides`, icon: <Images className="w-4 h-4" /> },
+      { key: "contact", href: `/${locale}/admin/contact`, icon: <Phone className="w-4 h-4" /> },
       { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
       { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
       { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
