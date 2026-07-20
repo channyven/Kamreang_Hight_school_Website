@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { statisticsSchema, type StatisticsInput } from "@/schemas/validations";
-import { createStatistics, updateStatistics } from "@/actions/statistics";
-import { supabase } from "@/lib/supabase";
+import { createStatistics, updateStatistics, getAdminStatisticsById } from "@/actions/statistics";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -30,8 +29,12 @@ export default function StatisticsFormPage({ params }: PageProps) {
 
   useEffect(() => {
     if (!isNew) {
-      supabase.from("statistics").select("*").eq("id", id).single().then(({ data }) => {
-        if (data) Object.entries(data).forEach(([k, v]) => { if (v !== null) setValue(k as keyof StatisticsInput, v as string); });
+      getAdminStatisticsById(id).then((data) => {
+        if (data) {
+          Object.entries(data).forEach(([k, v]) => {
+            if (v !== null) setValue(k as keyof StatisticsInput, v as unknown as string);
+          });
+        }
         setLoading(false);
       });
     }

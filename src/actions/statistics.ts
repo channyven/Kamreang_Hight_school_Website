@@ -2,9 +2,35 @@
 
 import { createServerClient } from "@/lib/supabase";
 import { statisticsSchema, type StatisticsInput } from "@/schemas/validations";
-import type { ActionResult } from "@/types";
+import type { ActionResult, Statistics } from "@/types";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
+
+// ─── Admin list fetch ─────────────────────────────────────────
+// Uses service-role client (bypasses RLS) so admin can see all rows.
+
+export async function getAdminStatisticsList(): Promise<Statistics[]> {
+  try { await requireAdmin(); } catch { return []; }
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("statistics")
+    .select("*")
+    .order("academic_year", { ascending: false });
+  return (data ?? []) as Statistics[];
+}
+
+export async function getAdminStatisticsById(id: string): Promise<Statistics | null> {
+  try { await requireAdmin(); } catch { return null; }
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("statistics")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return data as Statistics | null;
+}
+
+// ─── CRUD Actions ──────────────────────────────────────────────
 
 export async function createStatistics(
   data: StatisticsInput
@@ -17,9 +43,9 @@ export async function createStatistics(
 
   const supabase = createServerClient();
 
-  // If setting as current, clear existing current flags first
+  // If setting as current, clear existing current flags on all rows first
   if (parsed.data.is_current) {
-    await supabase.from("statistics").update({ is_current: false }).neq("id", "00000000-0000-0000-0000-000000000000");
+    await supabase.from("statistics").update({ is_current: false }).not("id", "is", null);
   }
 
   const { error } = await supabase.from("statistics").insert(parsed.data);
@@ -42,7 +68,7 @@ export async function updateStatistics(
 
   const supabase = createServerClient();
 
-  // If setting as current, clear existing current flags first
+  // If setting as current, clear existing current flags on other rows first
   if (parsed.data.is_current) {
     await supabase.from("statistics").update({ is_current: false }).neq("id", id);
   }
