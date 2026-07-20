@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
         <TabsContent value="general" className="space-y-5 mt-4">
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Contact Information</h2>
-            {["school_address_km", "school_address_en", "school_phone", "school_email", "school_hours_km", "school_hours_en", "school_facebook", "school_youtube", "school_tiktok"].map((key) => (
+            {["school_address_km", "school_address_en", "school_phone", "school_email", "school_hours_km", "school_hours_en", "school_facebook", "school_tiktok"].map((key) => (
               <div key={key} className="flex items-end gap-3">
                 <div className="flex-1 space-y-1.5">
                   <Label className="capitalize">{key.replace(/_/g, " ")}</Label>
