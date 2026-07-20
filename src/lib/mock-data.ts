@@ -10,6 +10,8 @@ import type {
   HeroSlide,
   OrgNodeData,
   GovernanceItem,
+  BankAccount,
+  DonationPurpose,
 } from "@/types";
 
 // ─── Hero Slides (max 5) ───────────────────────────────────────
@@ -479,6 +481,20 @@ export const mockGovernanceItems: GovernanceItem[] = [
   { id: "g10", section: "culture", icon: "MessageCircleQuestion", text_km: "សិស្សហ្វឹកហាត់បង្ហាញសំណួរ លំហាត់ និងចំណេះដឹងថ្មីៗ", text_en: "Students practice presenting questions, exercises, and new knowledge", sort_order: 4, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
   { id: "g11", section: "culture", icon: "FlaskConical", text_km: "សិស្សរៀនជាគម្រោងស្រាវជ្រាវ ដើម្បីពង្រឹងការយល់ដឹងខ្លឹមសារមេរៀន", text_en: "Students undertake research projects to deepen their understanding of lessons", sort_order: 5, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
   { id: "g12", section: "culture", icon: "Presentation", text_km: "សិស្សផ្សព្វផ្សាយគម្រោងស្រាវជ្រាវ ដើម្បីអភិវឌ្ឍជំនាញ និងបទពិសោធន៍ជាក់ស្តែង", text_en: "Students present research projects to build practical skills and experience", sort_order: 6, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+];
+
+// ─── Bank Accounts (Donate page) ───────────────────────────────
+export const mockBankAccounts: BankAccount[] = [
+  { id: "b1", bank_name_km: "ធនាគារ ABA", bank_name_en: "ABA Bank", account_name_km: "វិទ្យាល័យកំរៀង", account_name_en: "Kamrieng High School", account_number: "000 123 456", currency: "USD / KHR", logo_color: "#0066cc", sort_order: 1, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "b2", bank_name_km: "ធនាគារ ACLEDA", bank_name_en: "ACLEDA Bank", account_name_km: "វិទ្យាល័យកំរៀង", account_name_en: "Kamrieng High School", account_number: "001 987 654", currency: "USD / KHR", logo_color: "#e62020", sort_order: 2, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+];
+
+// ─── Donation Purposes (Why Donate cards) ──────────────────────
+export const mockDonationPurposes: DonationPurpose[] = [
+  { id: "p1", icon: "BookOpen", title_km: "បណ្ណាល័យ និងសៀវភៅ", title_en: "Library & Books", desc_km: "ជួយយើងពង្រីកបណ្ណាល័យជាមួយសៀវភៅ និងសម្ភារៈសិក្សាទំនើប", desc_en: "Help us expand our library with modern textbooks and learning materials.", sort_order: 1, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "p2", icon: "Laptop", title_km: "បច្ចេកវិទ្យា និងមន្ទីរពិសោធន៍", title_en: "Technology & Labs", desc_km: "គាំទ្រការធ្វើឱ្យប្រសើរឡើងនូវបន្ទប់កុំព្យូទ័រ និងមន្ទីរពិទ្យាសាស្ត្រ", desc_en: "Support the upgrade of computer labs and science facilities.", sort_order: 2, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "p3", icon: "GraduationCap", title_km: "អាហារូបករណ៍សិស្ស", title_en: "Student Scholarships", desc_km: "ផ្តល់អាហារូបករណ៍ដល់សិស្សមានទេព្យកោសល្យដែលខ្វះខាតហិរញ្ញវត្ថុ", desc_en: "Provide scholarships for talented students with financial need.", sort_order: 3, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+  { id: "p4", icon: "School", title_km: "ហេដ្ឋារចនាសម្ព័ន្ធសាលា", title_en: "School Infrastructure", desc_km: "ផ្តល់មូលនិធិសម្រាប់ការជួសជុលថ្នាក់រៀន និងការធ្វើឱ្យប្រសើរឡើងនូវបរិវេណ", desc_en: "Fund classroom renovations and campus improvements.", sort_order: 4, is_active: true, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
 ];
 
 // ─── School Info ───────────────────────────────────────────────
