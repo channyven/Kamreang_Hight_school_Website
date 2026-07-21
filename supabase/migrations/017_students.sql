@@ -101,8 +101,8 @@ village          VARCHAR(100),
   card_expiry_date DATE,
 
   -- Audit
-  created_by BIGINT REFERENCES admin_users(id),
-updated_by BIGINT REFERENCES admin_users(id),
+  created_by UUID REFERENCES admin_users(id) ON DELETE SET NULL,
+updated_by UUID REFERENCES admin_users(id) ON DELETE SET NULL,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
