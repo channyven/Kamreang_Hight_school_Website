@@ -43,19 +43,19 @@ interface PageProps {
 // ─── Theme colors per achievement type ────────────────────────
 const TYPE_THEME: Record<string, { gradient: string; icon: string; badge: string }> = {
   student: {
-    gradient: "from-blue-500 to-blue-600",
-    icon: "text-blue-400",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
+    gradient: "from-school-blue-500 to-school-blue-600",
+    icon: "text-school-blue-400",
+    badge: "bg-school-blue-50 text-school-blue-700 border-school-blue-200",
   },
   teacher: {
-    gradient: "from-purple-500 to-purple-600",
-    icon: "text-purple-400",
-    badge: "bg-purple-50 text-purple-700 border-purple-200",
+    gradient: "from-school-gold-500 to-school-gold-600",
+    icon: "text-school-gold-400",
+    badge: "bg-school-gold-50 text-school-gold-700 border-school-gold-200",
   },
   school: {
-    gradient: "from-amber-500 to-amber-600",
-    icon: "text-amber-400",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
+    gradient: "from-school-blue-800 to-school-blue-900",
+    icon: "text-school-blue-400",
+    badge: "bg-school-blue-50 text-school-blue-700 border-school-blue-200",
   },
 };
 
@@ -72,10 +72,10 @@ const TYPE_LABELS: Record<string, { en: string; km: string }> = {
 };
 
 const LEVEL_LABELS: Record<string, { en: string; km: string; color: string }> = {
-  national:    { en: "National", km: "ជាតិ", color: "from-red-400 to-red-500" },
-  provincial:  { en: "Provincial", km: "ខេត្ត", color: "from-orange-400 to-orange-500" },
-  district:    { en: "District", km: "ស្រុក", color: "from-blue-400 to-blue-500" },
-  school:      { en: "School Level", km: "កម្រិតសាលា", color: "from-emerald-400 to-emerald-500" },
+  national:    { en: "National", km: "ជាតិ", color: "from-school-gold-400 to-school-gold-500" },
+  provincial:  { en: "Provincial", km: "ខេត្ត", color: "from-school-blue-400 to-school-blue-500" },
+  district:    { en: "District", km: "ស្រុក", color: "from-school-gray-400 to-school-gray-500" },
+  school:      { en: "School Level", km: "កម្រិតសាលា", color: "from-school-green-400 to-school-green-500" },
 };
 
 const STATUS_CONFIG: Record<
@@ -295,7 +295,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                   </span>
                 )}
                 {achievement.is_featured && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-amber-900">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-school-gold-400 to-school-gold-500 text-school-gold-900">
                     <Star className="w-3.5 h-3.5 fill-current" />
                     {locale === "km" ? "ពិសេស" : "Featured"}
                   </span>
@@ -366,7 +366,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
 
             {/* Status Card */}
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-5 py-3.5 bg-gradient-to-r from-gray-600 to-gray-700 flex items-center gap-2.5">
+              <div className="px-5 py-3.5 bg-gradient-to-r from-school-blue-800 to-school-blue-900 flex items-center gap-2.5">
                 <Sparkles className="w-4 h-4 text-white/80" />
                 <h3 className="text-sm font-semibold text-white">
                   {locale === "km" ? "ស្ថានភាព" : "Status"}
@@ -382,7 +382,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">{locale === "km" ? "បង្ហាញលើទំព័រដើម" : "Featured"}</span>
-                  <span className={`text-sm font-medium ${achievement.is_featured ? "text-amber-600" : "text-gray-400"}`}>
+                  <span className={`text-sm font-medium ${achievement.is_featured ? "text-school-gold-600" : "text-gray-400"}`}>
                     {achievement.is_featured
                       ? (locale === "km" ? "បាទ/ចាស" : "Yes")
                       : (locale === "km" ? "ទេ" : "No")}
@@ -414,7 +414,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                   <span className="text-lg">🇰🇭</span> ភាសាខ្មែរ
                 </div>
                 <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                  <div className="px-4 py-2.5 bg-gradient-to-r from-red-50 to-red-100/50 border-b border-gray-100">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-school-gold-50 to-school-gold-100/50 border-b border-gray-100">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       {locale === "km" ? "ចំណងជើង" : "Title"}
                     </span>
@@ -424,7 +424,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                       {achievement.title_km || "—"}
                     </p>
                   </div>
-                  <div className="px-4 py-2.5 bg-gradient-to-r from-red-50 to-red-100/50 border-y border-gray-100">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-school-gold-50 to-school-gold-100/50 border-y border-gray-100">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       {locale === "km" ? "ការពិពណ៌នា" : "Description"}
                     </span>
@@ -443,7 +443,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                   <span className="text-lg">🇺🇸</span> English
                 </div>
                 <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                  <div className="px-4 py-2.5 bg-gradient-to-r from-blue-50 to-blue-100/50 border-b border-gray-100">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-school-blue-50 to-school-blue-100/50 border-b border-gray-100">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</span>
                   </div>
                   <div className="px-4 py-3">
@@ -451,7 +451,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                       {achievement.title_en || "—"}
                     </p>
                   </div>
-                  <div className="px-4 py-2.5 bg-gradient-to-r from-blue-50 to-blue-100/50 border-y border-gray-100">
+                  <div className="px-4 py-2.5 bg-gradient-to-r from-school-blue-50 to-school-blue-100/50 border-y border-gray-100">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</span>
                   </div>
                   <div className="px-4 py-3">
@@ -497,8 +497,8 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* Status */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-100">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  <div className="w-8 h-8 rounded-lg bg-school-green-50 flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4 text-school-green-600" />
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
@@ -515,8 +515,8 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* Featured */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-100">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                    <Star className="w-4 h-4 text-amber-500" />
+                  <div className="w-8 h-8 rounded-lg bg-school-gold-50 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-school-gold-500" />
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
@@ -524,7 +524,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                     </p>
                   </div>
                 </div>
-                <p className={`text-sm font-semibold ${achievement.is_featured ? "text-amber-600" : "text-gray-400"}`}>
+                <p className={`text-sm font-semibold ${achievement.is_featured ? "text-school-gold-600" : "text-gray-400"}`}>
                   {achievement.is_featured
                     ? (locale === "km" ? "បាទ/ចាស" : "Yes")
                     : (locale === "km" ? "ទេ" : "No")}
@@ -534,8 +534,8 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* Created At */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-100">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-lg bg-school-blue-50 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-school-blue-600" />
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
@@ -551,8 +551,8 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* Updated At */}
               <div className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100/50 border border-gray-100">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-purple-600" />
+                  <div className="w-8 h-8 rounded-lg bg-school-gray-100 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-school-gray-600" />
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
