@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { getPublishedAchievementById, getPublishedAchievements } from "@/lib/queries";
 import { getLocalizedText, formatDate, convertGoogleDriveUrl } from "@/utils";
 import ShareButton from "@/components/public/ShareButton";
+import ImageZoom from "@/components/public/ImageZoom";
 
 const PhotoGallery = dynamic(() => import("@/components/public/PhotoGallery"));
 
@@ -171,22 +172,34 @@ export default async function AchievementDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ── Left — Main ── */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Image */}
+            {/* Image with click-to-zoom lightbox */}
             {achievement.image_url && (
-              <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] rounded-2xl overflow-hidden shadow-xl bg-school-gray-100 -mt-8 sm:-mt-12">
-                <Image
+              <div className="-mt-8 sm:-mt-12">
+                <ImageZoom
                   src={convertGoogleDriveUrl(achievement.image_url)}
                   alt={title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 700px"
-                  className="object-cover"
-                  priority
                   unoptimized={
                     achievement.image_url.includes("google.com") ||
                     achievement.image_url.includes("firebasestorage") ||
                     false
                   }
-                />
+                >
+                  <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] rounded-2xl overflow-hidden shadow-xl bg-school-gray-100">
+                    <Image
+                      src={convertGoogleDriveUrl(achievement.image_url)}
+                      alt={title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 700px"
+                      className="object-cover"
+                      priority
+                      unoptimized={
+                        achievement.image_url.includes("google.com") ||
+                        achievement.image_url.includes("firebasestorage") ||
+                        false
+                      }
+                    />
+                  </div>
+                </ImageZoom>
               </div>
             )}
 
