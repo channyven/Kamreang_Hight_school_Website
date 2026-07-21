@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
-import { Newspaper, Sparkles } from "lucide-react";
+import { Newspaper } from "lucide-react";
 import { getPublishedNews, getNewsCategories } from "@/lib/queries";
 import NewsContent from "./NewsContent";
 
@@ -42,13 +42,6 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
 
         <div className="relative z-10 container mx-auto px-6 py-16 sm:py-20 lg:py-24">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="animate-hero-fade-in-1 mb-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-school-gold-400 text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span className={locale === "km" ? "font-khmer" : ""}>{t("title")}</span>
-              </div>
-            </div>
-
             <h1 className="animate-hero-fade-in-2 text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 tracking-tight">
               {t("title")}
             </h1>

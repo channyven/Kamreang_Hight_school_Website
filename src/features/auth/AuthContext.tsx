@@ -16,6 +16,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
   type FirebaseUser,
 } from "@/lib/firebase";
 import type { SessionUser, UserRole, RolePermissions } from "@/types";
@@ -26,11 +30,12 @@ interface AuthContextValue {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   permissions: RolePermissions | null;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signInWithEmail: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   hasPermission: (key: keyof RolePermissions) => boolean;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -185,7 +190,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [firebaseUser]);
 
   const signInWithEmail = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, rememberMe = true) => {
+      // "Remember me" controls whether Firebase keeps the session across
+      // browser restarts (local) or clears it when the tab/browser closes
+      // (session-only).
+      await setPersistence(
+        auth,
+        rememberMe ? browserLocalPersistence : browserSessionPersistence
+      );
+
       return new Promise<void>((resolve, reject) => {
         const timeoutId = setTimeout(() => {
           pendingSession.current = null;
@@ -218,6 +231,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const resetPassword = useCallback(async (email: string) => {
+    await sendPasswordResetEmail(auth, email);
+  }, []);
+
   const signInWithGoogle = useCallback(async () => {
     return new Promise<void>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -246,6 +263,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     await signOut(auth);
+    // Explicitly await the server-side cookie deletion here rather than
+    // relying on the onAuthStateChanged listener to do it asynchronously.
+    // Callers (e.g. AdminGate) redirect to /login the instant `user` goes
+    // null below — if the __session cookie were still present when that
+    // redirect's middleware check ran, it would bounce the user straight
+    // back to the admin route, landing on a blank page.
+    try { await fetch("/api/auth/session", { method: "DELETE" }); } catch { /* non-critical */ }
     setUser(null);
     setFirebaseUser(null);
   }, []);
@@ -271,6 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         refreshUser,
         hasPermission,
+        resetPassword,
       }}
     >
       {children}

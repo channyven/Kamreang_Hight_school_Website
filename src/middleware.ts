@@ -42,10 +42,20 @@ export default async function middleware(request: NextRequest) {
   if (OBFUSCATED_ADMIN.test(pathname)) {
     const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
+    // The admin panel is always English for staff/operators — it doesn't
+    // follow the public site's EN/KM locale toggle. `locale` here is
+    // exactly 2 characters (guaranteed by OBFUSCATED_ADMIN's regex), so
+    // `/${locale}` is always 3 characters and safe to slice off.
+    const enPathname = locale === "en" ? pathname : `/en${pathname.slice(3)}`;
+
     if (!sessionCookie?.value) {
-      const loginUrl = new URL(`/${locale}/login`, request.url);
-      loginUrl.searchParams.set("redirect", pathname);
+      const loginUrl = new URL(`/en/login`, request.url);
+      loginUrl.searchParams.set("redirect", enPathname);
       return NextResponse.redirect(loginUrl);
+    }
+
+    if (locale !== "en") {
+      return NextResponse.redirect(new URL(enPathname, request.url));
     }
 
     // Rewrite internally to the real route — browser keeps seeing

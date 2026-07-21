@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
@@ -12,6 +13,7 @@ interface DonateQrImageProps {
 
 export default function DonateQrImage({ src, alt }: DonateQrImageProps) {
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
 
   return (
     <>
@@ -19,7 +21,7 @@ export default function DonateQrImage({ src, alt }: DonateQrImageProps) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={alt}
-        title="Click to enlarge"
+        title={locale === "km" ? "ចុចដើម្បីពង្រីក" : "Click to enlarge"}
         className="block cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-xl"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

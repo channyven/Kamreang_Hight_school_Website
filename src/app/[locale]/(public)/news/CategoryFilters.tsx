@@ -2,14 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Newspaper,
-  Megaphone,
-  CalendarDays,
-  FlaskConical,
-  Trophy,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import type { NewsCategory } from "@/types";
 import { getLocalizedText } from "@/utils";
 
@@ -20,18 +13,6 @@ interface CategoryFiltersProps {
   locale: string;
   currentSlug: string;
   onCategoryChange: (slug: string) => void;
-}
-
-// Map category slugs to unique icons
-const CATEGORY_ICONS: Record<string, typeof Newspaper> = {
-  announcement: Megaphone,
-  events: CalendarDays,
-  science: FlaskConical,
-  sports: Trophy,
-};
-
-function getCategoryIcon(slug: string) {
-  return CATEGORY_ICONS[slug] ?? Newspaper;
 }
 
 export default function CategoryFilters({
@@ -95,8 +76,7 @@ export default function CategoryFilters({
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
-              <span className="relative z-10 flex items-center gap-1.5">
-                <Newspaper className="w-3.5 h-3.5" />
+              <span className="relative z-10">
                 {locale === "km" ? "ទាំងអស់" : "All"}
               </span>
               <span
@@ -111,7 +91,6 @@ export default function CategoryFilters({
 
           {/* Category buttons */}
           {categories.map((cat) => {
-            const Icon = getCategoryIcon(cat.slug);
             const catCount = categoryCounts.get(cat.id) ?? 0;
             const isActive = currentSlug === cat.slug;
 
@@ -135,8 +114,7 @@ export default function CategoryFilters({
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-1.5">
-                    <Icon className="w-3.5 h-3.5" />
+                  <span className="relative z-10">
                     {getLocalizedText(cat.name_km, cat.name_en, locale)}
                   </span>
                   <span
@@ -162,17 +140,7 @@ export default function CategoryFilters({
           aria-label={locale === "km" ? "ជ្រើសរើសប្រភេទ" : "Select category"}
           className="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm hover:border-school-blue-300 hover:shadow transition-all duration-200"
         >
-          <span className="flex items-center gap-2">
-            {currentSlug ? (
-              (() => {
-                const Icon = getCategoryIcon(currentSlug);
-                return <Icon className="w-4 h-4 text-school-blue-800" />;
-              })()
-            ) : (
-              <Newspaper className="w-4 h-4 text-school-blue-800" />
-            )}
-            {mobileLabel}
-          </span>
+          <span>{mobileLabel}</span>
           <ChevronDown
             className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
               mobileOpen ? "rotate-180" : ""
@@ -200,10 +168,7 @@ export default function CategoryFilters({
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <Newspaper className="w-4 h-4" />
-                  {locale === "km" ? "ទាំងអស់" : "All Categories"}
-                </span>
+                <span>{locale === "km" ? "ទាំងអស់" : "All Categories"}</span>
                 <span
                   className={`text-[10px] px-2 py-0.5 rounded-full ${
                     isAllActive ? "bg-white/20" : "bg-gray-100 text-gray-500"
@@ -215,7 +180,6 @@ export default function CategoryFilters({
 
               {/* Category options */}
               {categories.map((cat) => {
-                const Icon = getCategoryIcon(cat.slug);
                 const catCount = categoryCounts.get(cat.id) ?? 0;
                 const isActive = currentSlug === cat.slug;
 
@@ -229,10 +193,7 @@ export default function CategoryFilters({
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-                    <span className="flex items-center gap-2">
-                      <Icon className="w-4 h-4" />
-                      {getLocalizedText(cat.name_km, cat.name_en, locale)}
-                    </span>
+                    <span>{getLocalizedText(cat.name_km, cat.name_en, locale)}</span>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded-full ${
                         isActive ? "bg-white/20" : "bg-gray-100 text-gray-500"

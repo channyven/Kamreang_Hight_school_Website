@@ -55,7 +55,7 @@ export default function ContactPageClient({
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to send message");
+      toast.error(t("error"));
     }
   };
 

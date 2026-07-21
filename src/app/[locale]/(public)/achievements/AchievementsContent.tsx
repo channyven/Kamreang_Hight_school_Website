@@ -16,22 +16,15 @@ import { cn, getLocalizedText, formatShortDate, convertGoogleDriveUrl } from "@/
 import type { Achievement } from "@/types";
 
 // ─── Level tag colors ─────────────────────────────────────────
+// Brand guide: navy, gold, gray, and (sparingly) green only.
 
 const LEVEL_STYLES: Record<string, string> = {
-  national:    "bg-red-100 text-red-700",
-  provincial:  "bg-orange-100 text-orange-700",
-  district:    "bg-blue-100 text-blue-700",
-  school:      "bg-emerald-100 text-emerald-700",
+  national:    "bg-school-blue-50 text-school-blue-700",
+  provincial:  "bg-school-gold-50 text-school-gold-800",
+  district:    "bg-gray-100 text-gray-700",
+  school:      "bg-school-green-50 text-school-green-700",
 };
 const LEVEL_FALLBACK = "bg-gray-100 text-gray-600";
-
-// ─── Type icon mapping ────────────────────────────────────────
-
-const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  student: GraduationCap,
-  teacher: Users,
-  school: School,
-};
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -80,40 +73,51 @@ export default function AchievementsContent({ achievements, translations }: Prop
   const t = (key: string) => translations[key] ?? key;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       {/* ─── Stats summary ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 -mt-7 relative z-10">
-        <StatBox icon={Trophy} value={counts.all} label={locale === "km" ? "សរុប" : "Total"} />
-        <StatBox icon={GraduationCap} value={counts.student} label={locale === "km" ? "សិស្ស" : "Students"} />
-        <StatBox icon={Users} value={counts.teacher} label={locale === "km" ? "គ្រូ" : "Teachers"} />
-        <StatBox icon={School} value={counts.school} label={locale === "km" ? "សាលា" : "School"} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 -mt-7 relative z-10 items-stretch">
+        <StatBox icon={Trophy} value={counts.all} label={locale === "km" ? "សរុប" : "Total"} accent="navy" />
+        <StatBox icon={GraduationCap} value={counts.student} label={locale === "km" ? "សិស្ស" : "Students"} accent="navy" />
+        <StatBox icon={Users} value={counts.teacher} label={locale === "km" ? "គ្រូ" : "Teachers"} accent="navy" />
+        <StatBox icon={School} value={counts.school} label={locale === "km" ? "សាលា" : "School"} accent="navy" />
       </div>
 
       {/* ─── Filter pills ─── */}
       <div className="flex flex-wrap items-center gap-2 mb-8">
         {(["all", "student", "teacher", "school"] as const).map((type) => {
-          const Icon = type === "all" ? Trophy : TYPE_ICONS[type];
           const isActive = selectedType === type;
           return (
             <button
               key={type}
               onClick={() => handleFilter(type)}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border",
-                isActive
-                  ? "bg-school-blue-800 text-white border-school-blue-800"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-school-blue-300 hover:text-school-blue-700",
-              )}
+              className="relative shrink-0 focus:outline-none"
             >
-              <Icon className="w-3.5 h-3.5" />
-              {type === "all" ? (locale === "km" ? "ទាំងអស់" : "All") : t(type)}
               <span
                 className={cn(
-                  "ml-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-full",
-                  isActive ? "bg-white/20" : "bg-gray-100 text-gray-400",
+                  "relative inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer",
+                  isActive
+                    ? "text-white"
+                    : "text-gray-600 hover:text-school-blue-700 hover:bg-school-blue-50/80 border border-transparent hover:border-school-blue-200",
                 )}
               >
-                {counts[type]}
+                {isActive && (
+                  <motion.span
+                    layoutId="activeAchievementFilter"
+                    className="absolute inset-0 rounded-xl bg-school-blue-800 shadow-md shadow-school-blue-800/20"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">
+                  {type === "all" ? (locale === "km" ? "ទាំងអស់" : "All") : t(type)}
+                </span>
+                <span
+                  className={cn(
+                    "relative z-10 text-[10px] px-1.5 py-0.5 rounded-full",
+                    isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500",
+                  )}
+                >
+                  {counts[type]}
+                </span>
               </span>
             </button>
           );
@@ -122,7 +126,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
 
       {/* ─── Grid ─── */}
       {filtered.length > 0 ? (
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
           <AnimatePresence mode="popLayout">
             {filtered.map((item, i) => {
               const title = getLocalizedText(item.title_km, item.title_en, locale);
@@ -136,11 +140,11 @@ export default function AchievementsContent({ achievements, translations }: Prop
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                   transition={{ duration: 0.35, delay: i * 0.035, ease: "easeOut" }}
-                  className="group bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden"
+                  className="group bg-white rounded-2xl border border-gray-100 hover:border-transparent shadow-[0_4px_16px_-8px_rgba(44,42,122,0.08)] hover:shadow-[0_16px_40px_-15px_rgba(44,42,122,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden"
                 >
                   {/* Image or Trophy icon */}
                   {item.image_url ? (
-                    <div className="relative w-full h-40 bg-gray-50 shrink-0">
+                    <div className="relative w-full h-44 bg-gray-50 shrink-0 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={convertGoogleDriveUrl(item.image_url)}
@@ -150,9 +154,9 @@ export default function AchievementsContent({ achievements, translations }: Prop
                       />
                     </div>
                   ) : (
-                    <div className="relative w-full h-40 bg-gradient-to-br from-school-blue-50 via-white to-school-gold-50 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-gold-100 transition-all duration-500">
-                      <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-school-blue-100/50">
-                        <Trophy className="w-6 h-6 text-school-blue-400" />
+                    <div className="relative w-full h-44 bg-gradient-to-br from-school-blue-50 via-white to-school-gold-50 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-gold-100 transition-all duration-500">
+                      <div className="w-14 h-14 rounded-2xl bg-white/90 flex items-center justify-center shadow-sm ring-1 ring-school-blue-100/60 transition-transform duration-500 group-hover:scale-110">
+                        <Trophy className="w-7 h-7 text-school-blue-400" />
                       </div>
                     </div>
                   )}
@@ -162,7 +166,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
                     {item.award_level && (
                       <span
                         className={cn(
-                          "inline-block self-start px-2 py-0.5 rounded text-[11px] font-medium mb-2",
+                          "inline-block self-start px-2.5 py-1 rounded-full text-[11px] font-semibold mb-2.5",
                           LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK,
                         )}
                       >
@@ -218,7 +222,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-20 text-center"
         >
-          <div className="w-16 h-16 rounded-xl bg-gray-50 flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
             <SearchX className="w-8 h-8 text-gray-300" />
           </div>
           <p className="text-sm text-gray-400">
@@ -236,25 +240,39 @@ export default function AchievementsContent({ achievements, translations }: Prop
 }
 
 // ─── Stat box ─────────────────────────────────────────────────
+// Brand guide: navy, gold, gray, and (sparingly) green only.
+
+const STAT_ACCENTS = {
+  navy: { bg: "bg-school-blue-50", text: "text-school-blue-700" },
+  gold: { bg: "bg-school-gold-50", text: "text-school-gold-700" },
+  gray: { bg: "bg-gray-100", text: "text-gray-600" },
+  green: { bg: "bg-school-green-50", text: "text-school-green-700" },
+} as const;
 
 function StatBox({
   icon: Icon,
   value,
   label,
+  accent,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   value: number;
   label: string;
+  accent: keyof typeof STAT_ACCENTS;
 }) {
+  const colors = STAT_ACCENTS[accent];
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-school-blue-50 flex items-center justify-center shrink-0">
-        <Icon className="w-[18px] h-[18px] text-school-blue-600" />
+    <div className="group h-full flex flex-col items-center text-center bg-white rounded-2xl border border-gray-100 shadow-[0_10px_30px_-15px_rgba(44,42,122,0.12)] hover:shadow-[0_16px_40px_-15px_rgba(44,42,122,0.18)] hover:-translate-y-1 transition-all duration-300 p-5 pt-6">
+      <div
+        className={cn(
+          "w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110",
+          colors.bg,
+        )}
+      >
+        <Icon className={cn("w-6 h-6", colors.text)} />
       </div>
-      <div>
-        <p className="text-xl font-bold text-gray-900 leading-none tabular-nums">{value}</p>
-        <p className="text-[11px] text-gray-500 mt-0.5">{label}</p>
-      </div>
+      <p className="text-2xl font-bold text-school-blue-900 leading-none tabular-nums">{value}</p>
+      <p className="text-xs text-gray-500 mt-1.5 font-medium">{label}</p>
     </div>
   );
 }

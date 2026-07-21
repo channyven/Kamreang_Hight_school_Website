@@ -146,14 +146,25 @@
     "role_editor": "Content Editor"
   },
   "auth": {
-    "login": "Sign In",
+    "login": "Login",
     "logout": "Sign Out",
-    "email": "Email address",
+    "email": "Email Address",
     "password": "Password",
     "login_with_google": "Continue with Google",
-    "forgot_password": "Forgot password?",
+    "forgot_password": "Forgot Password?",
     "error_invalid": "Invalid email or password",
     "error_inactive": "Account has been deactivated",
-    "error_no_account": "No account found in the system"
+    "error_no_account": "No account found in the system",
+    "remember_me": "Remember me on this device",
+    "management_system_login": "MANAGEMENT SYSTEM LOGIN",
+    "authorized_staff_only": "For authorized school staff only",
+    "support": "Support",
+    "about_portal": "About Portal",
+    "reset_password_title": "Reset Password",
+    "reset_password_desc": "Enter your email and we'll send you a link to reset your password.",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login": "Back to Sign In",
+    "reset_email_sent": "Password reset email sent — check your inbox.",
+    "reset_email_error": "Couldn't send reset email. Check the address and try again."
   }
 }

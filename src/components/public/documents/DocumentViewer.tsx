@@ -196,7 +196,7 @@ export default function DocumentViewer({
                 <button
                   onClick={onClose}
                   className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 active:scale-90 transition-all duration-200"
-                  aria-label="Close"
+                  aria-label={locale === "km" ? "បិទ" : "Close"}
                 >
                   <X className="w-4 h-4" />
                 </button>
