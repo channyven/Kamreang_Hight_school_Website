@@ -259,6 +259,25 @@ export const getHeroSlides = unstable_cache(
   { tags: ["hero_slides"], revalidate: 60 }
 );
 
+export const getPublishedAchievementById = unstable_cache(
+  async (id: string): Promise<Achievement | null> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("id", id)
+        .eq("status", "published")
+        .single();
+      return (data ?? null) as Achievement | null;
+    } catch {
+      return null;
+    }
+  },
+  ["published-achievement-by-id"],
+  { tags: ["achievements"], revalidate: 60 }
+);
+
 export const getCurrentStatistics = unstable_cache(
   async (): Promise<Statistics> => {
     try {

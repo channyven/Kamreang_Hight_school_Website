@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { Plus, Search, Edit, Trash2, Loader2, Trophy, Award } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Loader2, Trophy, Award, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -162,6 +162,9 @@ export default function AdminAchievementsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
+                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                            <Link href={adminHref(locale, `achievements/${item.id}/view`)}><Eye className="w-4 h-4 text-gray-500" /></Link>
+                          </Button>
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
                             <Link href={adminHref(locale, `achievements/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
