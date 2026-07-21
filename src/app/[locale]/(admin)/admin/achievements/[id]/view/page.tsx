@@ -27,6 +27,7 @@ import {
   Sparkles,
   CheckCircle2,
   XCircle,
+  ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -356,6 +357,9 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
                 )}
                 {achievement.participant_name && (
                   <InfoRow icon={User} label={locale === "km" ? "អ្នកចូលរួម" : "Participant"} value={achievement.participant_name} />
+                )}
+                {(achievement.gallery_images?.length ?? 0) > 0 && (
+                  <InfoRow icon={ImageIcon} label={locale === "km" ? "រូបភាព" : "Gallery"} value={`${achievement.gallery_images?.length ?? 0} ${locale === "km" ? "រូប" : "photos"}`} />
                 )}
               </div>
             </div>

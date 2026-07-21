@@ -14,6 +14,7 @@ import {
   Settings2,
   Image as ImageIcon,
   Globe,
+  FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import { achievementSchema, type AchievementInput } from "@/schemas/validations"
 import { createAchievement, updateAchievement } from "@/actions/achievements";
 import { supabase } from "@/lib/supabase";
 import { adminHref, convertGoogleDriveUrl } from "@/utils";
+import PhotoGallery from "@/components/admin/PhotoGallery";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -96,6 +98,8 @@ export default function AchievementFormPage({ params }: PageProps) {
               if (v === null) return;
               if (k === "is_featured") {
                 setValue("is_featured", Boolean(v));
+              } else if (k === "gallery_images") {
+                setValue("gallery_images", Array.isArray(v) ? v : []);
               } else {
                 setValue(k as keyof AchievementInput, v as string);
               }
@@ -390,6 +394,34 @@ export default function AchievementFormPage({ params }: PageProps) {
             <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
               <h2 className="font-semibold text-gray-900">Image</h2>
               <Input {...register("image_url")} placeholder="Image URL" />
+            </div>
+
+            {/* ── Photo Gallery ── */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2.5">
+                  <FolderOpen className="w-4 h-4 text-school-blue-800" />
+                  <h2 className="font-semibold text-gray-900 text-sm">
+                    {locale === "km" ? "វិចិត្រសាលរូបភាព" : "Photo Gallery"}
+                  </h2>
+                </div>
+                <Badge variant="outline" className="text-[11px] font-mono text-gray-400">
+                  {watch("gallery_images")?.length ?? 0} {locale === "km" ? "រូប" : "img"}
+                </Badge>
+              </div>
+              <div className="p-5">
+                <Controller
+                  name="gallery_images"
+                  control={control}
+                  render={({ field }) => (
+                    <PhotoGallery
+                      images={field.value ?? []}
+                      onChange={field.onChange}
+                      locale={locale}
+                    />
+                  )}
+                />
+              </div>
             </div>
 
             {/* ── Submit ── */}

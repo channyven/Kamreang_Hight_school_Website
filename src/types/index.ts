@@ -98,6 +98,7 @@ export interface Achievement {
   achievement_date?: string;
   participant_name?: string;
   image_url?: string;
+  gallery_images?: string[];
   is_featured?: boolean;
   status: ContentStatus;
   created_by?: string;

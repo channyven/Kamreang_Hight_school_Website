@@ -66,6 +66,7 @@ export const achievementSchema = z.object({
   achievement_date: z.string().optional(),
   participant_name: z.string().max(300).optional(),
   image_url: z.string().optional(),
+  gallery_images: z.array(z.string()).default([]),
   is_featured: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
 });

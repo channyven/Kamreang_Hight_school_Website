@@ -19,10 +19,13 @@ import {
   Award,
 } from "lucide-react";
 
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { getPublishedAchievementById, getPublishedAchievements } from "@/lib/queries";
 import { getLocalizedText, formatDate, convertGoogleDriveUrl } from "@/utils";
 import ShareButton from "@/components/public/ShareButton";
+
+const PhotoGallery = dynamic(() => import("@/components/public/PhotoGallery"));
 
 export const revalidate = 60;
 
@@ -193,7 +196,12 @@ export default async function AchievementDetailPage({
                 {locale === "km" ? "អំពីសមិទ្ធផល" : "About This Achievement"}
               </h2>
 
-              {description ? (
+              {/* Gallery */}
+            {achievement.gallery_images && achievement.gallery_images.length > 0 && (
+              <PhotoGallery images={achievement.gallery_images} locale={locale} />
+            )}
+
+            {description ? (
                 <div className="space-y-4">
                   {description.split("\n").map((paragraph, i) => (
                     <p key={i} className={`text-school-gray-700 leading-relaxed ${locale === "km" ? "font-khmer" : ""}`}>
