@@ -21,7 +21,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     title_en: "Welcome to Kamrieng High School",
     subtitle_km: "ផ្ដល់ការអប់រំប្រកបដោយគុណភាព វប្បធម៌ និងនវានុវត្ត",
     subtitle_en: "Empowering the next generation of Cambodian leaders through academic rigor, cultural integrity, and innovative learning.",
-    gradient: "linear-gradient(135deg, #061525 0%, #0c2d5e 55%, #092045 100%)",
+    gradient: "linear-gradient(135deg, #191845 0%, #2c2a7a 55%, #343291 100%)",
     cta_primary_en: "Enroll Now",
     cta_primary_km: "ចុះឈ្មោះឥឡូវ",
     cta_secondary_en: "View Prospectus",
@@ -37,7 +37,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     title_en: "Excellence in Education",
     subtitle_km: "កម្មវិធីសិក្សាទំនើបបញ្ចូលជាមួយប្រពៃណីខ្មែរ ដើម្បីភាពជោគជ័យ",
     subtitle_en: "Modern curriculum blending STEM, humanities, and Khmer classical arts to prepare students for a global future.",
-    gradient: "linear-gradient(135deg, #061e14 0%, #0c4228 55%, #083320 100%)",
+    gradient: "linear-gradient(135deg, #0a0921 0%, #191845 55%, #0f0e2e 100%)",
     cta_primary_en: "Our Programs",
     cta_primary_km: "កម្មវិធីរបស់យើង",
     cta_secondary_en: "Meet Our Teachers",
@@ -53,7 +53,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     title_en: "Rooted in Khmer Heritage",
     subtitle_km: "ការអប់រំដែលការពារវប្បធម៌ប្រពៃណីខ្មែរ ហើយប្រែក្លាយជីវិតរបស់យើង",
     subtitle_en: "Honoring Cambodias rich cultural legacy through traditional arts, Khmer language, and national history.",
-    gradient: "linear-gradient(135deg, #1a0c05 0%, #5c2d0a 55%, #421f08 100%)",
+    gradient: "linear-gradient(135deg, #191845 0%, #343291 55%, #242263 100%)",
     cta_primary_en: "Learn More",
     cta_primary_km: "ស្វែងយល់បន្ថែម",
     cta_secondary_en: "Latest News",
@@ -69,7 +69,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     title_en: "Building Cambodia's Future",
     subtitle_km: "ជំនឹ STEM ភាសា ហើយភាពជាអ្នកដឹកនាំ ស្ថាបនាកម្ពុជានៃថ្ងៃស្អែក",
     subtitle_en: "Through STEM education, leadership programs, and digital literacy, we prepare students to lead Cambodia's development.",
-    gradient: "linear-gradient(135deg, #0c0820 0%, #271463 55%, #1a0c4a 100%)",
+    gradient: "linear-gradient(135deg, #0a0928 0%, #242263 55%, #3e3bab 100%)",
     cta_primary_en: "Join Us Today",
     cta_primary_km: "ចូលរួមជាមួយយើង",
     cta_secondary_en: "Our Achievements",
@@ -81,7 +81,9 @@ const FALLBACK_SLIDES: HeroSlide[] = [
   },
 ];
 
-const SLIDE_ACCENTS = ["#fdbc13", "#4ade80", "#fb923c", "#c084fc"];
+// Brand guide: Gold is the single accent color for highlights/CTAs; green is
+// reserved for the rare "growth" moment. Every slide uses one of these two.
+const SLIDE_ACCENTS = ["#dfad32", "#dfad32", "#72b944", "#dfad32"];
 
 function AngkorWatSilhouette() {
   return (
@@ -267,7 +269,7 @@ export default function HeroSection({ slides }: HeroSectionProps) {
           {slide.image_url ? (
             <Image src={slide.image_url} alt={slide.title_en} fill sizes="100vw" className="object-cover" priority={current === 0} />
           ) : (
-            <div className="absolute inset-0" style={{ background: slide.gradient ?? "linear-gradient(135deg, #061525 0%, #0c2d5e 100%)" }}>
+            <div className="absolute inset-0" style={{ background: slide.gradient ?? "linear-gradient(135deg, #191845 0%, #2c2a7a 100%)" }}>
               <KhmerPattern />
               <div className="absolute right-0 bottom-0 w-[55%] h-[88%] hidden lg:block pointer-events-none" style={{ color: "white", opacity: 0.08 }}>
                 <AngkorWatSilhouette />
@@ -298,30 +300,42 @@ export default function HeroSection({ slides }: HeroSectionProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05, duration: 0.4 }}
-                  className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full border text-xs font-semibold tracking-wider uppercase"
+                  className={cn(
+                    "inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full border text-xs font-semibold tracking-wider uppercase",
+                    locale === "km" && "font-khmer normal-case tracking-normal"
+                  )}
                   style={{ borderColor: `${accent}50`, color: accent, background: `${accent}12` }}
                 >
                   <span style={{ fontSize: "10px" }}>🇰🇭</span>
-                  Kingdom of Cambodia
+                  {locale === "km" ? "ព្រះរាជាណាចក្រកម្ពុជា" : "Kingdom of Cambodia"}
                 </motion.div>
 
+                {/* Secondary caption always shows the *other* language, so
+                    the large headline below stays the primary, correctly
+                    localized text instead of duplicating it. */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.4 }}
-                  className="font-khmer text-lg md:text-xl mb-2 leading-relaxed tracking-wide"
+                  className={cn(
+                    "text-lg md:text-xl mb-2 leading-relaxed tracking-wide",
+                    locale === "km" ? "" : "font-khmer"
+                  )}
                   style={{ color: accent }}
                 >
-                  {slide.title_km}
+                  {locale === "km" ? slide.title_en : slide.title_km}
                 </motion.p>
 
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15, duration: 0.4 }}
-                  className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-6 tracking-tight"
+                  className={cn(
+                    "text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-6 tracking-tight",
+                    locale === "km" && "font-khmer"
+                  )}
                 >
-                  {slide.title_en}
+                  {locale === "km" ? slide.title_km : slide.title_en}
                 </motion.h1>
 
                 <motion.div

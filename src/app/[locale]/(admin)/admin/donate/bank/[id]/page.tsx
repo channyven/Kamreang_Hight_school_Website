@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ImageUploader from "@/components/admin/ImageUploader";
-import { adminHref } from "@/utils";
+import { adminHref, convertGoogleDriveUrl } from "@/utils";
 import { bankAccountSchema, type BankAccountInput } from "@/schemas/validations";
 import { createBankAccount, updateBankAccount, getBankAccountById } from "@/actions/donate";
 
@@ -33,6 +33,17 @@ export default function BankAccountFormPage({ params }: PageProps) {
     });
 
   const logoColor = watch("logo_color") ?? "#00376f";
+  const watchLogoUrl = watch("logo_url");
+
+  // Auto-convert Google Drive share links to our proxy format whenever the value changes
+  useEffect(() => {
+    if (watchLogoUrl) {
+      const converted = convertGoogleDriveUrl(watchLogoUrl);
+      if (converted !== watchLogoUrl) {
+        setValue("logo_url", converted);
+      }
+    }
+  }, [watchLogoUrl, setValue]);
 
   useEffect(() => {
     if (!isNew) {

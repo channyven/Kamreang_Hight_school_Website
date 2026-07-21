@@ -8,17 +8,18 @@ import { Button } from "@/components/ui/button";
 import type { Achievement } from "@/types";
 import { getLocalizedText, formatShortDate, convertGoogleDriveUrl } from "@/utils";
 
+// Brand guide: navy, gold, gray, and (sparingly) green only — no red/violet/cyan/rose/orange.
 const LEVEL_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-  national:   { bg: "bg-red-50 border-red-200",    text: "text-red-700",   icon: <Award className="w-3.5 h-3.5" /> },
-  provincial: { bg: "bg-amber-50 border-amber-200", text: "text-amber-700", icon: <Medal className="w-3.5 h-3.5" /> },
-  district:   { bg: "bg-blue-50 border-blue-200",   text: "text-blue-700",  icon: <Medal className="w-3.5 h-3.5" /> },
-  school:     { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700", icon: <Star className="w-3.5 h-3.5" /> },
+  national:   { bg: "bg-school-blue-50 border-school-blue-200", text: "text-school-blue-700", icon: <Award className="w-3.5 h-3.5" /> },
+  provincial: { bg: "bg-school-gold-50 border-school-gold-200", text: "text-school-gold-800", icon: <Medal className="w-3.5 h-3.5" /> },
+  district:   { bg: "bg-gray-100 border-gray-300",              text: "text-gray-700",        icon: <Medal className="w-3.5 h-3.5" /> },
+  school:     { bg: "bg-school-green-50 border-school-green-200", text: "text-school-green-800", icon: <Star className="w-3.5 h-3.5" /> },
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  student: "bg-violet-50 text-violet-600",
-  teacher: "bg-cyan-50 text-cyan-600",
-  school: "bg-rose-50 text-rose-600",
+  student: "bg-school-gold-50 text-school-gold-800",
+  teacher: "bg-school-blue-50 text-school-blue-700",
+  school: "bg-gray-100 text-gray-700",
 };
 const DEFAULT_TYPE_COLOR = "bg-gray-50 text-gray-600";
 
@@ -39,7 +40,7 @@ export default function AchievementsSection({ achievements }: AchievementsSectio
               <span className="block w-2 h-2 rounded-full bg-school-gold-500" />
               <span className="block w-8 h-px bg-school-gold-400/60" />
             </div>
-            <span className="inline-block px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold tracking-wide mb-2">{t("title")}</span>
+            <span className="inline-block px-3 py-1 rounded-full bg-school-gold-50 text-school-gold-800 text-xs font-semibold tracking-wide mb-2">{t("title")}</span>
             <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mt-1 ${locale === "km" ? "font-khmer" : ""}`}>{t("subtitle")}</h2>
           </div>
           <Button asChild variant="outline" className="hidden sm:flex border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all group">
@@ -76,9 +77,9 @@ export default function AchievementsSection({ achievements }: AchievementsSectio
                     />
                   </div>
                 ) : (
-                  <div className="relative w-full h-40 bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center shrink-0 group-hover:from-amber-100 group-hover:to-orange-100 transition-all duration-500">
-                    <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-amber-200/50">
-                      <Trophy className="w-6 h-6 text-amber-500" />
+                  <div className="relative w-full h-40 bg-gradient-to-br from-school-gold-50 via-white to-school-gold-100 flex items-center justify-center shrink-0 group-hover:from-school-gold-100 group-hover:to-school-gold-200 transition-all duration-500">
+                    <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-school-gold-200/50">
+                      <Trophy className="w-6 h-6 text-school-gold-600" />
                     </div>
                   </div>
                 )}

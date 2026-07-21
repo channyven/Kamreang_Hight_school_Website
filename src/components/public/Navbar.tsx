@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, Heart, LogIn } from "lucide-react";
+import { Menu, X, Globe, Heart } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn, adminHref } from "@/utils";
@@ -150,21 +150,6 @@ export default function Navbar() {
                 </button>
               ))}
             </div>
-
-            {/* Admin sign-in */}
-            <Link
-              href={adminHref(locale)}
-              aria-label={t("admin")}
-              title={t("admin")}
-              className={cn(
-                "hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors",
-                isTransparent
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : "text-gray-600 hover:text-school-blue-800 hover:bg-gray-100"
-              )}
-            >
-              <LogIn className="w-[18px] h-[18px]" />
-            </Link>
 
             {/* Mobile menu toggle */}
             <button

@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   Clock,
   Archive,
-  Sparkles,
   Link as LinkIcon,
   AlertTriangle,
 } from "lucide-react";
@@ -487,7 +486,6 @@ export default function NewsFormPage({ params }: PageProps) {
                 {/* Featured Toggle */}
                 <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-amber-50/50 border border-amber-100/60">
                   <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
                     <div>
                       <Label className="text-sm font-medium text-amber-800 cursor-pointer">
                         {locale === "km" ? "ព័ត៌មានពិសេស" : "Featured Article"}
