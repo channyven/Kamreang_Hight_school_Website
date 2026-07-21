@@ -184,7 +184,7 @@ export default function AchievementFormPage({ params }: PageProps) {
               <div className="p-5 sm:p-6 space-y-5">
                 {/* Title - Bilingual */}
                 <div className="space-y-3">
-                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-2">
+                  <Label className="text-xs font-semibold text-gray-600 flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5 text-gray-400" />
                     {locale === "km" ? "ចំណងជើង" : "Title"}
                     <span className="text-red-400">*</span>
@@ -221,13 +221,13 @@ export default function AchievementFormPage({ params }: PageProps) {
                 {/* Date + Participant */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <Label className="text-xs font-semibold text-gray-600">
                       {locale === "km" ? "កាលបរិច្ឆេទសមិទ្ធផល" : "Achievement Date"}
                     </Label>
                     <Input type="date" {...register("achievement_date")} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <Label className="text-xs font-semibold text-gray-600">
                       {locale === "km" ? "ឈ្មោះអ្នកចូលរួម" : "Participant Name"}
                     </Label>
                     <Input {...register("participant_name")} placeholder={locale === "km" ? "ឈ្មោះសិស្ស/ក្រុម..." : "Student / Team name..."} />
@@ -238,7 +238,7 @@ export default function AchievementFormPage({ params }: PageProps) {
 
                 {/* Description - Bilingual */}
                 <div className="space-y-3">
-                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-2">
+                  <Label className="text-xs font-semibold text-gray-600 flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5 text-gray-400" />
                     {locale === "km" ? "ការពិពណ៌នា" : "Description"}
                     <span className="text-[10px] font-normal text-gray-400 ml-2 normal-case">
@@ -287,7 +287,7 @@ export default function AchievementFormPage({ params }: PageProps) {
               <div className="p-5 space-y-5">
                 {/* Status */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <Label className="text-xs font-semibold text-gray-600">
                     {locale === "km" ? "ស្ថានភាព" : "Status"}
                   </Label>
                   <Controller
@@ -312,7 +312,7 @@ export default function AchievementFormPage({ params }: PageProps) {
 
                 {/* Achievement Type */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <Label className="text-xs font-semibold text-gray-600">
                     {locale === "km" ? "ប្រភេទ" : "Achievement Type"}
                   </Label>
                   <Controller
@@ -337,7 +337,7 @@ export default function AchievementFormPage({ params }: PageProps) {
 
                 {/* Award Level */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <Label className="text-xs font-semibold text-gray-600">
                     {locale === "km" ? "កម្រិត" : "Award Level"}
                   </Label>
                   <Controller
@@ -396,7 +396,7 @@ export default function AchievementFormPage({ params }: PageProps) {
                 </h2>
               </div>
               <div className="p-5 space-y-3">
-                <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <Label className="text-xs font-semibold text-gray-600">
                   {locale === "km" ? "តំណភ្ជាប់រូបភាព" : "Image URL"}
                 </Label>
                 <Input {...register("image_url")} placeholder="https://example.com/image.jpg" />

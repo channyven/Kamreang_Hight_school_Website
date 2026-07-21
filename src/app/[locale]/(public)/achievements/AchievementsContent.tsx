@@ -3,7 +3,8 @@
 import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLocale } from "next-intl";import {
+import { useLocale } from "next-intl";
+import {
   Trophy,
   Calendar,
   Users,
@@ -83,7 +84,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       {/* ─── Stats summary ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 -mt-7 relative z-10 items-stretch">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8 -mt-6 relative z-10 items-stretch">
         <StatBox icon={Trophy} value={counts.all} label={locale === "km" ? "សរុប" : "Total"} accent="navy" />
         <StatBox icon={GraduationCap} value={counts.student} label={locale === "km" ? "សិស្ស" : "Students"} accent="navy" />
         <StatBox icon={Users} value={counts.teacher} label={locale === "km" ? "គ្រូ" : "Teachers"} accent="navy" />
@@ -134,7 +135,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
 
       {/* ─── Grid ─── */}
       {filtered.length > 0 ? (
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           <AnimatePresence mode="popLayout">
             {filtered.map((item, i) => {
               const title = getLocalizedText(item.title_km, item.title_en, locale);
@@ -155,7 +156,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
                   >
                     {/* Image or Trophy icon */}
                     {item.image_url ? (
-                      <div className="relative w-full h-40 bg-school-gray-100 shrink-0">
+                      <div className="relative w-full h-32 bg-school-gray-100 shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={convertGoogleDriveUrl(item.image_url)}
@@ -165,20 +166,20 @@ export default function AchievementsContent({ achievements, translations }: Prop
                         />
                       </div>
                     ) : (
-                      <div className="relative w-full h-40 bg-gradient-to-br from-school-blue-50 via-white to-school-gold-50 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-gold-100 transition-all duration-500">
-                        <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-school-blue-100/50">
-                          <Trophy className="w-6 h-6 text-school-blue-400" />
+                      <div className="relative w-full h-32 bg-gradient-to-br from-school-blue-50 via-white to-school-gold-50 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-gold-100 transition-all duration-500">
+                        <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center shadow-sm ring-1 ring-school-blue-100/50">
+                          <Trophy className="w-5 h-5 text-school-blue-400" />
                         </div>
                       </div>
                     )}
 
-                    <div className="p-5 pt-4 flex flex-col flex-1">
+                    <div className="p-4 pt-3 flex flex-col flex-1">
                       {/* Badge row: level + type */}
-                      <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-2">
                         {item.award_level && (
                           <span
                             className={cn(
-                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border",
+                              "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border",
                               (LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK).bg,
                               (LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK).text,
                             )}
@@ -189,7 +190,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
                         )}
                         {item.achievement_type && (
                           <span className={cn(
-                            "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border",
+                            "inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border",
                             TYPE_COLORS[item.achievement_type] ?? "bg-school-gray-50 text-school-gray-600 border-school-gray-200",
                           )}>
                             {t(item.achievement_type)}
@@ -200,7 +201,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
                       {/* Title */}
                       <h3
                         className={cn(
-                          "font-semibold text-gray-900 text-sm leading-snug mb-1 group-hover:text-school-blue-800 transition-colors",
+                          "font-semibold text-gray-900 text-xs leading-snug mb-1 group-hover:text-school-blue-800 transition-colors",
                           locale === "km" ? "font-khmer" : "",
                         )}
                       >
@@ -209,7 +210,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
 
                       {/* Participant */}
                       {item.participant_name && (
-                        <p className="text-xs text-school-blue-600/70 font-medium mb-1">
+                        <p className="text-[11px] text-school-blue-600/70 font-medium mb-1">
                           {item.participant_name}
                         </p>
                       )}
@@ -218,7 +219,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
                       {desc && (
                         <p
                         className={cn(
-                          "text-xs text-school-gray-400 leading-relaxed line-clamp-2 mb-3 flex-1",
+                          "text-[11px] text-school-gray-400 leading-relaxed line-clamp-2 mb-2 flex-1",
                             locale === "km" ? "font-khmer" : "",
                           )}
                         >
@@ -228,7 +229,7 @@ export default function AchievementsContent({ achievements, translations }: Prop
 
                       {/* Date */}
                       {item.achievement_date && (
-                        <div className="flex items-center gap-1.5 text-[11px] text-school-gray-400 pt-2 border-t border-school-gray-100 mt-auto">
+                        <div className="flex items-center gap-1.5 text-[10px] text-school-gray-400 pt-1.5 border-t border-school-gray-100 mt-auto">
                           <Calendar className="w-3 h-3" />
                           {formatShortDate(item.achievement_date, locale)}
                         </div>
@@ -246,10 +247,10 @@ export default function AchievementsContent({ achievements, translations }: Prop
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-20 text-center"
         >
-          <div className="w-16 h-16 rounded-2xl bg-school-gray-100 flex items-center justify-center mb-4">
-            <SearchX className="w-8 h-8 text-school-gray-300" />
+          <div className="w-12 h-12 rounded-2xl bg-school-gray-100 flex items-center justify-center mb-3">
+            <SearchX className="w-6 h-6 text-school-gray-300" />
           </div>
-          <p className="text-sm text-school-gray-400">
+          <p className="text-xs text-school-gray-400">
             {locale === "km"
               ? "មិនទាន់មានសមិទ្ធផលនៅឡើយទេ"
               : "No achievements to show yet."}
@@ -286,17 +287,17 @@ function StatBox({
 }) {
   const colors = STAT_ACCENTS[accent];
   return (
-    <div className="group h-full flex flex-col items-center text-center bg-white rounded-2xl border border-school-gray-200 shadow-[0_10px_30px_-15px_rgba(44,42,122,0.12)] hover:shadow-[0_16px_40px_-15px_rgba(44,42,122,0.18)] hover:-translate-y-1 transition-all duration-300 p-5 pt-6">
+    <div className="group h-full flex flex-col items-center text-center bg-white rounded-2xl border border-school-gray-200 shadow-[0_10px_30px_-15px_rgba(44,42,122,0.12)] hover:shadow-[0_16px_40px_-15px_rgba(44,42,122,0.18)] hover:-translate-y-1 transition-all duration-300 p-4 pt-5">
       <div
         className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110",
+          "w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-transform duration-300 group-hover:scale-110",
           colors.bg,
         )}
       >
         <Icon className={cn("w-6 h-6", colors.text)} />
       </div>
-      <p className="text-2xl font-bold text-school-blue-900 leading-none tabular-nums">{value}</p>
-      <p className="text-xs text-school-gray-500 mt-1.5 font-medium">{label}</p>
+      <p className="text-xl font-bold text-school-blue-900 leading-none tabular-nums">{value}</p>
+      <p className="text-[11px] text-school-gray-500 mt-1 font-medium">{label}</p>
     </div>
   );
 }
