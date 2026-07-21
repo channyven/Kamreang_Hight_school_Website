@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import { getPublishedDocuments } from "@/lib/queries";
 import { CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
 import DocumentsClient from "./DocumentsClient";
@@ -7,7 +8,8 @@ import DocumentsClient from "./DocumentsClient";
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: "Documents" };
+  const locale = await getLocale();
+  return { title: locale === "km" ? "ឯកសារ" : "Documents" };
 }
 
 export default async function DocumentsPage() {

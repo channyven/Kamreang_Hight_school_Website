@@ -11,7 +11,6 @@ import {
   Globe,
   FileText,
   Image as ImageIcon,
-  Sparkles,
   Palette,
   Eye,
   EyeOff,
@@ -317,7 +316,6 @@ export default function HeroSlideFormPage({ params }: PageProps) {
             {/* ── Call to Action Buttons ── */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
-                <Sparkles className="w-4 h-4 text-school-blue-800" />
                 <h2 className="font-semibold text-gray-900 text-sm">
                   {locale === "km" ? "ប៊ូតុងសកម្មភាព" : "Call to Action Buttons"}
                 </h2>

@@ -46,17 +46,19 @@ export default async function AchievementsPage() {
 
         <div className="relative z-10 container mx-auto px-6 pt-28 pb-16 sm:pt-32 sm:pb-20">
           <div className="max-w-xl mx-auto text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 mb-6">
-              <Trophy className="w-6 h-6 text-white/80" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-school-gold-400/15 ring-1 ring-school-gold-400/20 mb-6">
+              <Trophy className="w-7 h-7 text-school-gold-400" />
             </div>
 
             <h1
-              className={`text-3xl sm:text-4xl font-bold text-white leading-snug mb-3 tracking-tight ${
+              className={`text-3xl sm:text-4xl font-bold text-white leading-snug mb-4 tracking-tight ${
                 locale === "km" ? "font-khmer" : ""
               }`}
             >
               {t("title")}
             </h1>
+
+            <div className="w-14 h-1 bg-school-gold-400 rounded-full mx-auto mb-4" />
 
             <p
               className={`text-white/50 text-sm sm:text-base max-w-md mx-auto ${

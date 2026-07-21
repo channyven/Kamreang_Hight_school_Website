@@ -13,7 +13,6 @@ import {
   FileText,
   Settings2,
   Image as ImageIcon,
-  Sparkles,
   Globe,
 } from "lucide-react";
 import Link from "next/link";
@@ -364,7 +363,6 @@ export default function AchievementFormPage({ params }: PageProps) {
                 {/* Featured Toggle */}
                 <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-amber-50/50 border border-amber-100/60">
                   <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
                     <div>
                       <Label className="text-sm font-medium text-amber-800 cursor-pointer">
                         {locale === "km" ? "សមិទ្ធផលពិសេស" : "Featured"}

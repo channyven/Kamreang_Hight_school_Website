@@ -4,16 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocale } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  Search,
-  ArrowRight,
-  FileText,
-  GraduationCap,
-  ClipboardList,
-  ShieldCheck,
-  Folder,
-  FolderOpen,
-} from "lucide-react";
+import { Search, ArrowRight, FolderOpen } from "lucide-react";
 import type { AppDocument } from "@/types";
 import { DOCUMENT_CATEGORIES } from "@/types";
 import DocumentCard from "@/components/public/documents/DocumentCard";
@@ -24,15 +15,6 @@ interface DocumentsClientProps {
   /** Mapping from DocumentCategory to DB slug. */
   categorySlugMap: Record<string, string>;
 }
-
-/** Icon for each document category key. */
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  report: <FileText className="w-4 h-4" />,
-  result: <GraduationCap className="w-4 h-4" />,
-  form: <ClipboardList className="w-4 h-4" />,
-  policy: <ShieldCheck className="w-4 h-4" />,
-  other: <Folder className="w-4 h-4" />,
-};
 
 export default function DocumentsClient({
   documents,
@@ -141,9 +123,11 @@ export default function DocumentsClient({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-white font-bold text-5xl md:text-6xl lg:text-7xl mb-3 tracking-tight"
+            className={`text-white font-bold text-5xl md:text-6xl lg:text-7xl mb-3 tracking-tight ${
+              locale === "km" ? "font-khmer" : ""
+            }`}
           >
-            Documents
+            {locale === "km" ? "ឯកសារ" : "Documents"}
           </motion.h1>
 
           <motion.p
@@ -196,13 +180,12 @@ export default function DocumentsClient({
           {/* "All" button */}
           <button
             onClick={() => handleCategoryChange("")}
-            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
               !urlCategory
                 ? "bg-school-blue-800 text-white shadow-sm"
                 : "bg-white text-gray-600 border border-gray-300 hover:border-school-blue-400 hover:text-school-blue-700"
             }`}
           >
-            <Folder className="w-4 h-4" />
             {locale === "km" ? "ទាំងអស់" : "All"}
           </button>
 
@@ -212,13 +195,12 @@ export default function DocumentsClient({
               <button
                 key={cat.key}
                 onClick={() => handleCategoryChange(cat.key)}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-school-blue-800 text-white shadow-sm"
                     : "bg-white text-gray-600 border border-gray-300 hover:border-school-blue-400 hover:text-school-blue-700"
                 }`}
               >
-                {CATEGORY_ICONS[cat.key] ?? <Folder className="w-4 h-4" />}
                 {locale === "km" ? cat.labelKm : cat.labelEn}
               </button>
             );
