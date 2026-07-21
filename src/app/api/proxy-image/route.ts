@@ -51,9 +51,15 @@ export async function GET(request: NextRequest) {
     });
     clearTimeout(timeout);
 
-    if (!response.ok) {
-      // If the download endpoint fails, try Google's thumbnail endpoint as a fallback.
-      // The thumbnail returns a 302 redirect that fetch() follows to lh3.googleusercontent.com.
+    const contentType = response.headers.get("content-type") || "";
+
+    // The primary download endpoint can return 200 OK with an HTML page
+    // instead of image bytes — e.g. when the file isn't shared as "Anyone
+    // with the link", or Google shows a virus-scan interstitial. That's
+    // not just a bad status, so we check content-type too, not just !ok.
+    if (!response.ok || !contentType.startsWith("image/")) {
+      // Try Google's thumbnail endpoint as a fallback.
+      // It returns a 302 redirect that fetch() follows to lh3.googleusercontent.com.
       const fileIdMatch = urlParam.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
       if (fileIdMatch && urlParam.includes("drive.usercontent.google.com/download")) {
         const fallbackTimeout = setTimeout(() => controller.abort(), 15000);
@@ -86,17 +92,17 @@ export async function GET(request: NextRequest) {
         console.error(`Proxy fallback also failed for ${urlParam}`);
       }
 
-      console.error(`Proxy fetch failed: ${response.status} for ${urlParam}`);
-      return new NextResponse(`Upstream fetch failed: ${response.status}`, {
-        status: response.status,
-      });
-    }
-
-    // Get the content type — bail if upstream didn't return an image
-    const contentType = response.headers.get("content-type") || "";
-    if (!contentType.startsWith("image/")) {
+      if (!response.ok) {
+        console.error(`Proxy fetch failed: ${response.status} for ${urlParam}`);
+        return new NextResponse(`Upstream fetch failed: ${response.status}`, {
+          status: response.status,
+        });
+      }
       console.error(`Proxy: upstream returned non-image content-type: ${contentType} for ${urlParam}`);
-      return new NextResponse("Upstream did not return an image", { status: 502 });
+      return new NextResponse(
+        "Upstream did not return an image — make sure the Google Drive file is shared as \"Anyone with the link\"",
+        { status: 502 }
+      );
     }
 
     // Build response headers for the client

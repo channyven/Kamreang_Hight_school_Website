@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import ImageUploader from "@/components/admin/ImageUploader";
-import { adminHref } from "@/utils";
+import { adminHref, convertGoogleDriveUrl } from "@/utils";
 import { donationQrSchema, type DonationQrInput } from "@/schemas/validations";
 import { createDonationQr, updateDonationQr, getDonationQrById } from "@/actions/donate";
 
@@ -26,11 +26,23 @@ export default function DonationQrFormPage({ params }: PageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(!isNew);
 
-  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, control, setValue, watch, formState: { errors, isSubmitting } } =
     useForm<DonationQrInput>({
       resolver: zodResolver(donationQrSchema),
       defaultValues: { image_url: "", is_active: true, sort_order: 0 },
     });
+
+  const watchImageUrl = watch("image_url");
+
+  // Auto-convert Google Drive share links to our proxy format whenever the value changes
+  useEffect(() => {
+    if (watchImageUrl) {
+      const converted = convertGoogleDriveUrl(watchImageUrl);
+      if (converted !== watchImageUrl) {
+        setValue("image_url", converted);
+      }
+    }
+  }, [watchImageUrl, setValue]);
 
   useEffect(() => {
     if (!isNew) {

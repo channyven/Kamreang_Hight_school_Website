@@ -195,10 +195,13 @@ export const donateQrUrlSchema = z
   .trim()
   .min(1, "QR code image is required")
   .max(2000, "URL is too long")
-  .url("Invalid image URL")
-  .refine((u) => u.startsWith("http://") || u.startsWith("https://"), {
-    message: "URL must start with http:// or https://",
-  });
+  .refine(
+    (u) =>
+      u.startsWith("http://") ||
+      u.startsWith("https://") ||
+      u.startsWith("/api/proxy-image?url="),
+    { message: "Invalid image URL" }
+  );
 
 export const donationQrSchema = z.object({
   label_km: z.string().max(200).optional(),
