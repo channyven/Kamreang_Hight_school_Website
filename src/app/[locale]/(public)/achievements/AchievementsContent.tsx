@@ -3,27 +3,36 @@
 import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLocale } from "next-intl";import { Trophy,
+import { useLocale } from "next-intl";import {
+  Trophy,
   Calendar,
   Users,
   GraduationCap,
   School,
   SearchX,
+  Award,
+  Medal,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { cn, getLocalizedText, formatShortDate, convertGoogleDriveUrl } from "@/utils";
 import type { Achievement } from "@/types";
 
 // ─── Level tag colors ─────────────────────────────────────────
-// Brand guide: navy, gold, gray, and (sparingly) green only.
 
-const LEVEL_STYLES: Record<string, string> = {
-  national:    "bg-school-blue-50 text-school-blue-700",
-  provincial:  "bg-school-gold-50 text-school-gold-800",
-  district:    "bg-school-gray-100 text-school-gray-700",
-  school:      "bg-school-gold-50 text-school-gold-700",
+const LEVEL_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+  national:   { bg: "bg-school-blue-50 border-school-blue-200", text: "text-school-blue-700", icon: <Award className="w-3 h-3" /> },
+  provincial: { bg: "bg-school-gold-50 border-school-gold-200", text: "text-school-gold-800", icon: <Medal className="w-3 h-3" /> },
+  district:   { bg: "bg-school-gray-100 border-school-gray-300", text: "text-school-gray-700", icon: <Medal className="w-3 h-3" /> },
+  school:     { bg: "bg-school-gold-50 border-school-gold-200", text: "text-school-gold-700", icon: <Star className="w-3 h-3" /> },
 };
-const LEVEL_FALLBACK = "bg-school-gray-100 text-school-gray-600";
+const LEVEL_FALLBACK = { bg: "bg-school-gray-100 border-school-gray-200", text: "text-school-gray-600", icon: <Award className="w-3 h-3" /> };
+
+const TYPE_COLORS: Record<string, string> = {
+  student: "bg-school-blue-50 text-school-blue-700 border-school-blue-200",
+  teacher: "bg-school-gold-50 text-school-gold-800 border-school-gold-200",
+  school:  "bg-school-gray-100 text-school-gray-700 border-school-gray-300",
+};
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -164,17 +173,29 @@ export default function AchievementsContent({ achievements, translations }: Prop
                     )}
 
                     <div className="p-5 pt-4 flex flex-col flex-1">
-                      {/* Level tag */}
-                      {item.award_level && (
-                        <span
-                          className={cn(
-                            "inline-block self-start px-2 py-0.5 rounded text-[11px] font-medium mb-2",
-                            LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK,
-                          )}
-                        >
-                          {t(item.award_level === "school" ? "school_level" : item.award_level)}
-                        </span>
-                      )}
+                      {/* Badge row: level + type */}
+                      <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                        {item.award_level && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border",
+                              (LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK).bg,
+                              (LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK).text,
+                            )}
+                          >
+                            {(LEVEL_STYLES[item.award_level] ?? LEVEL_FALLBACK).icon}
+                            {t(item.award_level === "school" ? "school_level" : item.award_level)}
+                          </span>
+                        )}
+                        {item.achievement_type && (
+                          <span className={cn(
+                            "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border",
+                            TYPE_COLORS[item.achievement_type] ?? "bg-school-gray-50 text-school-gray-600 border-school-gray-200",
+                          )}>
+                            {t(item.achievement_type)}
+                          </span>
+                        )}
+                      </div>
 
                       {/* Title */}
                       <h3
