@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
   Plus, Search, Loader2, Users, Download,
@@ -29,6 +30,7 @@ import type { Student } from "@/types";
 import { toast } from "sonner";
 import { deleteStudent, getStudents } from "@/actions/students";
 import { exportStudentsToExcel } from "@/lib/export";
+import { adminHref } from "@/utils";
 
 
 const STATUS_COLORS: Record<string, "success" | "default" | "warning" | "danger" | "info"> = {
@@ -53,6 +55,7 @@ const STATUS_LABELS: Record<string, Record<string, string>> = {
 
 export default function AdminStudentsPage() {
   const locale = useLocale();
+  const router = useRouter();
   const [items, setItems] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -237,13 +240,13 @@ export default function AdminStudentsPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem asChild>
-                  <Link href={`/${locale}/admin/students/${s.id}`} className="flex items-center gap-2">
+                  <Link href={adminHref(locale, `students/${s.id}`)} className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-gray-500" />
                     View Details
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`/${locale}/admin/students/${s.id}/edit`} className="flex items-center gap-2">
+                  <Link href={adminHref(locale, `students/${s.id}/edit`)} className="flex items-center gap-2">
                     <Edit className="w-4 h-4 text-blue-500" />
                     Edit
                   </Link>
@@ -299,7 +302,7 @@ export default function AdminStudentsPage() {
           <Button asChild
             className="bg-blue-600 hover:bg-blue-700 h-9 text-sm gap-2"
           >
-            <Link href={`/${locale}/admin/students/new`}>
+            <Link href={adminHref(locale, "students/new")}>
               <Plus className="w-4 h-4" /> Add Student
             </Link>
           </Button>
@@ -502,9 +505,17 @@ export default function AdminStudentsPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={row.id}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => router.push(adminHref(locale, `students/${row.original.id}`))}
+                    >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3">
+                        <td
+                          key={cell.id}
+                          className="px-4 py-3"
+                          onClick={cell.column.id === "actions" ? (e) => e.stopPropagation() : undefined}
+                        >
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}

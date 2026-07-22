@@ -5,9 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import {
-  ArrowLeft, Edit, Download, Printer, Plus,
+  ArrowLeft, Edit, Download, Printer,
   User, Users, Phone, Mail, MapPin, GraduationCap, Calendar,
-  BookOpen, CreditCard, Clock, CheckCircle, AlertTriangle, XCircle, QrCode,
+  BookOpen, CreditCard, Clock, AlertTriangle, QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { getStudentById } from "@/actions/students";
 import type { Student } from "@/types";
-import { formatDate } from "@/utils";
+import { formatDate, adminHref } from "@/utils";
+import { exportStudentsToExcel } from "@/lib/export";
 import StudentQrCard from "@/components/admin/students/StudentQrCard";
 
 interface PageProps { params: Promise<{ id: string }>; }
@@ -113,8 +114,8 @@ export default function StudentDetailsPage({ params }: PageProps) {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Student Not Found</h2>
           <p className="text-sm text-gray-500 mb-6">The student you are looking for does not exist or has been removed.</p>
-          <Button asChild className="bg-blue-600 hover:bg-blue-700">
-            <Link href={`/${locale}/admin/students`}><ArrowLeft className="w-4 h-4 mr-2" /> Back to Students</Link>
+          <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
+            <Link href={adminHref(locale, "students")}><ArrowLeft className="w-4 h-4 mr-2" /> Back to Students</Link>
           </Button>
         </div>
       </div>
@@ -131,7 +132,7 @@ export default function StudentDetailsPage({ params }: PageProps) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-6">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full">
-              <Link href={`/${locale}/admin/students`}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
+              <Link href={adminHref(locale, "students")}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Student Details</h1>
@@ -142,8 +143,8 @@ export default function StudentDetailsPage({ params }: PageProps) {
             <Button variant="outline" size="sm" className="h-9 gap-2 text-sm" onClick={() => window.print()}>
               <Printer className="w-4 h-4" /> Print
             </Button>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 h-9 gap-2 text-sm">
-              <Link href={`/${locale}/admin/students/${s.id}/edit`}>
+            <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900 h-9 gap-2 text-sm">
+              <Link href={adminHref(locale, `students/${s.id}/edit`)}>
                 <Edit className="w-4 h-4" /> Edit Student
               </Link>
             </Button>
@@ -152,21 +153,24 @@ export default function StudentDetailsPage({ params }: PageProps) {
 
         {/* ═══ PROFILE HEADER ═══ */}
         <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden mb-6">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 h-24 sm:h-32" />
+          <div className="bg-gradient-to-r from-school-blue-700 to-school-blue-900 h-24 sm:h-32" />
           <CardContent className="relative px-6 pb-6">
-            <div className="flex flex-col sm:flex-row items-start gap-5 -mt-12 sm:-mt-16">
-              {/* Photo */}
-              <div className="shrink-0 ring-4 ring-white rounded-full">
+            <div className="flex flex-col sm:flex-row items-start gap-5">
+              {/* Photo — only the photo overlaps the banner; it has its own
+                  white ring so it stays legible regardless of what's behind it. */}
+              <div className="shrink-0 ring-4 ring-white rounded-full -mt-12 sm:-mt-16">
                 {s.photo ? (
                   <Image src={s.photo} alt={`${s.english_first_name} ${s.english_last_name}`} width={96} height={96}
                     className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover" />
                 ) : (
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                    <User className="w-10 h-10 text-blue-500" />
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-school-blue-100 to-school-blue-200 flex items-center justify-center">
+                    <User className="w-10 h-10 text-school-blue-600" />
                   </div>
                 )}
               </div>
-              <div className="pt-2 sm:pt-4 flex-1 min-w-0">
+              {/* Text block — no negative margin, so it always starts on the
+                  white card body below the banner, never over the gradient. */}
+              <div className="pt-2 flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
@@ -211,7 +215,7 @@ export default function StudentDetailsPage({ params }: PageProps) {
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-white border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-blue-600" />
+                  <User className="w-5 h-5 text-school-blue-800" />
                   <CardTitle className="text-base font-semibold text-gray-900">Personal Information</CardTitle>
                 </div>
               </CardHeader>
@@ -235,7 +239,7 @@ export default function StudentDetailsPage({ params }: PageProps) {
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-white border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                  <GraduationCap className="w-5 h-5 text-school-blue-800" />
                   <CardTitle className="text-base font-semibold text-gray-900">Academic Information</CardTitle>
                 </div>
               </CardHeader>
@@ -262,28 +266,15 @@ export default function StudentDetailsPage({ params }: PageProps) {
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-white border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <Clock className="w-5 h-5 text-school-blue-800" />
                   <CardTitle className="text-base font-semibold text-gray-900">Attendance Summary</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                  {[
-                    { label: "Present", count: 42, icon: CheckCircle, color: "text-green-600", bg: "bg-green-50" },
-                    { label: "Late", count: 5, icon: Clock, color: "text-yellow-600", bg: "bg-yellow-50" },
-                    { label: "Absent", count: 3, icon: XCircle, color: "text-red-600", bg: "bg-red-50" },
-                    { label: "Excused", count: 2, icon: AlertTriangle, color: "text-blue-600", bg: "bg-blue-50" },
-                  ].map((item) => (
-                    <div key={item.label} className={`${item.bg} rounded-xl p-4 text-center`}>
-                      <item.icon className={`w-6 h-6 ${item.color} mx-auto mb-1`} />
-                      <p className={`text-2xl font-bold ${item.color}`}>{item.count}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{item.label}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-center py-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                   <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Attendance history will be available once the attendance module is configured.</p>
+                  <p className="text-sm font-medium text-gray-500">No attendance records yet.</p>
+                  <p className="text-xs text-gray-400 mt-1">Attendance history will be available once the attendance module is configured.</p>
                 </div>
               </CardContent>
             </Card>
@@ -291,21 +282,16 @@ export default function StudentDetailsPage({ params }: PageProps) {
             {/* Parents / Guardians */}
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-white border-b border-gray-200 px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-600" />
-                    <CardTitle className="text-base font-semibold text-gray-900">Parents / Guardians</CardTitle>
-                  </div>
-                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-                    <Plus className="w-3.5 h-3.5" /> Add Guardian
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-school-blue-800" />
+                  <CardTitle className="text-base font-semibold text-gray-900">Parents / Guardians</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="text-center py-8">
                   <User className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                   <p className="text-sm font-medium text-gray-500">No parents/guardians on file.</p>
-                  <p className="text-xs text-gray-400 mt-1">Add a parent or guardian to get started.</p>
+                  <p className="text-xs text-gray-400 mt-1">This will be available in a future update.</p>
                 </div>
               </CardContent>
             </Card>
@@ -316,7 +302,7 @@ export default function StudentDetailsPage({ params }: PageProps) {
             <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-white border-b border-gray-200 px-6 py-4">
                 <div className="flex items-center gap-2">
-                  <QrCode className="w-5 h-5 text-blue-600" />
+                  <QrCode className="w-5 h-5 text-school-blue-800" />
                   <CardTitle className="text-base font-semibold text-gray-900">Student ID Card</CardTitle>
                 </div>
               </CardHeader>
@@ -332,14 +318,18 @@ export default function StudentDetailsPage({ params }: PageProps) {
               </CardHeader>
               <CardContent className="p-4 space-y-2">
                 <Button asChild variant="outline" className="w-full justify-start h-10 gap-3 text-sm">
-                  <Link href={`/${locale}/admin/students/${s.id}/edit`}>
-                    <Edit className="w-4 h-4 text-blue-500" /> Edit Student Record
+                  <Link href={adminHref(locale, `students/${s.id}/edit`)}>
+                    <Edit className="w-4 h-4 text-school-blue-700" /> Edit Student Record
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start h-10 gap-3 text-sm">
+                <Button variant="outline" className="w-full justify-start h-10 gap-3 text-sm" onClick={() => window.print()}>
                   <Printer className="w-4 h-4 text-gray-500" /> Print Profile
                 </Button>
-                <Button variant="outline" className="w-full justify-start h-10 gap-3 text-sm">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-10 gap-3 text-sm"
+                  onClick={() => exportStudentsToExcel([s], `${s.student_id}-${s.english_last_name}`)}
+                >
                   <Download className="w-4 h-4 text-gray-500" /> Export Data
                 </Button>
               </CardContent>

@@ -24,7 +24,7 @@ import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { studentSchema, type StudentInput } from "@/schemas/validations";
 import { updateStudent, getStudentById } from "@/actions/students";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -199,7 +199,7 @@ export default function StudentEditPage({ params }: PageProps) {
     setSubmitting(false);
     if (result.success) {
       toast.success("Student updated successfully.");
-      router.push(`/${locale}/admin/students`);
+      router.push(adminHref(locale, "students"));
     } else {
       toast.error(result.error ?? "Failed to update student");
     }
@@ -221,7 +221,7 @@ export default function StudentEditPage({ params }: PageProps) {
         <div className="flex items-center justify-between py-6">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full">
-              <Link href={`/${locale}/admin/students`}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
+              <Link href={adminHref(locale, "students")}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Edit Student</h1>
@@ -485,7 +485,7 @@ export default function StudentEditPage({ params }: PageProps) {
           {/* ═══ Bottom Action ═══ */}
           <div className="flex items-center justify-end gap-3 pt-2 pb-8">
             <Button type="button" variant="outline"
-              onClick={() => router.push(`/${locale}/admin/students`)} className="h-12 px-8 rounded-xl">
+              onClick={() => router.push(adminHref(locale, "students"))} className="h-12 px-8 rounded-xl">
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}

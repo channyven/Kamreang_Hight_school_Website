@@ -22,6 +22,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { studentSchema, type StudentInput } from "@/schemas/validations";
 import { createStudent } from "@/actions/students";
+import { adminHref } from "@/utils";
 
 // ─── Config ──────────────────────────────────────────────────
 
@@ -135,7 +136,7 @@ export default function NewStudentPage() {
 
     if (result.success) {
       toast.success("Student created successfully.");
-      router.push(`/${locale}/admin/students`);
+      router.push(adminHref(locale, "students"));
     } else {
       toast.error(result.error ?? "Failed to create student");
     }
@@ -155,7 +156,7 @@ export default function NewStudentPage() {
         <div className="flex items-center justify-between py-6">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-full">
-              <Link href={`/${locale}/admin/students`}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
+              <Link href={adminHref(locale, "students")}><ArrowLeft className="w-5 h-5 text-gray-500" /></Link>
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Add New Student</h1>
@@ -421,7 +422,7 @@ export default function NewStudentPage() {
           {/* ═══ Bottom Actions ═══ */}
           <div className="flex items-center justify-end gap-3 pt-2 pb-8">
             <Button type="button" variant="outline"
-              onClick={() => router.push(`/${locale}/admin/students`)} className="h-12 px-8 rounded-xl">
+              onClick={() => router.push(adminHref(locale, "students"))} className="h-12 px-8 rounded-xl">
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}
