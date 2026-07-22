@@ -19,7 +19,7 @@ export async function createStatistics(
 
   // If setting as current, clear existing current flags first
   if (parsed.data.is_current) {
-    await supabase.from("statistics").update({ is_current: false }).neq("id", "00000000-0000-0000-0000-000000000000");
+    await supabase.from("statistics").update({ is_current: false }).eq("is_current", true);
   }
 
   const { error } = await supabase.from("statistics").insert(parsed.data);

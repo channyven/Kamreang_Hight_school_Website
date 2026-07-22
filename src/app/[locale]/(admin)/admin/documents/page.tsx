@@ -84,7 +84,7 @@ export default function AdminDocumentsPage() {
       .channel("documents-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "documents" },
+        { event: "*", schema: "public", table: "downloads" },
         () => {
           fetchDocuments();
         }

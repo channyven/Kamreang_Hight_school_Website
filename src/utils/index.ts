@@ -55,12 +55,16 @@ export function formatShortDate(date: string | Date, locale = "en"): string {
 // ─── String helpers ───────────────────────────────────────────
 
 export function slugify(text: string): string {
-  return text
+  let slug = text
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();
+  if (!slug) {
+    slug = "post-" + Array.from(text).reduce((acc, ch) => acc + ch.charCodeAt(0), 0).toString(36);
+  }
+  return slug;
 }
 
 export function truncate(text: string, length: number): string {

@@ -20,7 +20,7 @@ export default function CopyButton({ value }: { value: string }) {
     >
       {copied
         ? <Check className="w-3.5 h-3.5 text-green-500" />
-        : <Copy className="w-3.5 h-3.5" style={{ color: "#737781" }} />
+        : <Copy className="w-3.5 h-3.5 text-gray-500" />
       }
     </button>
   );

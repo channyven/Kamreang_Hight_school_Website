@@ -121,11 +121,7 @@ export default function ContactPageClient({
                 }`}
             >
               {
-                locale === "km"
-                  ?
-                  "ព័ត៌មានទំនាក់ទំនង"
-                  :
-                  "Contact Information"
+                t("information_title")
               }
             </h2>
             <div className="space-y-5 mb-8">
@@ -193,11 +189,7 @@ export default function ContactPageClient({
                 }`}
             >
               {
-                locale === "km"
-                  ?
-                  "ផ្ញើសារ"
-                  :
-                  "Send Message"
+                t("form_title")
               }
             </h2>
             <form
@@ -212,13 +204,7 @@ export default function ContactPageClient({
                   <Input
                     id="name"
                     {...register("name")}
-                    placeholder={
-                      locale === "km"
-                        ?
-                        "ឈ្មោះ"
-                        :
-                        "John Doe"
-                    }
+                    placeholder={t("name_placeholder")}
                   />
                   {
                     errors.name &&

@@ -15,7 +15,7 @@ export const contactSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z
     .string()
-    .regex(/^[\d\s+\-()]*$/, "Invalid phone number")
+    .regex(/^[\d\s+\-()]+$/, "Invalid phone number")
     .optional()
     .or(z.literal("")),
   subject: z.string().min(3, "Subject is required").max(200),

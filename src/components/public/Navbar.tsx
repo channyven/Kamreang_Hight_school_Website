@@ -106,8 +106,8 @@ export default function Navbar() {
             <div className="hidden sm:block">
               <p className={cn("text-sm font-bold leading-tight transition-colors", isTransparent ? "text-white" : "text-school-blue-800", "group-hover:text-school-gold-500")}>
                 {locale === "km"
-                  ? process.env.NEXT_PUBLIC_SCHOOL_NAME_KM
-                  : process.env.NEXT_PUBLIC_SCHOOL_NAME_EN}
+                  ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
+                  : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School")}
               </p>
             </div>
           </Link>

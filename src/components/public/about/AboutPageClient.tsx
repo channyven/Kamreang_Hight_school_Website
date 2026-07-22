@@ -216,15 +216,20 @@ function SectionHeading({
   khmer,
   english,
   subtitle,
+  km,
 }: {
   khmer: string;
   english: string;
   subtitle?: string;
+  km: boolean;
 }) {
   return (
     <div className="text-center mb-12">
-      <p className="font-khmer text-3xl md:text-4xl mb-1 text-school-blue-800">{khmer}</p>
-      <h2 className="text-2xl font-bold text-gray-900">{english}</h2>
+      {km ? (
+        <p className="font-khmer text-3xl md:text-4xl mb-1 text-school-blue-800">{khmer}</p>
+      ) : (
+        <h2 className="text-2xl font-bold text-gray-900">{english}</h2>
+      )}
       {subtitle && (
         <p className="text-xs tracking-[0.2em] uppercase font-medium text-gray-400 mt-1">
           {subtitle}
@@ -486,6 +491,7 @@ export default function AboutPageClient({
             <SectionHeading
               khmer="ស្ថិតិសាលារៀន"
               english="School at a Glance"
+              km={km}
             />
           </ScrollReveal>
 
@@ -658,6 +664,7 @@ export default function AboutPageClient({
             <SectionHeading
               khmer="ប្រវត្តិ​សាលា"
               english="School History"
+              km={km}
             />
           </ScrollReveal>
 
@@ -736,6 +743,7 @@ export default function AboutPageClient({
             <SectionHeading
               khmer="ដំណាក់កាលសំខាន់ៗ"
               english="Key Milestones"
+              km={km}
             />
           </ScrollReveal>
 
@@ -874,6 +882,7 @@ export default function AboutPageClient({
             <SectionHeading
               khmer="គណៈ​គ្រប់គ្រង​សាលា"
               english="School Leadership"
+              km={km}
             />
           </ScrollReveal>
 

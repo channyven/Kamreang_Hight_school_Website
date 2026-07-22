@@ -201,20 +201,79 @@ export interface OperationsReportContent {
     notes_km?: string;
     notes_en?: string;
   };
+  regular_testing?: {
+    monthly_tests_km?: string;
+    monthly_tests_en?: string;
+    semester_tests_km?: string;
+    semester_tests_en?: string;
+    notes_km?: string;
+    notes_en?: string;
+  };
+  planning?: {
+    school_improvement_plan_km?: string;
+    school_improvement_plan_en?: string;
+    teacher_development_plan_km?: string;
+    teacher_development_plan_en?: string;
+    student_support_plan_km?: string;
+    student_support_plan_en?: string;
+  };
+  agreements?: {
+    teacher_contracts_km?: string;
+    teacher_contracts_en?: string;
+    community_partnerships_km?: string;
+    community_partnerships_en?: string;
+  };
+  self_assessment?: {
+    model_school_standard_km?: string;
+    model_school_standard_en?: string;
+    last_assessment_date_km?: string;
+    last_assessment_date_en?: string;
+    score?: number;
+    max_score?: number;
+  };
+  awards?: {
+    awards?: { title_km: string; title_en: string; year: number }[];
+  };
+  timetables?: {
+    grade7_km?: string;
+    grade7_en?: string;
+    grade8_km?: string;
+    grade8_en?: string;
+    grade9_km?: string;
+    grade9_en?: string;
+    grade10_km?: string;
+    grade10_en?: string;
+    grade11_km?: string;
+    grade11_en?: string;
+    grade12_km?: string;
+    grade12_en?: string;
+  };
   student_stats?: {
     items?: { label_km: string; label_en: string; value: number; suffix?: string }[];
     notes_km?: string;
     notes_en?: string;
   };
+  feeder_schools?: {
+    schools?: { name_km: string; name_en: string; student_count: number }[];
+  };
+  academic_results?: {
+    grade9_pass_rate?: number;
+    grade12_pass_rate?: number;
+    top_students?: { name: string; score: number }[];
+  };
   staff_status?: { label_km: string; label_en: string; count: number }[];
   facilities?: {
     items?: { label_km: string; label_en: string; detail_km: string; detail_en: string }[];
+    textbook_status?: { subject_km: string; subject_en: string; student_ratio: number }[];
     notes_km?: string;
     notes_en?: string;
   };
   budget?: {
     currency?: string;
-    items?: { label_km: string; label_en: string; amount: number }[];
+    total_budget?: number;
+    community_support?: number;
+    expenditure?: { label_km: string; label_en: string; amount: number }[];
+    remaining_balance?: number;
     notes_km?: string;
     notes_en?: string;
   };

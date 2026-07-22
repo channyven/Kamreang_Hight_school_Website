@@ -11,7 +11,15 @@ import {
   getSectionIcon,
   GeneralInfoSection,
   TeachingHoursSection,
+  RegularTestingSection,
+  PlanningSection,
+  AgreementsSection,
+  SelfAssessmentSection,
+  AwardsSection,
+  TimetablesSection,
   StudentStatsSection,
+  FeederSchoolsSection,
+  AcademicResultsSection,
   StaffStatusSection,
   FacilitiesSection,
   BudgetSection,
@@ -27,6 +35,9 @@ export default function ReportClient({
   report: SchoolReport;
   locale: Locale;
 }) {
+  // Note: the parent always provides a non-null report (it renders
+  // NoReportPlaceholder when the DB has no published report).
+
   const t = useTranslations("report");
   const [active, setActive] = useState(reportSections[0].id);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -137,19 +148,51 @@ export default function ReportClient({
           <GeneralInfoSection data={report.general} locale={locale} />
         </SectionShell>
 
-        <SectionShell id="teaching" title={t("teaching")} icon={getSectionIcon("Clock")}>
+        <SectionShell id="teachingHours" title={t("teachingHours")} icon={getSectionIcon("Clock")}>
           <TeachingHoursSection data={report.teachingHours} locale={locale} />
         </SectionShell>
 
-        <SectionShell id="students" title={t("students")} icon={getSectionIcon("Users")}>
+        <SectionShell id="regularTesting" title={t("regularTesting")} icon={getSectionIcon("ClipboardCheck")}>
+          <RegularTestingSection data={report.regularTesting} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="planning" title={t("planning")} icon={getSectionIcon("Book")}>
+          <PlanningSection data={report.planning} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="agreements" title={t("agreements")} icon={getSectionIcon("FileText")}>
+          <AgreementsSection data={report.agreements} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="selfAssessment" title={t("selfAssessment")} icon={getSectionIcon("Award")}>
+          <SelfAssessmentSection data={report.selfAssessment} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="awards" title={t("awards")} icon={getSectionIcon("Trophy")}>
+          <AwardsSection data={report.awards} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="timetables" title={t("timetables")} icon={getSectionIcon("Calendar")}>
+          <TimetablesSection data={report.timetables} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="studentStats" title={t("studentStats")} icon={getSectionIcon("Users")}>
           <StudentStatsSection data={report.studentStats} locale={locale} />
         </SectionShell>
 
-        <SectionShell id="staff" title={t("staff")} icon={getSectionIcon("UserCheck")}>
+        <SectionShell id="feederSchools" title={t("feederSchools")} icon={getSectionIcon("Building")}>
+          <FeederSchoolsSection data={report.feederSchools} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="academicResults" title={t("academicResults")} icon={getSectionIcon("BarChart2")}>
+          <AcademicResultsSection data={report.academicResults} locale={locale} />
+        </SectionShell>
+
+        <SectionShell id="staffStatus" title={t("staffStatus")} icon={getSectionIcon("UserCheck")}>
           <StaffStatusSection data={report.staffStatus} locale={locale} />
         </SectionShell>
 
-        <SectionShell id="facilities" title={t("facilities")} icon={getSectionIcon("Building2")}>
+        <SectionShell id="textbookStatus" title={t("textbookStatus")} icon={getSectionIcon("BookOpen")}>
           <FacilitiesSection data={report.facilities} locale={locale} />
         </SectionShell>
 
@@ -161,7 +204,7 @@ export default function ReportClient({
           <ChallengesSection data={report.challenges} locale={locale} />
         </SectionShell>
 
-        <SectionShell id="future" title={t("future")} icon={getSectionIcon("Rocket")}>
+        <SectionShell id="futureDirection" title={t("futureDirection")} icon={getSectionIcon("Rocket")}>
           <FutureDirectionSection data={report.futureDirection} locale={locale} />
         </SectionShell>
 

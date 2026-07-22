@@ -22,12 +22,14 @@ INSERT INTO activity_categories (name_km, name_en, slug, color, sort_order) VALU
 ON CONFLICT (slug) DO NOTHING;
 
 -- ─── Download Categories ─────────────────────────────────────
+-- Slugs must match CATEGORY_SLUG_MAP in src/lib/document-helpers.ts so the
+-- document create/edit forms can resolve the selected category to a category_id.
 INSERT INTO download_categories (name_km, name_en, slug, icon, sort_order) VALUES
-  ('បែបបទចុះឈ្មោះ', 'Registration Forms', 'registration', 'file-text', 1),
-  ('គោលនយោបាយសាលា', 'School Policies', 'policies', 'shield', 2),
-  ('កាលវិភាគសិក្សា', 'Academic Calendar', 'calendar', 'calendar', 3),
-  ('ឯកសារផ្លូវការ', 'Official Documents', 'official', 'file', 4),
-  ('ឯកសារប្រលង', 'Exam Documents', 'exams', 'clipboard', 5)
+  ('របាយការណ៍', 'Reports', 'reports', 'file-bar', 1),
+  ('លទ្ធផលប្រឡង', 'Exam Results', 'exam-results', 'clipboard', 2),
+  ('បែបបទ', 'Forms', 'registration-forms', 'file-text', 3),
+  ('គោលនយោបាយ', 'Policies', 'school-policies', 'shield', 4),
+  ('ឯកសារផ្សេងៗ', 'Other', 'other-documents', 'file', 5)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ─── School Information ───────────────────────────────────────

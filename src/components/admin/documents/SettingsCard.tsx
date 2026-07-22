@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import type { Control, FieldErrors } from "react-hook-form";
 import { useController } from "react-hook-form";
 import { useLocale } from "next-intl";
@@ -13,7 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { DOCUMENT_CATEGORIES } from "@/types";
+import { getDocumentCategories } from "@/actions/Document";
+import type { DocumentCategoryOption } from "@/actions/Document";
 
 interface SettingsCardProps {
   control: Control<DocumentInput>;
@@ -22,9 +24,15 @@ interface SettingsCardProps {
 
 /**
  * Sidebar card with Category select, Sort Order input, and Active toggle.
+ * Categories are loaded from the database with a hardcoded fallback.
  */
 export default function SettingsCard({ control, errors }: SettingsCardProps) {
   const locale = useLocale();
+  const [categories, setCategories] = useState<DocumentCategoryOption[]>([]);
+
+  useEffect(() => {
+    getDocumentCategories().then(setCategories);
+  }, []);
 
   const { field: categoryField } = useController({
     name: "category",
@@ -60,7 +68,7 @@ export default function SettingsCard({ control, errors }: SettingsCardProps) {
             />
           </SelectTrigger>
           <SelectContent>
-            {DOCUMENT_CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <SelectItem key={cat.key} value={cat.key}>
                 {locale === "km" ? cat.labelKm : cat.labelEn}
               </SelectItem>
