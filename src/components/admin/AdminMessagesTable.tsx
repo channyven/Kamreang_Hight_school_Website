@@ -1,6 +1,6 @@
 "use client";
 
-import { formatRelativeDate } from "@/utils";
+import { formatRelativeDate, cn } from "@/utils";
 import type { Message } from "@/types";
 
 interface AdminMessagesTableProps {
@@ -13,47 +13,42 @@ export default function AdminMessagesTable({ messages }: AdminMessagesTableProps
       {messages.map((msg, i) => (
         <tr
           key={msg.id}
-          className="transition-colors"
-          style={{
-            borderBottom: i < messages.length - 1 ? "1px solid #eaeff6" : undefined,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#f8faff")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+          className={cn(
+            "transition-colors hover:bg-muted/50",
+            i < messages.length - 1 && "border-b border-border"
+          )}
         >
           <td className="px-5 py-3.5">
             <div className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                style={{ background: "#e8f0fe", color: "#1a56db" }}
-              >
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-primary/10 text-primary">
                 {msg.name[0]?.toUpperCase()}
               </div>
               <div>
-                <p className="font-medium leading-tight" style={{ color: "#0d1c2f" }}>
+                <p className="font-medium leading-tight text-foreground">
                   {msg.name}
                 </p>
-                <p className="text-xs" style={{ color: "#8892a0" }}>{msg.email}</p>
+                <p className="text-xs text-muted-foreground">{msg.email}</p>
               </div>
             </div>
           </td>
           <td className="px-5 py-3.5 max-w-[200px]">
-            <p className="truncate" style={{ color: "#434750" }}>{msg.subject}</p>
+            <p className="truncate text-foreground/70">{msg.subject}</p>
           </td>
           <td className="px-5 py-3.5">
             <span
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-              style={
+              className={cn(
+                "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
                 msg.status === "unread"
-                  ? { background: "#fef2f2", color: "#dc2626" }
+                  ? "bg-destructive/10 text-destructive"
                   : msg.status === "replied"
-                  ? { background: "#dcfce7", color: "#15803d" }
-                  : { background: "#f4f6fb", color: "#8892a0" }
-              }
+                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-muted text-muted-foreground"
+              )}
             >
               {msg.status === "unread" ? "New" : msg.status === "replied" ? "Replied" : "Read"}
             </span>
           </td>
-          <td className="px-5 py-3.5 text-xs" style={{ color: "#8892a0" }}>
+          <td className="px-5 py-3.5 text-xs text-muted-foreground">
             {formatRelativeDate(msg.created_at)}
           </td>
         </tr>
