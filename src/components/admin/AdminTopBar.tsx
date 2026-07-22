@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { Bell, ExternalLink, LogOut, Menu, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ExternalLink, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
+import { locales, localeNames } from "@/i18n/config";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,9 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { motion, LayoutGroup } from "framer-motion";
 import { useAuth } from "@/providers/AuthContext";
+import { useTheme } from "@/hooks/use-theme";
 import { getInitials, adminHref, cn } from "@/utils";
-import type { Locale } from "@/i18n/config";
+import { useAdminLocale } from "@/providers/AdminLocaleProvider";
 import {
   Dialog,
   DialogContent,
@@ -27,9 +32,11 @@ import { Button } from "@/components/ui/button";
 
 export default function AdminTopBar() {
   const { user, logout } = useAuth();
-  const locale = useLocale() as Locale;
+  const { locale, switchLocale } = useAdminLocale();
   const t = useTranslations("admin");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const { theme, toggleTheme, mounted } = useTheme();
 
   const roleLabel =
     user?.role === "administrator"
@@ -42,96 +49,119 @@ export default function AdminTopBar() {
 
   return (
     <header
-      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30"
-      style={{
-        background: "#fff",
-        borderBottom: "1px solid #f4f4f4",
-        boxShadow: "0 1px 3px rgba(44,42,122,0.04)",
-      }}
+      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30 bg-background border-b border-border shadow-sm"
     >
       {/* Left: mobile menu + search */}
       <div className="flex items-center gap-3 flex-1 max-w-md">
         <button
-          className="lg:hidden p-2 rounded-lg transition-colors"
-          style={{ color: "#848484" }}
+          className="lg:hidden p-2 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Search */}
-        <div
-          className="hidden sm:flex items-center gap-2 flex-1 h-9 px-3 rounded-xl text-sm"
-          style={{ background: "#f4f4f4", color: "#848484" }}
-        >
+        <div className="hidden sm:flex items-center gap-2 flex-1 h-9 px-3 rounded-xl text-sm bg-muted text-muted-foreground">
           <Search className="w-4 h-4 shrink-0" />
           <input
             type="text"
             placeholder={locale === "km" ? "ស្វែងរក..." : "Search…"}
             className={cn(
-              "flex-1 bg-transparent outline-none text-sm placeholder:text-current",
+              "flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground text-foreground",
               locale === "km" && "font-khmer"
             )}
-            style={{ color: "#636363" }}
           />
         </div>
       </div>
 
-      {/* Right: view site + bell + user */}
+      {/* Right: view site + dark mode toggle + language + user */}
       <div className="flex items-center gap-1.5">
         <Link
           href={`/${locale}`}
           target="_blank"
           className={cn(
-            "hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium transition-colors mr-1",
+            "hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium transition-colors mr-1 text-muted-foreground hover:text-primary hover:bg-muted",
             locale === "km" && "font-khmer"
           )}
-          style={{ color: "#848484" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#2c2a7a")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#848484")}
         >
           <ExternalLink className="w-3.5 h-3.5" />
           {locale === "km" ? "មើលគេហទំព័រ" : "View Site"}
         </Link>
 
-        {/* Notification bell */}
+        {/* Dark mode toggle */}
         <button
-          className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors"
-          style={{ color: "#848484" }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+          className="flex items-center justify-center w-9 h-9 rounded-xl transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
         >
-          <Bell className="w-5 h-5" />
-          <span
-            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-white"
-            style={{ background: "#ef4444" }}
-          />
+          {mounted && theme === "dark" ? (
+            <Sun style={{ width: 18, height: 18 }} />
+          ) : (
+            <Moon style={{ width: 18, height: 18 }} />
+          )}
         </button>
+
+        {/* Language switcher */}
+        <LayoutGroup>
+          <div className="flex items-center gap-0.5 h-9 rounded-xl px-1.5 bg-muted">
+            {locales.map((loc) => (
+              <button
+                key={loc}
+                onClick={() => switchLocale(loc)}
+                className={cn(
+                  "relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150",
+                  locale === "km" && "font-khmer",
+                  loc === locale
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-primary"
+                )}
+                title={localeNames[loc]}
+              >
+                {loc === locale && (
+                  <motion.div
+                    layoutId="active-lang"
+                    className="absolute inset-0 rounded-lg bg-primary"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1">
+                  <span className="relative w-4 h-3 overflow-hidden rounded-sm shrink-0">
+                    <Image
+                      src={`/icons/flag-${loc}.svg`}
+                      alt={localeNames[loc]}
+                      fill
+                      className="object-contain"
+                      sizes="16px"
+                    />
+                  </span>
+                  <span>{loc.toUpperCase()}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </LayoutGroup>
 
         {/* User dropdown */}
         {user && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
-                className="flex items-center gap-2.5 h-9 pl-2 pr-3 rounded-xl transition-colors ml-1"
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-              >
+              <button className="flex items-center gap-2.5 h-9 pl-2 pr-3 rounded-xl transition-colors ml-1 hover:bg-muted">
                 <Avatar className="w-7 h-7">
                   <AvatarImage src={user.avatar_url} />
                   <AvatarFallback
-                    className="text-xs font-bold text-white"
-                    style={{ background: "#2c2a7a" }}
+                    className="text-xs font-bold text-white bg-primary"
                   >
                     {getInitials(user.full_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-semibold leading-none" style={{ color: "#2c2a7a" }}>
+                  <p className="text-sm font-semibold leading-none text-primary">
                     {user.full_name}
                   </p>
                   <p
-                    className={cn("text-[11px] leading-none mt-0.5", locale === "km" && "font-khmer")}
-                    style={{ color: "#848484" }}
+                    className={cn(
+                      "text-[11px] leading-none mt-0.5 text-muted-foreground",
+                      locale === "km" && "font-khmer"
+                    )}
                   >
                     {roleLabel}
                   </p>
@@ -143,7 +173,7 @@ export default function AdminTopBar() {
                 <Link href={adminHref(locale, "profile")}>{t("profile")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)} className="text-red-600 gap-2">
+              <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)} className="text-destructive gap-2">
                 <LogOut className="w-3.5 h-3.5" />
                 {t("logout")}
               </DropdownMenuItem>

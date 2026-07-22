@@ -2,13 +2,14 @@
 
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
-  School, ChevronLeft, ChevronRight, LogOut, X, Plus,
+  ChevronLeft, ChevronRight, LogOut, X, Plus,
   GraduationCap, Landmark, BookOpen, Heart, Image as ImageIcon, Phone,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
@@ -94,23 +95,25 @@ export default function AdminSidebar() {
       {/* Brand */}
       <div
         className={cn(
-          "flex items-center gap-3 px-4 py-5 border-b",
+          "flex items-center gap-3 px-4 py-5 border-b border-[rgba(255,255,255,0.08)]",
           collapsed ? "justify-center px-3" : ""
         )}
-        style={{ borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div
-          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: "#dfad32" }}
-        >
-          <School className="w-5 h-5 text-white" />
+        <div className="relative w-9 h-9 rounded-xl overflow-hidden shrink-0 ring-2 ring-white/20">
+          <Image
+            src="/images/about/kamrieng%20high%20school.jpg"
+            alt="School logo"
+            fill
+            className="object-cover"
+            sizes="36px"
+          />
         </div>
         {!collapsed && (
           <div className="min-w-0">
             <p className={cn("text-sm font-bold text-white leading-tight", locale === "km" && "font-khmer")}>
               {t("portal_name")}
             </p>
-            <p className="text-xs leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
+            <p className="text-xs leading-tight mt-0.5 text-[rgba(255,255,255,0.45)]">
               {locale === "km"
                 ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
                 : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School")}
@@ -125,10 +128,9 @@ export default function AdminSidebar() {
           <Link
             href={adminHref(locale, "news/new")}
             className={cn(
-              "flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95",
+              "flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95 bg-secondary text-secondary-foreground",
               locale === "km" && "font-khmer"
             )}
-            style={{ background: "#dfad32", color: "#191845" }}
           >
             <Plus className="w-4 h-4" />
             {t("create_new_post")}
@@ -139,8 +141,7 @@ export default function AdminSidebar() {
         <div className="px-2 pt-4 pb-2">
           <Link
             href={adminHref(locale, "news/new")}
-            className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
-            style={{ background: "#dfad32", color: "#191845" }}
+            className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90 bg-secondary text-secondary-foreground"
             title={t("create_new_post")}
           >
             <Plus className="w-4 h-4" />
@@ -149,7 +150,7 @@ export default function AdminSidebar() {
       )}
 
       {/* Nav groups */}
-      <nav className="flex-1 px-3 pb-3 overflow-y-auto scrollbar-thin" style={{ paddingTop: 8 }}>
+      <nav className="flex-1 px-3 pb-3 overflow-y-auto scrollbar-thin" style={{ paddingTop: "8px" }}>
         {NAV_GROUPS.map((group) => {
           const groupItems = visibleItems.filter((i) => group.keys.includes(i.key));
           if (groupItems.length === 0) return null;
@@ -158,10 +159,9 @@ export default function AdminSidebar() {
               {!collapsed && (
                 <p
                   className={cn(
-                    "text-[10px] font-semibold uppercase tracking-widest px-3 mb-1",
+                    "text-[10px] font-semibold uppercase tracking-widest px-3 mb-1 text-[rgba(255,255,255,0.3)]",
                     locale === "km" && "font-khmer normal-case tracking-normal"
                   )}
-                  style={{ color: "rgba(255,255,255,0.3)" }}
                 >
                   {t(group.labelKey as Parameters<typeof t>[0])}
                 </p>
@@ -179,13 +179,13 @@ export default function AdminSidebar() {
                         "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
                         collapsed && "justify-center px-2",
                         active
-                          ? "text-white"
-                          : "hover:text-white"
+                          ? "text-[#dfad32]"
+                          : "text-[rgba(255,255,255,0.5)] hover:text-white"
                       )}
                       style={
                         active
-                          ? { background: "rgba(223,173,50,0.15)", color: "#dfad32" }
-                          : { color: "rgba(255,255,255,0.5)" }
+                          ? { background: "rgba(223,173,50,0.15)" }
+                          : {}
                       }
                     >
                       <span className="shrink-0">{item.icon}</span>
@@ -204,21 +204,15 @@ export default function AdminSidebar() {
       </nav>
 
       {/* User footer */}
-      <div
-        className="px-3 py-3 border-t"
-        style={{ borderColor: "rgba(255,255,255,0.08)" }}
-      >
+      <div className="px-3 py-3 border-t border-[rgba(255,255,255,0.08)]">
         {!collapsed && user && (
           <div className="flex items-center gap-2.5 px-1 mb-2">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-              style={{ background: "rgba(223,173,50,0.2)", color: "#dfad32" }}
-            >
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-[rgba(223,173,50,0.2)] text-[#dfad32]">
               {user.full_name?.[0]?.toUpperCase() ?? "A"}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-medium text-white truncate leading-tight">{user.full_name}</p>
-              <p className="text-[11px] truncate leading-tight" style={{ color: "rgba(255,255,255,0.4)" }}>
+              <p className="text-[11px] truncate leading-tight text-[rgba(255,255,255,0.4)]">
                 {user.email}
               </p>
             </div>
@@ -228,12 +222,9 @@ export default function AdminSidebar() {
           onClick={() => setShowLogoutConfirm(true)}
           title={t("logout")}
           className={cn(
-            "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors",
+            "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors text-[rgba(255,255,255,0.45)] hover:text-white",
             collapsed ? "justify-center" : ""
           )}
-          style={{ color: "rgba(255,255,255,0.45)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
         >
           <LogOut className="w-4 h-4 shrink-0" />
           {!collapsed && <span className={cn(locale === "km" && "font-khmer")}>{t("logout")}</span>}
@@ -289,8 +280,8 @@ export default function AdminSidebar() {
 
       {/* Collapse toggle (desktop) */}
       <button
-        className="hidden lg:flex absolute -right-3.5 top-20 w-7 h-7 rounded-full items-center justify-center text-white border transition-all duration-150"
-        style={{ background: "#191845", borderColor: "rgba(255,255,255,0.12)" }}
+        className="hidden lg:flex absolute -right-3.5 top-20 w-7 h-7 rounded-full items-center justify-center text-white border border-[rgba(255,255,255,0.12)] transition-all duration-150"
+        style={{ background: "hsl(var(--admin-sidebar-bg))" }}
         onClick={() => setCollapsed((c) => !c)}
       >
         {collapsed
@@ -308,7 +299,7 @@ export default function AdminSidebar() {
           "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40",
           collapsed ? "w-16" : "w-60"
         )}
-        style={{ background: "#191845" }}
+        style={{ background: "hsl(var(--admin-sidebar-bg))" }}
       >
         <SidebarContent />
       </aside>
@@ -330,11 +321,10 @@ export default function AdminSidebar() {
               exit={{ x: -256 }}
               transition={{ type: "tween", duration: 0.25 }}
               className="lg:hidden fixed top-0 left-0 h-full w-60 z-50"
-              style={{ background: "#191845" }}
+              style={{ background: "hsl(var(--admin-sidebar-bg))" }}
             >
               <button
-                className="absolute top-4 right-4 hover:text-white transition-colors"
-                style={{ color: "rgba(255,255,255,0.5)" }}
+                className="absolute top-4 right-4 hover:text-white transition-colors text-[rgba(255,255,255,0.5)]"
                 onClick={() => setMobileOpen(false)}
               >
                 <X className="w-5 h-5" />

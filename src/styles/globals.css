@@ -31,6 +31,11 @@
     --school-gold-main: 42.7 73% 53.5%;  /* #dfad32 */
     --school-gray: 0 0% 85%;             /* #d8d8d8 */
     --school-green: 96.4 46.2% 49.6%;    /* #72b944 — optional accent */
+
+    /* Admin-specific CSS variables */
+    --admin-sidebar-bg: 241 49% 9%;       /* #191845 */
+    --admin-page-bg: 0 0% 96%;            /* #f4f4f4 */
+    --admin-card-bg: 0 0% 100%;           /* #ffffff */
   }
 
   .dark {
@@ -53,8 +58,28 @@
     --border: 241 25% 20%;
     --input: 241 25% 20%;
     --ring: 241.4 48.8% 66.3%;
+
+    /* Admin-specific dark mode overrides */
+    --admin-sidebar-bg: 241 55% 4%;       /* very dark navy for sidebar */
+    --admin-page-bg: 241 40% 11%;         /* matching --card */
+    --admin-card-bg: 241 35% 14%;         /* slightly lighter than page */
+
   }
+
 }
+
+  /* ─── Dark mode overrides for common Tailwind utility classes ───
+       Using !important to override Tailwind's utilities layer.         */
+  .dark .bg-white { background: hsl(var(--admin-card-bg)) !important; }
+  .dark .text-gray-900 { color: hsl(var(--foreground)) !important; }
+  .dark .text-gray-700 { color: hsl(var(--foreground)) !important; }
+  .dark .text-gray-500 { color: hsl(var(--muted-foreground)) !important; }
+  .dark .text-gray-400 { color: hsl(var(--muted-foreground)) !important; }
+  .dark .text-gray-600 { color: hsl(var(--muted-foreground)) !important; }
+  .dark .border-gray-200 { border-color: hsl(var(--border)) !important; }
+  .dark .border-gray-100 { border-color: hsl(var(--border)) !important; }
+  .dark .bg-gray-50 { background: hsl(var(--muted)) !important; }
+  .dark .bg-gray-100 { background: hsl(var(--muted)) !important; }
 
 @layer base {
   * {
@@ -241,6 +266,17 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Admin page dark mode utility classes */
+  .admin-page-bg {
+    background: hsl(var(--admin-page-bg));
+  }
+  .admin-card-bg {
+    background: hsl(var(--admin-card-bg));
+  }
+  .admin-sidebar-bg {
+    background: hsl(var(--admin-sidebar-bg));
   }
 
   /* Glass morphism */

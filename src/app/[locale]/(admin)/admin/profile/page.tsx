@@ -265,7 +265,7 @@ export default function AdminProfilePage() {
   const avatarError = errors.avatar_url;
 
   return (
-    <div className="min-h-full" style={{ background: "#f4f6fb" }}>
+    <div className="min-h-full admin-page-bg">
       <div className="max-w-3xl mx-auto p-6 space-y-6">
 
         {/* ── Page header ── */}
@@ -282,9 +282,8 @@ export default function AdminProfilePage() {
 
         {/* ── Profile avatar card ── */}
         <div
-          className="rounded-2xl overflow-hidden"
+          className="rounded-2xl overflow-hidden admin-card-bg"
           style={{
-            background: "#fff",
             boxShadow: "0px 2px 12px rgba(13,27,56,0.06)",
           }}
         >
@@ -345,16 +344,12 @@ export default function AdminProfilePage() {
         {/* ── Edit form ── */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div
-            className="rounded-2xl overflow-hidden"
+            className="rounded-2xl overflow-hidden admin-card-bg"
             style={{
-              background: "#fff",
               boxShadow: "0px 2px 12px rgba(13,27,56,0.06)",
             }}
           >
-            <div
-              className="px-6 py-4 border-b"
-              style={{ borderColor: "#eaeff6" }}
-            >
+            <div className="px-6 py-4 border-b border-border">
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-semibold" style={{ color: "#0d1c2f" }}>
                   {locale === "km" ? "កែសម្រួលព័ត៌មាន" : "Edit Information"}
@@ -564,13 +559,12 @@ export default function AdminProfilePage() {
 
         {/* ── Account meta info ── */}
         <div
-          className="rounded-2xl p-6"
+          className="rounded-2xl p-6 admin-card-bg"
           style={{
-            background: "#fff",
             boxShadow: "0px 2px 12px rgba(13,27,56,0.06)",
           }}
         >
-          <h2 className="text-sm font-semibold mb-4" style={{ color: "#8892a0" }}>
+          <h2 className="text-sm font-semibold mb-4 text-muted-foreground">
             {locale === "km" ? "ព័ត៌មានគណនី" : "Account Details"}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -616,9 +610,8 @@ export default function AdminProfilePage() {
 
         {/* ── Password change section ── */}
         <div
-          className="rounded-2xl overflow-hidden"
+          className="rounded-2xl overflow-hidden admin-card-bg"
           style={{
-            background: "#fff",
             boxShadow: "0px 2px 12px rgba(13,27,56,0.06)",
           }}
         >

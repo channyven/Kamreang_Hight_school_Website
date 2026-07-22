@@ -22,10 +22,10 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-school-blue-800 mx-auto mb-4" />
-          <p className="text-gray-500 text-sm">Loading...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -34,7 +34,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-muted flex">
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
         <AdminTopBar />

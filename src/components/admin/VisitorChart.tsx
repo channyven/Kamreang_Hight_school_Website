@@ -43,13 +43,13 @@ export default function VisitorChart() {
         />
         <Tooltip
           contentStyle={{
-            background: "#fff",
-            border: "1px solid #e8edf5",
+            background: "var(--tooltip-bg, #fff)",
+            border: "1px solid var(--tooltip-border, #e8edf5)",
             borderRadius: 10,
             boxShadow: "0px 4px 20px rgba(30,78,140,0.10)",
             fontSize: 12,
           }}
-          labelStyle={{ color: "#0d1c2f", fontWeight: 600, marginBottom: 4 }}
+          labelStyle={{ color: "var(--tooltip-label, #0d1c2f)", fontWeight: 600, marginBottom: 4 }}
         />
         <Area
           type="monotone"
