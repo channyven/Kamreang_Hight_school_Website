@@ -1,5 +1,7 @@
 import { createServerClient } from "@/lib/supabase";
 import { getLocale } from "next-intl/server";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   Newspaper, MessageSquare,
   TrendingUp, TrendingDown, ArrowRight,
@@ -39,6 +41,15 @@ const ACTION_COLORS: Record<string, string> = {
 
 export default async function AdminDashboardPage() {
   const locale = await getLocale();
+
+  // Server-side guard: redirect unauthenticated users to the login page.
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get("__session")?.value;
+  if (!sessionCookie) {
+    const loginUrl = `/${locale}/auth/login`;
+    redirect(`${loginUrl}?redirect=/${locale}/admin`);
+  }
+
   const data = await getDashboardData();
 
   const now = new Date();
