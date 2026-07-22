@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { labelKey: "nav_group_overview", keys: ["dashboard", "statistics"] },
-  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "governance", "news", "achievements", "documents", "contact", "donate"] },
+  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "student_cards", "governance", "news", "achievements", "documents", "contact", "donate"] },
   { labelKey: "nav_group_inbox", keys: ["messages"] },
   { labelKey: "nav_group_system", keys: ["users", "settings"] },
 ];
@@ -50,6 +50,7 @@ export default function AdminSidebar() {
       { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
       { key: "teachers", href: adminHref(locale, "teachers"), icon: <GraduationCap className="w-4 h-4" /> },
       { key: "students", href: adminHref(locale, "students"), icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
+      { key: "student_cards", href: adminHref(locale, "students/cards"), icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
       { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
       { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
       { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
@@ -71,13 +72,35 @@ export default function AdminSidebar() {
     [allNavItems, hasPermission]
   );
 
-  const isActive = useCallback(
-    (href: string) => {
-      if (href === adminHref(locale)) return pathname === adminHref(locale);
-      return pathname.startsWith(href);
-    },
-    [locale, pathname]
-  );
+  // Compute the single best-matching nav item so that parent routes like
+  // /students don't stay highlighted when a child route like /students/cards is active.
+  const activeHref = useMemo(() => {
+    let best = "";
+    let bestLen = 0;
+    const base = adminHref(locale);
+
+    for (const item of visibleItems) {
+      const href = item.href;
+
+      // Dashboard: exact match only
+      if (href === base) {
+        if (pathname === base) return href;
+        continue;
+      }
+
+      // Check if pathname matches this href as a proper URL segment boundary.
+      // This prevents /students from matching /students-cards or /students_extra,
+      // while still matching /students/123.
+      if (pathname === href || pathname.startsWith(href + "/")) {
+        if (href.length > bestLen) {
+          best = href;
+          bestLen = href.length;
+        }
+      }
+    }
+
+    return best;
+  }, [visibleItems, pathname, locale]);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full relative">
@@ -158,7 +181,7 @@ export default function AdminSidebar() {
               )}
               <div className="space-y-0.5">
                 {groupItems.map((item) => {
-                  const active = isActive(item.href);
+                  const active = item.href === activeHref;
                   return (
                     <Link
                       key={item.key}

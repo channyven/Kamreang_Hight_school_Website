@@ -288,10 +288,11 @@ export default function StudentDetailsPage({ params }: PageProps) {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <User className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-gray-500">No parents/guardians on file.</p>
-                  <p className="text-xs text-gray-400 mt-1">This will be available in a future update.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <InfoRow label="Father's Name (English)" value={s.father_name} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Father's Name (Khmer)" value={s.father_name_km} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Mother's Name (English)" value={s.mother_name} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Mother's Name (Khmer)" value={s.mother_name_km} icon={<User className="w-4 h-4" />} />
                 </div>
               </CardContent>
             </Card>

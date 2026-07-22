@@ -64,10 +64,235 @@ export function downloadQrCode(
 ): void {
   const link = document.createElement("a");
   link.href = qrDataUrl;
-  link.download = `${fileName}-qr.png`;
+  link.download = `${fileName}_QR.png`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+/**
+ * Print a focused QR card for a single student — used from the QR detail modal.
+ */
+export function printQrCard(student: {
+  name: string;
+  nameKm?: string;
+  studentId: string;
+  qrDataUrl: string;
+  photo?: string | null;
+  gender?: string | null;
+  dateOfBirth?: string | null;
+  className?: string | null;
+  academicYear?: string | null;
+}): void {
+  const win = window.open("", "_blank");
+  if (!win) return;
+
+  const photoHtml = student.photo
+    ? `<img src="${student.photo}" alt="Photo" class="photo" />`
+    : `<div class="photo-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>`;
+
+  const now = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const formatDate = (d: string | null | undefined) => {
+    if (!d) return "";
+    try {
+      return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return d;
+    }
+  };
+
+  const genderLabel = student.gender
+    ? student.gender.charAt(0).toUpperCase() + student.gender.slice(1)
+    : "";
+
+  win.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Code - ${student.name}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 portrait; margin: 20mm; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f8fafc;
+      padding: 20px;
+    }
+    .print-container { max-width: 500px; width: 100%; }
+    .qr-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border: 1px solid #e2e8f0;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      padding: 24px 28px;
+      text-align: center;
+    }
+    .card-header .school-name {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .card-header .school-sub {
+      color: rgba(255,255,255,0.6);
+      font-size: 11px;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+    .card-body { padding: 28px; }
+    .main-row { display: flex; gap: 24px; align-items: center; }
+    .photo-section { flex-shrink: 0; }
+    .photo {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #e2e8f0;
+    }
+    .photo-placeholder {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 3px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .info-section { flex: 1; }
+    .info-section .name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .info-section .name-kh {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 2px;
+      font-family: 'Khmer OS', 'Moul', serif;
+    }
+    .info-section .id {
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .detail-item {}
+    .detail-item .label {
+      font-size: 9px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .detail-item .value {
+      font-size: 13px;
+      color: #0f172a;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .qr-section img {
+      width: 180px;
+      height: 180px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      padding: 8px;
+      background: white;
+    }
+    .qr-section .scan-label {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 6px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+    .card-footer {
+      text-align: center;
+      padding: 12px 28px;
+      background: #fafbfc;
+      border-top: 1px solid #f1f5f9;
+    }
+    .card-footer .printed-date {
+      font-size: 9px;
+      color: #94a3b8;
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .qr-card { box-shadow: none; border: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-container">
+    <div class="qr-card">
+      <div class="card-header">
+        <div class="school-name">KAMRIENG HIGH SCHOOL</div>
+        <div class="school-sub">Student QR Identification</div>
+      </div>
+      <div class="card-body">
+        <div class="main-row">
+          <div class="photo-section">${photoHtml}</div>
+          <div class="info-section">
+            <div class="name">${student.name}</div>
+            ${student.nameKm ? `<div class="name-kh">${student.nameKm}</div>` : ""}
+            <div class="id">${student.studentId}</div>
+          </div>
+        </div>
+
+        <div class="details">
+          ${genderLabel ? `<div class="detail-item"><div class="label">Gender</div><div class="value">${genderLabel}</div></div>` : ""}
+          ${student.dateOfBirth ? `<div class="detail-item"><div class="label">Date of Birth</div><div class="value">${formatDate(student.dateOfBirth)}</div></div>` : ""}
+          ${student.className ? `<div class="detail-item"><div class="label">Class</div><div class="value">${student.className}</div></div>` : ""}
+          ${student.academicYear ? `<div class="detail-item"><div class="label">Academic Year</div><div class="value">${student.academicYear}</div></div>` : ""}
+        </div>
+
+        <div class="qr-section">
+          <img src="${student.qrDataUrl}" alt="QR Code" />
+          <div class="scan-label">Scan to view student profile</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="printed-date">Printed on ${now}</div>
+      </div>
+    </div>
+  </div>
+  <script>window.onload = function() { setTimeout(function() { window.print(); setTimeout(function() { window.close(); }, 500); }, 500); }</script>
+</body>
+</html>
+  `);
+  win.document.close();
 }
 
 /**

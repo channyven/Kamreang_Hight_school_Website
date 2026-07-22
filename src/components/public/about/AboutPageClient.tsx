@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Quote,
   Mail,
-  Phone,
   Calendar,
   MapPin,
   Users,

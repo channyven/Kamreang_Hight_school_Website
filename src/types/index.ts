@@ -403,6 +403,10 @@ export interface Student {
   semester?: string;
   gpa?: number;
   credits_earned?: number;
+  father_name?: string;
+  father_name_km?: string;
+  mother_name?: string;
+  mother_name_km?: string;
   status: StudentStatus;
   card_issue_date?: string;
   card_expiry_date?: string;

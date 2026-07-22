@@ -238,11 +238,17 @@ export default function AdminStudentsPage() {
                   <MoreHorizontal className="w-4 h-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem asChild>
                   <Link href={adminHref(locale, `students/${s.id}`)} className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-gray-500" />
                     View Details
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={adminHref(locale, `students/${s.id}/card`)} className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-green-500" />
+                    Download Card
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

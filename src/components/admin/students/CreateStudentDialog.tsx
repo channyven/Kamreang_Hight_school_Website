@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   Save, Loader2, Camera, User, Phone, Mail, MapPin,
-  GraduationCap, ShieldCheck, X, Calendar, IdCard,
+  GraduationCap, ShieldCheck, X, Calendar, IdCard, Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
+        father_name: "", father_name_km: "", mother_name: "", mother_name_km: "",
         phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
@@ -99,6 +100,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
+        father_name: "", father_name_km: "", mother_name: "", mother_name_km: "",
         phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
@@ -327,7 +329,38 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
 
           <Separator />
 
-          {/* ═══ SECTION 3 — ACADEMIC PLACEMENT ═══ */}
+          {/* ═══ PARENT INFORMATION ═══ */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="w-5 h-5 text-blue-600" />
+              <h3 className="text-base font-semibold text-gray-900">Parent Information</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <FormField label="Father's Name (English) *">
+                <Input {...register("father_name")} className="h-10 rounded-lg" placeholder="Enter father's full name" />
+                {errors.father_name && <p className="text-xs text-red-500">{errors.father_name.message}</p>}
+              </FormField>
+              <FormField label="Father's Name (Khmer) *">
+                <Input {...register("father_name_km")} className="font-khmer h-10 rounded-lg" placeholder="ឈ្មោះឪពុក" />
+                {errors.father_name_km && <p className="text-xs text-red-500">{errors.father_name_km.message}</p>}
+              </FormField>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+              <FormField label="Mother's Name (English) *">
+                <Input {...register("mother_name")} className="h-10 rounded-lg" placeholder="Enter mother's full name" />
+                {errors.mother_name && <p className="text-xs text-red-500">{errors.mother_name.message}</p>}
+              </FormField>
+              <FormField label="Mother's Name (Khmer) *">
+                <Input {...register("mother_name_km")} className="font-khmer h-10 rounded-lg" placeholder="ឈ្មោះម្តាយ" />
+                {errors.mother_name_km && <p className="text-xs text-red-500">{errors.mother_name_km.message}</p>}
+              </FormField>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* ═══ SECTION 4 — ACADEMIC PLACEMENT ═══ */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <GraduationCap className="w-5 h-5 text-blue-600" />

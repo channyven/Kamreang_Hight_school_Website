@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   ArrowLeft, Save, Loader2, Camera, User, Phone, Mail, MapPin,
-  GraduationCap, ShieldCheck, X, Calendar, IdCard,
+  GraduationCap, ShieldCheck, X, Calendar, IdCard, Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -81,6 +81,7 @@ export default function NewStudentPage() {
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
+        father_name: "", father_name_km: "", mother_name: "", mother_name_km: "",
         phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
@@ -302,6 +303,38 @@ export default function NewStudentPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Commune"><Input {...register("commune")} placeholder="Enter commune" className="h-12 rounded-xl" /></FormField>
                 <FormField label="Village"><Input {...register("village")} placeholder="Enter village" className="h-12 rounded-xl" /></FormField>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ═══ PARENT INFORMATION ═══ */}
+          <Card className="border border-[#E5E7EB] shadow-sm rounded-xl overflow-hidden">
+            <CardHeader className="bg-white border-b border-[#E5E7EB] px-6 py-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                <CardTitle className="text-base font-semibold text-gray-900">Parent Information</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Father's Name (English) *">
+                  <Input {...register("father_name")} className="h-12 rounded-xl" placeholder="Enter father's full name" />
+                  {errors.father_name && <p className="text-xs text-red-500">{errors.father_name.message}</p>}
+                </FormField>
+                <FormField label="Father's Name (Khmer) *">
+                  <Input {...register("father_name_km")} className="font-khmer h-12 rounded-xl" placeholder="ឈ្មោះឪពុក" />
+                  {errors.father_name_km && <p className="text-xs text-red-500">{errors.father_name_km.message}</p>}
+                </FormField>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <FormField label="Mother's Name (English) *">
+                  <Input {...register("mother_name")} className="h-12 rounded-xl" placeholder="Enter mother's full name" />
+                  {errors.mother_name && <p className="text-xs text-red-500">{errors.mother_name.message}</p>}
+                </FormField>
+                <FormField label="Mother's Name (Khmer) *">
+                  <Input {...register("mother_name_km")} className="font-khmer h-12 rounded-xl" placeholder="ឈ្មោះម្តាយ" />
+                  {errors.mother_name_km && <p className="text-xs text-red-500">{errors.mother_name_km.message}</p>}
+                </FormField>
               </div>
             </CardContent>
           </Card>
