@@ -107,6 +107,42 @@ export const documentSchema = z.object({
 });
 export type DocumentInput = z.infer<typeof documentSchema>;
 
+// ─── Student ──────────────────────────────────────────────────
+
+export const studentSchema = z.object({
+  student_id: z.string().min(1, "Student ID is required").max(50),
+  qr_code: z.string().optional(),
+  qr_token: z.string().optional(),
+  photo: z.string().optional(),
+  khmer_first_name: z.string().min(1, "Khmer first name is required").max(100),
+  khmer_last_name: z.string().min(1, "Khmer last name is required").max(100),
+  english_first_name: z.string().min(1, "English first name is required").max(100),
+  english_last_name: z.string().min(1, "English last name is required").max(100),
+  gender: z.enum(["male", "female", "other"]).optional(),
+  date_of_birth: z.string().optional(),
+  place_of_birth: z.string().max(200).optional(),
+  nationality: z.string().max(100).default("Khmer"),
+  phone_number: z.string().max(20).optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  street_address: z.string().max(255).optional(),
+  province: z.string().max(100).optional(),
+  district: z.string().max(100).optional(),
+  commune: z.string().max(100).optional(),
+  village: z.string().max(100).optional(),
+  faculty: z.string().min(1, "Faculty is required").max(200),
+  major: z.string().min(1, "Major is required").max(200),
+  academic_year: z.string().min(1, "Academic year is required").max(20),
+  class_name: z.string().min(1, "Class is required").max(50),
+  study_year: z.string().optional(),
+  semester: z.string().optional(),
+  gpa: z.coerce.number().min(0).max(99.99).optional(),
+  credits_earned: z.coerce.number().int().min(0).optional(),
+  status: z.enum(["active", "inactive", "graduated", "suspended", "transferred", "expelled"]).default("active"),
+  card_issue_date: z.string().optional(),
+  card_expiry_date: z.string().optional(),
+});
+export type StudentInput = z.infer<typeof studentSchema>;
+
 // ─── Teacher ──────────────────────────────────────────────────
 
 export const teacherSchema = z.object({
