@@ -14,6 +14,15 @@ import {
 import { useAuth } from "@/providers/AuthContext";
 import { cn, adminHref } from "@/utils";
 import type { Locale } from "@/i18n/config";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   key: string;
@@ -41,6 +50,7 @@ export default function AdminSidebar() {
   const { user, logout, hasPermission } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const allNavItems: NavItem[] = useMemo(
     () => [
@@ -215,7 +225,7 @@ export default function AdminSidebar() {
           </div>
         )}
         <button
-          onClick={logout}
+          onClick={() => setShowLogoutConfirm(true)}
           title={t("logout")}
           className={cn(
             "flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors",
@@ -229,6 +239,53 @@ export default function AdminSidebar() {
           {!collapsed && <span className={cn(locale === "km" && "font-khmer")}>{t("logout")}</span>}
         </button>
       </div>
+
+      {/* Logout confirmation dialog */}
+      <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <DialogContent className="sm:max-w-[380px] !gap-0 overflow-hidden p-0">
+          <div className="px-7 pt-7 pb-5">
+            <DialogHeader className="!block">
+              <DialogTitle className={cn("text-xl font-bold text-center", locale === "km" && "font-khmer")}>
+                {locale === "km" ? "បញ្ជាក់ការចាកចេញ" : "Confirm Sign Out"}
+              </DialogTitle>
+              <DialogDescription className={cn("text-center text-sm mt-3 leading-relaxed", locale === "km" && "font-khmer")}>
+                {locale === "km"
+                  ? "តើអ្នកប្រាកដថាចង់ចាកចេញពីប្រព័ន្ធគ្រប់គ្រងឬទេ?"
+                  : "Are you sure you want to sign out of the admin panel?"}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          {/* Separator */}
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+          <DialogFooter className="gap-[30px] px-7 py-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutConfirm(false)}
+              className={cn(
+                "flex-1 transition-all duration-200 hover:bg-gray-100",
+                locale === "km" && "font-khmer"
+              )}
+            >
+              {locale === "km" ? "បោះបង់" : "Cancel"}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowLogoutConfirm(false);
+                logout();
+              }}
+              className={cn(
+                "flex-1 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
+                locale === "km" && "font-khmer"
+              )}
+            >
+              {locale === "km" ? "ចាកចេញ" : "Sign Out"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Collapse toggle (desktop) */}
       <button
