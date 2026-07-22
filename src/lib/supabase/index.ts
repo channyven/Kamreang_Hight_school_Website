@@ -40,6 +40,7 @@ export const STORAGE_BUCKETS = {
   AVATARS: "school-avatars",
   SETTINGS: "settings-images",
   SCHOOL_IMAGES: "school-images",
+  STUDENT_PHOTOS: "student-photos",
 } as const;
 
 export type StorageBucket =

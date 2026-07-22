@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ExternalLink, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
 import { locales, localeNames } from "@/i18n/config";
@@ -18,13 +19,22 @@ import { motion, LayoutGroup } from "framer-motion";
 import { useAuth } from "@/providers/AuthContext";
 import { useTheme } from "@/hooks/use-theme";
 import { getInitials, adminHref, cn } from "@/utils";
-import type { Locale } from "@/i18n/config";
 import { useAdminLocale } from "@/providers/AdminLocaleProvider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function AdminTopBar() {
   const { user, logout } = useAuth();
   const { locale, switchLocale } = useAdminLocale();
   const t = useTranslations("admin");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const { theme, toggleTheme, mounted } = useTheme();
 
@@ -130,15 +140,6 @@ export default function AdminTopBar() {
           </div>
         </LayoutGroup>
 
-        {/* Logout */}
-        <button
-          onClick={logout}
-          title={t("logout")}
-          className="flex items-center justify-center w-9 h-9 rounded-xl transition-colors text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-        >
-          <LogOut className="w-5 h-5" />
-        </button>
-
         {/* User dropdown */}
         {user && (
           <DropdownMenu>
@@ -172,7 +173,7 @@ export default function AdminTopBar() {
                 <Link href={adminHref(locale, "profile")}>{t("profile")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-destructive gap-2">
+              <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)} className="text-destructive gap-2">
                 <LogOut className="w-3.5 h-3.5" />
                 {t("logout")}
               </DropdownMenuItem>
@@ -180,6 +181,53 @@ export default function AdminTopBar() {
           </DropdownMenu>
         )}
       </div>
+
+      {/* Logout confirmation dialog */}
+      <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <DialogContent className="sm:max-w-[380px] !gap-0 overflow-hidden p-0">
+          <div className="px-7 pt-7 pb-5">
+            <DialogHeader className="!block">
+              <DialogTitle className={cn("text-xl font-bold text-center", locale === "km" && "font-khmer")}>
+                {locale === "km" ? "បញ្ជាក់ការចាកចេញ" : "Confirm Sign Out"}
+              </DialogTitle>
+              <DialogDescription className={cn("text-center text-sm mt-3 leading-relaxed", locale === "km" && "font-khmer")}>
+                {locale === "km"
+                  ? "តើអ្នកប្រាកដថាចង់ចាកចេញពីប្រព័ន្ធគ្រប់គ្រងឬទេ?"
+                  : "Are you sure you want to sign out of the admin panel?"}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          {/* Separator */}
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+
+          <DialogFooter className="gap-[30px] px-7 py-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutConfirm(false)}
+              className={cn(
+                "flex-1 transition-all duration-200 hover:bg-gray-100",
+                locale === "km" && "font-khmer"
+              )}
+            >
+              {locale === "km" ? "បោះបង់" : "Cancel"}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowLogoutConfirm(false);
+                logout();
+              }}
+              className={cn(
+                "flex-1 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
+                locale === "km" && "font-khmer"
+              )}
+            >
+              {locale === "km" ? "ចាកចេញ" : "Sign Out"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
