@@ -9,10 +9,10 @@ import {
   LayoutDashboard, Newspaper, Trophy, FileText,
   MessageSquare, Users, Settings, BarChart3,
   School, ChevronLeft, ChevronRight, LogOut, X, Plus,
-  GraduationCap, Landmark, BookOpen,
+  GraduationCap, Landmark, BookOpen, Heart, Image as ImageIcon, Phone,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -23,15 +23,15 @@ interface NavItem {
 }
 
 interface NavGroup {
-  label: string;
+  labelKey: string;
   keys: string[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
-  { label: "Overview", keys: ["dashboard", "statistics"] },
-  { label: "Content", keys: ["news", "achievements", "teachers", "students", "documents", "governance", "about"] },
-  { label: "Inbox", keys: ["messages"] },
-  { label: "System", keys: ["users", "settings"] },
+  { labelKey: "nav_group_overview", keys: ["dashboard", "statistics"] },
+  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "governance", "news", "achievements", "documents", "contact", "donate"] },
+  { labelKey: "nav_group_inbox", keys: ["messages"] },
+  { labelKey: "nav_group_system", keys: ["users", "settings"] },
 ];
 
 export default function AdminSidebar() {
@@ -44,18 +44,21 @@ export default function AdminSidebar() {
 
   const allNavItems: NavItem[] = useMemo(
     () => [
-      { key: "dashboard", href: `/${locale}/admin`, icon: <LayoutDashboard className="w-4 h-4" /> },
-      { key: "statistics", href: `/${locale}/admin/statistics`, icon: <BarChart3 className="w-4 h-4" /> },
-      { key: "news", href: `/${locale}/admin/news`, icon: <Newspaper className="w-4 h-4" /> },
-      { key: "achievements", href: `/${locale}/admin/achievements`, icon: <Trophy className="w-4 h-4" /> },
-      { key: "teachers", href: `/${locale}/admin/teachers`, icon: <GraduationCap className="w-4 h-4" /> },
-      { key: "students", href: `/${locale}/admin/students`, icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
-      { key: "documents", href: `/${locale}/admin/documents`, icon: <FileText className="w-4 h-4" /> },
-      { key: "governance", href: `/${locale}/admin/governance`, icon: <Landmark className="w-4 h-4" /> },
-      { key: "about", href: `/${locale}/admin/about`, icon: <FileText className="w-4 h-4" /> },
-      { key: "messages", href: `/${locale}/admin/messages`, icon: <MessageSquare className="w-4 h-4" /> },
-      { key: "users", href: `/${locale}/admin/users`, icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
-      { key: "settings", href: `/${locale}/admin/settings`, icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
+      { key: "dashboard", href: adminHref(locale), icon: <LayoutDashboard className="w-4 h-4" /> },
+      { key: "statistics", href: adminHref(locale, "statistics"), icon: <BarChart3 className="w-4 h-4" /> },
+      { key: "hero_slides", href: adminHref(locale, "hero-slides"), icon: <ImageIcon className="w-4 h-4" /> },
+      { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
+      { key: "teachers", href: adminHref(locale, "teachers"), icon: <GraduationCap className="w-4 h-4" /> },
+      { key: "students", href: adminHref(locale, "students"), icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
+      { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
+      { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
+      { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
+      { key: "documents", href: adminHref(locale, "documents"), icon: <FileText className="w-4 h-4" /> },
+      { key: "contact", href: adminHref(locale, "contact"), icon: <Phone className="w-4 h-4" /> },
+      { key: "donate", href: adminHref(locale, "donate"), icon: <Heart className="w-4 h-4" /> },
+      { key: "messages", href: adminHref(locale, "messages"), icon: <MessageSquare className="w-4 h-4" /> },
+      { key: "users", href: adminHref(locale, "users"), icon: <Users className="w-4 h-4" />, permission: "canManageUsers" },
+      { key: "settings", href: adminHref(locale, "settings"), icon: <Settings className="w-4 h-4" />, permission: "canManageSettings" },
     ],
     [locale]
   );
@@ -70,7 +73,7 @@ export default function AdminSidebar() {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === `/${locale}/admin`) return pathname === `/${locale}/admin`;
+      if (href === adminHref(locale)) return pathname === adminHref(locale);
       return pathname.startsWith(href);
     },
     [locale, pathname]
@@ -88,15 +91,19 @@ export default function AdminSidebar() {
       >
         <div
           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-          style={{ background: "#fdbc13" }}
+          style={{ background: "#dfad32" }}
         >
           <School className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white leading-tight">Admin Portal</p>
+            <p className={cn("text-sm font-bold text-white leading-tight", locale === "km" && "font-khmer")}>
+              {t("portal_name")}
+            </p>
             <p className="text-xs leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
-              {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
+              {locale === "km"
+                ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
+                : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School")}
             </p>
           </div>
         )}
@@ -106,22 +113,25 @@ export default function AdminSidebar() {
       {!collapsed && (
         <div className="px-3 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
-            style={{ background: "#fdbc13", color: "#0d1b38" }}
+            href={adminHref(locale, "news/new")}
+            className={cn(
+              "flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95",
+              locale === "km" && "font-khmer"
+            )}
+            style={{ background: "#dfad32", color: "#191845" }}
           >
             <Plus className="w-4 h-4" />
-            Create New Post
+            {t("create_new_post")}
           </Link>
         </div>
       )}
       {collapsed && (
         <div className="px-2 pt-4 pb-2">
           <Link
-            href={`/${locale}/admin/news/new`}
+            href={adminHref(locale, "news/new")}
             className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
-            style={{ background: "#fdbc13", color: "#0d1b38" }}
-            title="Create New Post"
+            style={{ background: "#dfad32", color: "#191845" }}
+            title={t("create_new_post")}
           >
             <Plus className="w-4 h-4" />
           </Link>
@@ -134,13 +144,16 @@ export default function AdminSidebar() {
           const groupItems = visibleItems.filter((i) => group.keys.includes(i.key));
           if (groupItems.length === 0) return null;
           return (
-            <div key={group.label} className="mb-4">
+            <div key={group.labelKey} className="mb-4">
               {!collapsed && (
                 <p
-                  className="text-[10px] font-semibold uppercase tracking-widest px-3 mb-1"
+                  className={cn(
+                    "text-[10px] font-semibold uppercase tracking-widest px-3 mb-1",
+                    locale === "km" && "font-khmer normal-case tracking-normal"
+                  )}
                   style={{ color: "rgba(255,255,255,0.3)" }}
                 >
-                  {group.label}
+                  {t(group.labelKey as Parameters<typeof t>[0])}
                 </p>
               )}
               <div className="space-y-0.5">
@@ -161,19 +174,15 @@ export default function AdminSidebar() {
                       )}
                       style={
                         active
-                          ? { background: "rgba(253,188,19,0.15)", color: "#fdbc13" }
+                          ? { background: "rgba(223,173,50,0.15)", color: "#dfad32" }
                           : { color: "rgba(255,255,255,0.5)" }
                       }
                     >
-                      {active && !collapsed && (
-                        <span
-                          className="absolute left-0 w-0.5 h-6 rounded-r"
-                          style={{ background: "#fdbc13" }}
-                        />
-                      )}
                       <span className="shrink-0">{item.icon}</span>
                       {!collapsed && (
-                        <span>{t(item.key as Parameters<typeof t>[0])}</span>
+                        <span className={cn(locale === "km" && "font-khmer")}>
+                          {t(item.key as Parameters<typeof t>[0])}
+                        </span>
                       )}
                     </Link>
                   );
@@ -193,7 +202,7 @@ export default function AdminSidebar() {
           <div className="flex items-center gap-2.5 px-1 mb-2">
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-              style={{ background: "rgba(253,188,19,0.2)", color: "#fdbc13" }}
+              style={{ background: "rgba(223,173,50,0.2)", color: "#dfad32" }}
             >
               {user.full_name?.[0]?.toUpperCase() ?? "A"}
             </div>
@@ -217,14 +226,14 @@ export default function AdminSidebar() {
           onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
         >
           <LogOut className="w-4 h-4 shrink-0" />
-          {!collapsed && <span>{t("logout")}</span>}
+          {!collapsed && <span className={cn(locale === "km" && "font-khmer")}>{t("logout")}</span>}
         </button>
       </div>
 
       {/* Collapse toggle (desktop) */}
       <button
         className="hidden lg:flex absolute -right-3.5 top-20 w-7 h-7 rounded-full items-center justify-center text-white border transition-all duration-150"
-        style={{ background: "#0d1b38", borderColor: "rgba(255,255,255,0.12)" }}
+        style={{ background: "#191845", borderColor: "rgba(255,255,255,0.12)" }}
         onClick={() => setCollapsed((c) => !c)}
       >
         {collapsed
@@ -242,7 +251,7 @@ export default function AdminSidebar() {
           "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40",
           collapsed ? "w-16" : "w-60"
         )}
-        style={{ background: "#0d1b38" }}
+        style={{ background: "#191845" }}
       >
         <SidebarContent />
       </aside>
@@ -264,7 +273,7 @@ export default function AdminSidebar() {
               exit={{ x: -256 }}
               transition={{ type: "tween", duration: 0.25 }}
               className="lg:hidden fixed top-0 left-0 h-full w-60 z-50"
-              style={{ background: "#0d1b38" }}
+              style={{ background: "#191845" }}
             >
               <button
                 className="absolute top-4 right-4 hover:text-white transition-colors"

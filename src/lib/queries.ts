@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, BankAccount, DonationPurpose, DonationQr, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -8,6 +8,8 @@ import {
   mockTeachers,
   mockStats,
   mockGovernanceItems,
+  mockBankAccounts,
+  mockDonationPurposes,
 } from "@/lib/mock-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
@@ -172,6 +174,108 @@ export const getGovernanceItems = unstable_cache(
   },
   ["governance-items"],
   { tags: ["governance_items"], revalidate: 60 }
+);
+
+export const getActiveBankAccounts = unstable_cache(
+  async (): Promise<BankAccount[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data, error } = await supabase
+        .from("bank_accounts")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order")
+        .order("created_at");
+      // Fall back to mocks only when the query fails (e.g. table missing);
+      // an empty result means the admin hid every account on purpose.
+      if (error) return mockBankAccounts;
+      return (data ?? []) as BankAccount[];
+    } catch {
+      return mockBankAccounts;
+    }
+  },
+  ["bank-accounts"],
+  { tags: ["bank_accounts"], revalidate: 60 }
+);
+
+export const getActiveDonationPurposes = unstable_cache(
+  async (): Promise<DonationPurpose[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data, error } = await supabase
+        .from("donation_purposes")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order")
+        .order("created_at");
+      // Fall back to mocks only when the query fails (e.g. table missing);
+      // an empty result means the admin hid every card on purpose.
+      if (error) return mockDonationPurposes;
+      return (data ?? []) as DonationPurpose[];
+    } catch {
+      return mockDonationPurposes;
+    }
+  },
+  ["donation-purposes"],
+  { tags: ["donation_purposes"], revalidate: 60 }
+);
+
+export const getActiveDonationQrCodes = unstable_cache(
+  async (): Promise<DonationQr[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("donation_qr_codes")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order")
+        .order("created_at");
+      // No mock fallback here: before 019 runs the donate page falls back
+      // to the legacy `donate_qr_url` settings key instead.
+      return (data ?? []) as DonationQr[];
+    } catch {
+      return [];
+    }
+  },
+  ["donation-qr-codes"],
+  { tags: ["donation_qr_codes"], revalidate: 60 }
+);
+
+export const getHeroSlides = unstable_cache(
+  async (): Promise<HeroSlide[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("hero_slides")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+      return (data ?? []) as HeroSlide[];
+    } catch {
+      return [];
+    }
+  },
+  ["hero-slides"],
+  { tags: ["hero_slides"], revalidate: 60 }
+);
+
+export const getPublishedAchievementById = unstable_cache(
+  async (id: string): Promise<Achievement | null> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("achievements")
+        .select("*")
+        .eq("id", id)
+        .eq("status", "published")
+        .single();
+      return (data ?? null) as Achievement | null;
+    } catch {
+      return null;
+    }
+  },
+  ["published-achievement-by-id"],
+  { tags: ["achievements"], revalidate: 60 }
 );
 
 export const getCurrentStatistics = unstable_cache(

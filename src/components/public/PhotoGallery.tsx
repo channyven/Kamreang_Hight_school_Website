@@ -80,7 +80,7 @@ export default function PhotoGallery({ images, locale = "en" }: PhotoGalleryProp
           >
             <Image
               src={url}
-              alt={`Photo ${index + 1}`}
+              alt={locale === "km" ? `រូបភាព ${index + 1}` : `Photo ${index + 1}`}
               fill
               className="object-cover transition-all duration-500 group-hover:scale-110"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -149,7 +149,7 @@ export default function PhotoGallery({ images, locale = "en" }: PhotoGalleryProp
             >
               <Image
                 src={images[lightboxIndex]}
-                alt={`Photo ${lightboxIndex + 1}`}
+                alt={locale === "km" ? `រូបភាព ${lightboxIndex + 1}` : `Photo ${lightboxIndex + 1}`}
                 fill
                 className="object-contain"
                 priority
@@ -182,7 +182,7 @@ export default function PhotoGallery({ images, locale = "en" }: PhotoGalleryProp
                 >
                   <Image
                     src={url}
-                    alt={`Thumbnail ${i + 1}`}
+                    alt={locale === "km" ? `រូបភាពតូច ${i + 1}` : `Thumbnail ${i + 1}`}
                     fill
                     className="object-cover"
                     unoptimized={url.includes("google.com")}

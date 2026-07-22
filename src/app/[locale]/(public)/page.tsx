@@ -4,8 +4,7 @@ import HeroSection from "@/components/public/home/HeroSection";
 import StatsSection from "@/components/public/home/StatsSection";
 import NewsSection from "@/components/public/home/NewsSection";
 import AchievementsSection from "@/components/public/home/AchievementsSection";
-import { getCurrentStatistics, getPublishedAchievements, getPublishedNews } from "@/lib/queries";
-import { mockHeroSlides } from "@/lib/mock-data";
+import { getHeroSlides, getCurrentStatistics, getPublishedAchievements, getPublishedNews } from "@/lib/queries";
 import type { News } from "@/types";
 
 // Static-generate this page per locale, refreshing at most every 60s —
@@ -44,7 +43,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [stats, allNews, allAchievements] = await Promise.all([
+  const [slides, stats, allNews, allAchievements] = await Promise.all([
+    getHeroSlides(),
     getCurrentStatistics(),
     getPublishedNews(),
     getPublishedAchievements(),
@@ -54,7 +54,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection slides={mockHeroSlides} />
+      <HeroSection slides={slides} />
       <StatsSection stats={stats} />
       <NewsSection news={news} />
       <AchievementsSection achievements={achievements} />

@@ -25,10 +25,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { supabase } from "@/lib/supabase";
 import type { Student } from "@/types";
 import { toast } from "sonner";
-import { deleteStudent } from "@/actions/students";
+import { deleteStudent, getStudents } from "@/actions/students";
 import { exportStudentsToExcel } from "@/lib/export";
 
 
@@ -88,12 +87,9 @@ export default function AdminStudentsPage() {
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: studentData } = await supabase
-        .from("students")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const studentData = await getStudents();
 
-      const raw = (studentData ?? []) as Student[];
+      const raw = studentData as Student[];
       setFullData(raw);
 
       let list = [...raw];

@@ -18,7 +18,8 @@ export async function createAchievement(
   const error = await new AchievementService().create(parsed.data);
   if (error) return { success: false, error };
 
-  revalidatePath("/[locale]/(public)", "page");
+  revalidatePath("/[locale]/achievements", "page");
+  revalidatePath("/", "layout");
   revalidateTag("achievements");
   return { success: true };
 }
@@ -36,7 +37,8 @@ export async function updateAchievement(
   const error = await new AchievementService().update(id, parsed.data);
   if (error) return { success: false, error };
 
-  revalidatePath("/[locale]/(public)", "page");
+  revalidatePath("/[locale]/achievements", "page");
+  revalidatePath("/", "layout");
   revalidateTag("achievements");
   return { success: true };
 }
@@ -48,7 +50,8 @@ export async function deleteAchievement(
   const error = await new AchievementService().remove(id);
   if (error) return { success: false, error };
 
-  revalidatePath("/[locale]/(public)", "page");
+  revalidatePath("/[locale]/achievements", "page");
+  revalidatePath("/", "layout");
   revalidateTag("achievements");
   return { success: true };
 }

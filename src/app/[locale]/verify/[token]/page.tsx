@@ -134,10 +134,10 @@ export default async function VerifyStudentPage({ params }: PageProps) {
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                   <InfoField label="Gender" value={s.gender ? s.gender.charAt(0).toUpperCase() + s.gender.slice(1) : null} />
                   <InfoField label="Date of Birth" value={s.date_of_birth ? formatDate(s.date_of_birth, locale) : null} />
-                  <InfoField label="Phone" value={s.phoneNumber} />
+                  <InfoField label="Phone" value={s.phone_number} />
                   <InfoField label="Email" value={s.email} />
                   <InfoField label="Address" value={
-                    [s.streetAddress, s.commune, s.district, s.province, s.village].filter(Boolean).join(", ")
+                    [s.street_address, s.commune, s.district, s.province, s.village].filter(Boolean).join(", ")
                   } />
                 </div>
               </div>

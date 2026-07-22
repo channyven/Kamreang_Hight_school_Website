@@ -4,15 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { Plus, Search, Edit, Trash2, Loader2, User } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Loader2, User, Phone, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
 import type { Teacher } from "@/types";
-import { getLocalizedText } from "@/utils";
+import { getLocalizedText, adminHref } from "@/utils";
 import { toast } from "sonner";
-import { deleteTeacher } from "@/actions/teachers";
+import { deleteTeacher, fetchTeachers } from "@/actions/teachers";
 
 export default function AdminTeachersPage() {
   const locale = useLocale();
@@ -22,13 +21,12 @@ export default function AdminTeachersPage() {
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from("teachers").select("*").order("sort_order");
-    let list = (data ?? []) as Teacher[];
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter((t) => t.name_en?.toLowerCase().includes(q) || t.name_km?.toLowerCase().includes(q));
-    }
-    setItems(list);
+    const list = await fetchTeachers();
+    const q = search.toLowerCase();
+    const filtered = q
+      ? list.filter((t: Teacher) => t.name_en?.toLowerCase().includes(q) || t.name_km?.toLowerCase().includes(q))
+      : list;
+    setItems(filtered);
     setLoading(false);
   }, [search]);
 
@@ -51,7 +49,7 @@ export default function AdminTeachersPage() {
           <p className="text-gray-500 text-sm mt-1">{items.length} teachers</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/teachers/new`}>
+          <Link href={adminHref(locale, "teachers/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Teacher"}
           </Link>
@@ -76,26 +74,27 @@ export default function AdminTeachersPage() {
                   <th className="text-left px-4 py-3 font-medium text-gray-500 w-12">#</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Name</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Subject</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Department</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Phone</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden xl:table-cell">Gender</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Status</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-500">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {items.map((item, i) => {
-                  const name = getLocalizedText(item.name_km, item.name_en, locale);
+                  const name = item.name_km;
                   return (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-400">{i + 1}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {item.photo_url ? (
-                            <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
-                              <Image src={item.photo_url} alt={name} width={36} height={36} className="object-cover w-full h-full" />
+                            <div className="w-11 h-11 rounded-full overflow-hidden shrink-0 ring-2 ring-blue-100 shadow-sm">
+                              <Image src={item.photo_url} alt={name} width={44} height={44} className="object-cover w-full h-full" />
                             </div>
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                              <User className="w-4 h-4 text-blue-400" />
+                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shrink-0 ring-2 ring-blue-100">
+                              <span className="text-sm font-bold text-blue-400">{name?.[0] ?? "?"}</span>
                             </div>
                           )}
                           <p className={`font-medium text-gray-900 truncate max-w-[200px] ${locale === "km" ? "font-khmer" : ""}`}>{name}</p>
@@ -104,8 +103,16 @@ export default function AdminTeachersPage() {
                       <td className="px-4 py-3 hidden md:table-cell text-gray-600">
                         {getLocalizedText(item.subject_km, item.subject_en, locale)}
                       </td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-gray-400 text-xs">
-                        {getLocalizedText(item.department_km, item.department_en, locale)}
+                      <td className="px-4 py-3 hidden lg:table-cell text-gray-600 text-xs font-mono">
+                        {item.phone || "—"}
+                      </td>
+                      <td className="px-4 py-3 hidden xl:table-cell">
+                        {item.gender ? (
+                          <Badge variant="outline" className="text-xs">
+                            {item.gender === "Male" ? "♂ " : "♀ "}
+                            {item.gender}
+                          </Badge>
+                        ) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={item.is_active ? "success" : "default"} className="text-xs">
@@ -115,7 +122,7 @@ export default function AdminTeachersPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/teachers/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                            <Link href={adminHref(locale, `teachers/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, name ?? "")}>
                             <Trash2 className="w-4 h-4 text-red-500" />

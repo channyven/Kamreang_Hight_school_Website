@@ -118,12 +118,15 @@ export function buildStorageUrl(path: string): string {
 }
 
 /**
- * Convert a Google Drive share link to a direct image URL suitable
+ * Convert a Google Drive share link to a proxied image URL suitable
  * for <img> or Next.js <Image>.
  *
- * The returned URL uses Google's usercontent domain which serves the raw
- * file directly (200 OK) instead of the thumbnail endpoint which returns
- * a 302 redirect that some browsers / Next.js Image have trouble following.
+ * The returned URL goes through our API proxy which fetches the image
+ * server-side (avoiding Google's hotlink blocking) and returns it as
+ * a same-origin response.
+ *
+ * Uses Google's thumbnail endpoint internally — it returns a 302 redirect
+ * to the raw image that fetch() follows automatically.
  *
  * The file MUST be publicly shared ("Anyone with the link can view").
  *
@@ -131,8 +134,9 @@ export function buildStorageUrl(path: string): string {
  *   https://drive.google.com/file/d/FILE_ID/view
  *   https://drive.google.com/file/d/FILE_ID/view?usp=sharing
  *   https://drive.google.com/open?id=FILE_ID
- *   https://drive.google.com/thumbnail?id=FILE_ID&sz=...
  *   https://drive.google.com/uc?id=FILE_ID
+ *   https://drive.google.com/uc?export=download&id=FILE_ID
+ *   https://drive.google.com/thumbnail?id=FILE_ID&sz=...
  *   https://drive.usercontent.google.com/download?id=FILE_ID&export=view
  *   https://lh3.googleusercontent.com/d/FILE_ID=...
  *
@@ -141,18 +145,23 @@ export function buildStorageUrl(path: string): string {
 export function convertGoogleDriveUrl(url: string): string {
   if (!url) return url;
 
+  // Already a proxied URL — return as-is
+  if (url.startsWith("/api/proxy-image?url=")) {
+    return url;
+  }
+
+  // Already a known direct format — return as-is
+  if (
+    url.startsWith("https://drive.google.com/thumbnail?id=") ||
+    url.startsWith("https://drive.usercontent.google.com/download?id=") ||
+    url.startsWith("https://lh3.googleusercontent.com/d/")
+  ) {
+    return url;
+  }
+
   // Extract the file ID from various Google Drive URL patterns
   const fileId = extractGoogleDriveFileId(url);
   if (!fileId) {
-    // Already a known direct format – return as-is
-    if (
-      url.startsWith("https://drive.google.com/thumbnail?id=") ||
-      url.startsWith("https://drive.google.com/uc?id=") ||
-      url.startsWith("https://drive.usercontent.google.com/download?id=") ||
-      url.startsWith("https://lh3.googleusercontent.com/d/")
-    ) {
-      return url;
-    }
     return url;
   }
 
@@ -174,9 +183,25 @@ function extractGoogleDriveFileId(url: string): string | null {
   );
   if (fileMatch) return fileMatch[1];
 
-  // Pattern 2: /open?id=FILE_ID or /download?id=FILE_ID
+  // Pattern 2: /open?id=FILE_ID
   const queryIdMatch = url.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
-  if (queryIdMatch && (url.includes("/open") || url.includes("/download"))) return queryIdMatch[1];
+  if (queryIdMatch) {
+    const beforeQuery = url.split("?")[0] || "";
+    if (
+      beforeQuery.endsWith("/open") ||
+      beforeQuery.endsWith("/uc") ||
+      beforeQuery.endsWith("/download") ||
+      beforeQuery.endsWith("/thumbnail")
+    ) {
+      return queryIdMatch[1];
+    }
+  }
+
+  // Pattern 3: lh3.googleusercontent.com/d/FILE_ID or .../FILE_ID=w...
+  const lhMatch = url.match(
+    /lh\d+\.googleusercontent\.com\/d\/([a-zA-Z0-9_\-]+)/
+  );
+  if (lhMatch) return lhMatch[1];
 
   return null;
 }
@@ -209,6 +234,10 @@ export function getAvatarUrl(
   const safeName = encodeURIComponent(name?.trim() || "?");
   return `https://ui-avatars.com/api/?name=${safeName}&background=${bg}&color=${fg}&size=${size}&font-size=0.5&bold=true&format=png`;
 }
+
+// ─── Admin path helper (security-by-obscurity) ───────────────
+
+export { ADMIN_PATH, adminHref } from "@/lib/admin-path";
 
 // ─── Misc ─────────────────────────────────────────────────────
 

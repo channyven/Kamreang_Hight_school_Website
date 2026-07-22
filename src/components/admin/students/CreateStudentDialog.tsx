@@ -82,7 +82,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
-        phoneNumber: "", email: "", streetAddress: "",
+        phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
         student_id: `STU${new Date().getFullYear()}${String(Math.floor(1000 + Math.random() * 9000))}`,
@@ -99,7 +99,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
-        phoneNumber: "", email: "", streetAddress: "",
+        phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
         student_id: `STU-${new Date().getFullYear()}-XXXX`,
@@ -292,7 +292,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
                 <FormField label="Phone Number">
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input {...register("phoneNumber")} placeholder="+855 12 345 678" className="pl-10 h-10 rounded-lg" />
+                    <Input {...register("phone_number")} placeholder="+855 12 345 678" className="pl-10 h-10 rounded-lg" />
                   </div>
                 </FormField>
                 <FormField label="Email">
@@ -305,7 +305,7 @@ export default function CreateStudentDialog({ open, onOpenChange, onSuccess }: P
               <FormField label="Street Address">
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input {...register("streetAddress")} placeholder="Street / House number" className="pl-10 h-10 rounded-lg" />
+                  <Input {...register("street_address")} placeholder="Street / House number" className="pl-10 h-10 rounded-lg" />
                 </div>
               </FormField>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

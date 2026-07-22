@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { News } from "@/types";
-import { formatShortDate, getLocalizedText } from "@/utils";
+import { formatShortDate, getLocalizedText, adminHref } from "@/utils";
 import { toast } from "sonner";
 import { deleteNews, getAdminNewsList } from "@/actions/news";
 
@@ -74,7 +74,7 @@ export default function AdminNewsPage() {
           <p className="text-gray-500 text-sm mt-1">{news.length} articles</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/news/new`}>
+          <Link href={adminHref(locale, "news/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Article"}
           </Link>
@@ -197,7 +197,7 @@ export default function AdminNewsPage() {
                             </Link>
                           </Button>
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/news/${item.id}`}>
+                            <Link href={adminHref(locale, `news/${item.id}`)}>
                               <Edit className="w-4 h-4 text-blue-500" />
                             </Link>
                           </Button>

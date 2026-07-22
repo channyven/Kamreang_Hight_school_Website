@@ -99,6 +99,7 @@ export interface Achievement {
   achievement_date?: string;
   participant_name?: string;
   image_url?: string;
+  gallery_images?: string[];
   is_featured?: boolean;
   status: ContentStatus;
   created_by?: string;
@@ -252,6 +253,46 @@ export interface GovernanceItem {
   updated_at: string;
 }
 
+export interface BankAccount {
+  id: string;
+  bank_name_km: string;
+  bank_name_en: string;
+  account_name_km: string;
+  account_name_en: string;
+  account_number: string;
+  currency: string;
+  logo_color: string;
+  logo_url?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DonationPurpose {
+  id: string;
+  icon: string;
+  title_km: string;
+  title_en: string;
+  desc_km?: string;
+  desc_en?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DonationQr {
+  id: string;
+  label_km?: string;
+  label_en?: string;
+  image_url: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface HeroSlide {
   id: string;
   title_km: string;
@@ -347,9 +388,9 @@ export interface Student {
   date_of_birth?: string;
   place_of_birth?: string;
   nationality: string;
-  phoneNumber?: string;
+  phone_number?: string;
   email?: string;
-  streetAddress?: string;
+  street_address?: string;
   province?: string;
   district?: string;
   commune?: string;

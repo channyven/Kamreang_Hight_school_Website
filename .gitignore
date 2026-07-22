@@ -50,5 +50,9 @@ next-env.d.ts
 .claude/
 kamrieng-highschool/
 
+# Raw data files (staff lists, spreadsheets, etc.)
+data/
+
 # Firebase Admin SDK service account key (sensitive credentials)
 *firebase-adminsdk*.json
+.firebase-service-account.json

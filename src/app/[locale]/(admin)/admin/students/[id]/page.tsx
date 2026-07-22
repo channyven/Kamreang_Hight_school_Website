@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { supabase } from "@/lib/supabase";
+import { getStudentById } from "@/actions/students";
 import type { Student } from "@/types";
 import { formatDate } from "@/utils";
 import StudentQrCard from "@/components/admin/students/StudentQrCard";
@@ -91,15 +91,12 @@ export default function StudentDetailsPage({ params }: PageProps) {
   const [studentLoaded, setStudentLoaded] = useState(false);
 
   useEffect(() => {
-    supabase.from("students").select("*").eq("id", id).single()
-      .then(({ data, error: err }) => {
-        if (err || !data) { setError(true); setLoading(false); return; }
-        const s = data as Student;
-        setStudent(s);
-        setLoading(false);
-        setStudentLoaded(true);
-
-      });
+    getStudentById(id).then((data) => {
+      if (!data) { setError(true); setLoading(false); return; }
+      setStudent(data as Student);
+      setLoading(false);
+      setStudentLoaded(true);
+    });
   }, [id]);
 
   const getStatusLabel = (status: string) =>
@@ -224,12 +221,12 @@ export default function StudentDetailsPage({ params }: PageProps) {
                   <InfoRow label="Date of Birth" value={s.date_of_birth ? formatDate(s.date_of_birth, locale) : null} icon={<Calendar className="w-4 h-4" />} />
                   <InfoRow label="Place of Birth" value={s.place_of_birth} icon={<MapPin className="w-4 h-4" />} />
                   <InfoRow label="Nationality" value={s.nationality} icon={<User className="w-4 h-4" />} />
-                  <InfoRow label="Phone Number" value={s.phoneNumber} icon={<Phone className="w-4 h-4" />} />
+                  <InfoRow label="Phone Number" value={s.phone_number} icon={<Phone className="w-4 h-4" />} />
                   <InfoRow label="Email" value={s.email} icon={<Mail className="w-4 h-4" />} />
                 </div>
                 <Separator className="my-3" />
                 <InfoRow label="Address" value={
-                  [s.streetAddress, s.commune, s.district, s.province, s.village].filter(Boolean).join(", ")
+                  [s.street_address, s.commune, s.district, s.province, s.village].filter(Boolean).join(", ")
                 } icon={<MapPin className="w-4 h-4" />} />
               </CardContent>
             </Card>

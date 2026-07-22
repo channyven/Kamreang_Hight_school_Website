@@ -23,8 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { studentSchema, type StudentInput } from "@/schemas/validations";
-import { updateStudent } from "@/actions/students";
-import { supabase } from "@/lib/supabase";
+import { updateStudent, getStudentById } from "@/actions/students";
 import { cn } from "@/utils";
 
 interface PageProps { params: Promise<{ id: string }>; }
@@ -131,7 +130,7 @@ export default function StudentEditPage({ params }: PageProps) {
         status: "active", nationality: "Khmer", gender: undefined,
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
-        phoneNumber: "", email: "", streetAddress: "",
+        phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
       },
@@ -140,17 +139,16 @@ export default function StudentEditPage({ params }: PageProps) {
 
   // ─── Load existing student for edit ────────────────────────
   useEffect(() => {
-    supabase.from("students").select("*").eq("id", id).single()
-      .then(({ data }) => {
-        if (data) {
-          const s = data as Record<string, unknown>;
-          const formData: Record<string, unknown> = {};
-          Object.entries(s).forEach(([k, v]) => { if (v !== null) formData[k] = v; });
-          reset(formData as StudentInput);
-          if (s.photo) { setPhotoPreview(s.photo as string); setPhotoUrl(s.photo as string); }
-        }
-        setLoading(false);
-      });
+    getStudentById(id).then((data) => {
+      if (data) {
+        const s = data as unknown as Record<string, unknown>;
+        const formData: Record<string, unknown> = {};
+        Object.entries(s).forEach(([k, v]) => { if (v !== null) formData[k] = v; });
+        reset(formData as StudentInput);
+        if (s.photo) { setPhotoPreview(s.photo as string); setPhotoUrl(s.photo as string); }
+      }
+      setLoading(false);
+    });
   }, [id, reset]);
 
   // ─── Photo upload — converts to compressed data URL ───────
@@ -344,7 +342,7 @@ export default function StudentEditPage({ params }: PageProps) {
                 <FormField label="Phone Number">
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input {...register("phoneNumber")} placeholder="+855 12 345 678" className="pl-12 h-12 rounded-xl" />
+                    <Input {...register("phone_number")} placeholder="+855 12 345 678" className="pl-12 h-12 rounded-xl" />
                   </div>
                 </FormField>
                 <FormField label="Email">
@@ -357,7 +355,7 @@ export default function StudentEditPage({ params }: PageProps) {
               <FormField label="Street Address">
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input {...register("streetAddress")} placeholder="Street / House number" className="pl-12 h-12 rounded-xl" />
+                  <Input {...register("street_address")} placeholder="Street / House number" className="pl-12 h-12 rounded-xl" />
                 </div>
               </FormField>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

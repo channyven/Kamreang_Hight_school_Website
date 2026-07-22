@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
 import { Save, Loader2, Settings, Users, FileText, Globe } from "lucide-react";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,7 +108,7 @@ export default function AdminSettingsPage() {
         <TabsContent value="general" className="space-y-5 mt-4">
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Contact Information</h2>
-            {["school_address_km", "school_address_en", "school_phone", "school_email", "school_hours_km", "school_hours_en", "school_facebook", "school_youtube", "school_tiktok"].map((key) => (
+            {["school_address_km", "school_address_en", "school_phone", "school_email", "school_hours_km", "school_hours_en", "school_facebook", "school_tiktok"].map((key) => (
               <div key={key} className="flex items-end gap-3">
                 <div className="flex-1 space-y-1.5">
                   <Label className="capitalize">{key.replace(/_/g, " ")}</Label>
@@ -215,12 +216,12 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                 ))}
-                <div className="space-y-1.5 md:col-span-2">
-                  <Label>Photo URL</Label>
-                  <Input
-                    value={leader.photo_url ?? ""}
-                    onChange={(e) => setLeadership((prev) => prev.map((l) => l.id === leader.id ? { ...l, photo_url: e.target.value } : l))}
-                    placeholder="https://..."
+                <div className="md:col-span-2">
+                  <ImageUploader
+                    value={leader.photo_url}
+                    onChange={(url) => setLeadership((prev) => prev.map((l) => l.id === leader.id ? { ...l, photo_url: url ?? "" } : l))}
+                    folder={`leadership/${leader.id}`}
+                    label="Photo"
                   />
                 </div>
               </div>

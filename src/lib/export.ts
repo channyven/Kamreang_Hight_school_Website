@@ -50,9 +50,9 @@ export function exportStudentsToExcel(
     date_of_birth?: string | null;
     place_of_birth?: string | null;
     nationality?: string | null;
-    phoneNumber?: string | number | null;
+    phone_number?: string | number | null;
     email?: string | null;
-    streetAddress?: string | null;
+    street_address?: string | null;
     province?: string | null;
     district?: string | null;
     commune?: string | null;
@@ -75,7 +75,7 @@ export function exportStudentsToExcel(
   const rows: ExportStudentRow[] = students.map((s) => {
     // Build full address
     const addressParts = [
-      s.streetAddress,
+      s.street_address,
       s.commune,
       s.district,
       s.province,
@@ -99,7 +99,7 @@ export function exportStudentsToExcel(
       "Date of Birth": formatDate(s.date_of_birth),
       "Place of Birth": s.place_of_birth ?? "",
       Nationality: s.nationality ?? "",
-      "Phone Number": s.phoneNumber?.toString() ?? "",
+      "Phone Number": s.phone_number?.toString() ?? "",
       Email: s.email ?? "",
       Address: address,
       Province: s.province ?? "",

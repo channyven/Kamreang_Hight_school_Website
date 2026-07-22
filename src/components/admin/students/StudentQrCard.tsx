@@ -6,9 +6,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { regenerateStudentQrCode } from "@/actions/students";
+import { regenerateStudentQrCode, getStudentById } from "@/actions/students";
 import { downloadQrCode, printStudentCard } from "@/lib/qrcode";
-import { supabase } from "@/lib/supabase";
 import type { Student } from "@/types";
 
 interface Props {
@@ -25,13 +24,9 @@ export default function StudentQrCard({ student }: Props) {
     setQrRegenerating(true);
     const result = await regenerateStudentQrCode(s.id);
     if (result.success) {
-      const { data: refreshed } = await supabase
-        .from("students")
-        .select("qr_code")
-        .eq("id", s.id)
-        .single();
+      const refreshed = await getStudentById(s.id);
       if (refreshed?.qr_code) {
-        setQrDataUrl(refreshed.qr_code as string);
+        setQrDataUrl(refreshed.qr_code);
       }
       toast.success("QR code regenerated successfully.");
     } else {

@@ -80,7 +80,7 @@ export default function NewStudentPage() {
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
-        phoneNumber: "", email: "", streetAddress: "",
+        phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
         student_id: `STU-${new Date().getFullYear()}-XXXX`,
@@ -278,7 +278,7 @@ export default function NewStudentPage() {
                 <FormField label="Phone Number">
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input {...register("phoneNumber")} placeholder="+855 12 345 678" className="pl-12 h-12 rounded-xl" />
+                    <Input {...register("phone_number")} placeholder="+855 12 345 678" className="pl-12 h-12 rounded-xl" />
                   </div>
                 </FormField>
                 <FormField label="Email">
@@ -291,7 +291,7 @@ export default function NewStudentPage() {
               <FormField label="Street Address">
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input {...register("streetAddress")} placeholder="Street / House number" className="pl-12 h-12 rounded-xl" />
+                  <Input {...register("street_address")} placeholder="Street / House number" className="pl-12 h-12 rounded-xl" />
                 </div>
               </FormField>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

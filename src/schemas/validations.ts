@@ -8,6 +8,11 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+export const resetPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
 // ─── Contact Form ─────────────────────────────────────────────
 
 export const contactSchema = z.object({
@@ -56,11 +61,12 @@ export const achievementSchema = z.object({
   title_en: z.string().min(1, "English title is required").max(500),
   description_km: z.string().optional(),
   description_en: z.string().optional(),
-  achievement_type: z.enum(["academic", "sports", "arts", "community", "other"]).optional(),
+  achievement_type: z.enum(["student", "teacher", "school"]).optional(),
   award_level: z.enum(["national", "provincial", "district", "school"]).optional(),
   achievement_date: z.string().optional(),
   participant_name: z.string().max(300).optional(),
   image_url: z.string().optional(),
+  gallery_images: z.array(z.string()).default([]),
   is_featured: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
 });
@@ -116,9 +122,9 @@ export const studentSchema = z.object({
   date_of_birth: z.string().optional(),
   place_of_birth: z.string().max(200).optional(),
   nationality: z.string().max(100).default("Khmer"),
-  phoneNumber: z.string().max(20).optional(),
+  phone_number: z.string().max(20).optional(),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
-  streetAddress: z.string().max(255).optional(),
+  street_address: z.string().max(255).optional(),
   province: z.string().max(100).optional(),
   district: z.string().max(100).optional(),
   commune: z.string().max(100).optional(),
@@ -141,7 +147,7 @@ export type StudentInput = z.infer<typeof studentSchema>;
 
 export const teacherSchema = z.object({
   name_km: z.string().min(1, "Khmer name is required").max(200),
-  name_en: z.string().min(1, "English name is required").max(200),
+  name_en: z.string().max(200).optional().or(z.literal("")),
   subject_km: z.string().max(200).optional(),
   subject_en: z.string().max(200).optional(),
   department_km: z.string().max(200).optional(),
@@ -149,12 +155,34 @@ export const teacherSchema = z.object({
   qualification_km: z.string().max(300).optional(),
   qualification_en: z.string().max(300).optional(),
   photo_url: z.string().optional(),
+  phone: z.string().optional(),
+  gender: z.string().optional(),
   years_experience: z.coerce.number().int().min(0).optional(),
   grade_levels: z.array(z.coerce.number().int().min(7).max(12)).default([]),
   is_active: z.boolean().default(true),
   sort_order: z.coerce.number().int().min(0).default(0),
 });
 export type TeacherInput = z.infer<typeof teacherSchema>;
+
+// ─── Hero Slide ────────────────────────────────────────────────
+
+export const heroSlideSchema = z.object({
+  title_km: z.string().min(1, "Khmer title is required").max(300),
+  title_en: z.string().min(1, "English title is required").max(300),
+  subtitle_km: z.string().max(500).optional(),
+  subtitle_en: z.string().max(500).optional(),
+  image_url: z.string().optional().or(z.literal("")),
+  gradient: z.string().optional().or(z.literal("")),
+  cta_primary_km: z.string().max(100).optional(),
+  cta_primary_en: z.string().max(100).optional(),
+  cta_secondary_km: z.string().max(100).optional(),
+  cta_secondary_en: z.string().max(100).optional(),
+  cta_primary_href: z.string().max(200).optional(),
+  cta_secondary_href: z.string().max(200).optional(),
+  sort_order: z.coerce.number().int().min(1).max(99).default(1),
+  is_active: z.boolean().default(true),
+});
+export type HeroSlideInput = z.infer<typeof heroSlideSchema>;
 
 // ─── Governance Item ──────────────────────────────────────────
 
@@ -167,6 +195,59 @@ export const governanceItemSchema = z.object({
   is_active: z.boolean().default(true),
 });
 export type GovernanceItemInput = z.infer<typeof governanceItemSchema>;
+
+// ─── Bank Account (Donate page) ───────────────────────────────
+
+export const bankAccountSchema = z.object({
+  bank_name_km: z.string().min(1, "Khmer bank name is required").max(200),
+  bank_name_en: z.string().min(1, "English bank name is required").max(200),
+  account_name_km: z.string().min(1, "Khmer account name is required").max(200),
+  account_name_en: z.string().min(1, "English account name is required").max(200),
+  account_number: z.string().min(1, "Account number is required").max(50),
+  currency: z.string().max(50).default("USD / KHR"),
+  logo_color: z.string().max(20).default("#00376f"),
+  logo_url: z.string().max(2000).optional(),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type BankAccountInput = z.infer<typeof bankAccountSchema>;
+
+// ─── Donation Purpose ("Why Donate" card) ─────────────────────
+
+export const donationPurposeSchema = z.object({
+  icon: z.string().min(1, "Icon is required").max(20),
+  title_km: z.string().min(1, "Khmer title is required").max(200),
+  title_en: z.string().min(1, "English title is required").max(200),
+  desc_km: z.string().max(500).optional(),
+  desc_en: z.string().max(500).optional(),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type DonationPurposeInput = z.infer<typeof donationPurposeSchema>;
+
+// ─── Donation QR code (Donate page) ───────────────────────────
+
+export const donateQrUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "QR code image is required")
+  .max(2000, "URL is too long")
+  .refine(
+    (u) =>
+      u.startsWith("http://") ||
+      u.startsWith("https://") ||
+      u.startsWith("/api/proxy-image?url="),
+    { message: "Invalid image URL" }
+  );
+
+export const donationQrSchema = z.object({
+  label_km: z.string().max(200).optional(),
+  label_en: z.string().max(200).optional(),
+  image_url: donateQrUrlSchema,
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type DonationQrInput = z.infer<typeof donationQrSchema>;
 
 // ─── User (Admin create/edit) ─────────────────────────────────
 
@@ -186,3 +267,45 @@ export const updateUserSchema = z.object({
   is_active: z.boolean().optional(),
 });
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+/**
+ * Profile-specific schema for admins editing their own profile.
+ * Stricter validation with localized-friendly messages.
+ */
+export const profileUpdateSchema = z.object({
+  full_name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be under 100 characters")
+    .regex(/^[\p{L}\s\-'.]*$/u, "Name can only contain letters, spaces, hyphens, apostrophes, and periods"),
+  avatar_url: z
+    .string()
+    .url("Please enter a valid URL (https://...)")
+    .optional()
+    .or(z.literal("")),
+});
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+
+// ─── Password Change ──────────────────────────────────────────
+
+export const changePasswordSchema = z
+  .object({
+    current_password: z.string().min(1, "Current password is required"),
+    new_password: z
+      .string()
+      .min(8, "New password must be at least 8 characters")
+      .max(128, "New password must be under 128 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirm_password: z.string().min(1, "Please confirm your new password"),
+  })
+  .refine((data) => data.new_password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  })
+  .refine((data) => data.current_password !== data.new_password, {
+    message: "New password must be different from your current password",
+    path: ["new_password"],
+  });
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

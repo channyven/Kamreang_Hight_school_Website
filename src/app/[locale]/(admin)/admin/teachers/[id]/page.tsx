@@ -6,15 +6,17 @@ import { useLocale } from "next-intl";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Phone, User } from "lucide-react";
+import { adminHref } from "@/utils";
 import Link from "next/link";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { teacherSchema, type TeacherInput } from "@/schemas/validations";
-import { createTeacher, updateTeacher } from "@/actions/teachers";
-import { supabase } from "@/lib/supabase";
+import { createTeacher, updateTeacher, fetchTeacher } from "@/actions/teachers";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -30,8 +32,12 @@ export default function TeacherFormPage({ params }: PageProps) {
 
   useEffect(() => {
     if (!isNew) {
-      supabase.from("teachers").select("*").eq("id", id).single().then(({ data }) => {
-        if (data) Object.entries(data).forEach(([k, v]) => { if (v !== null) setValue(k as keyof TeacherInput, v as string); });
+      fetchTeacher(id).then((data) => {
+        if (data) {
+          Object.entries(data).forEach(([k, v]) => {
+            if (v !== null) setValue(k as keyof TeacherInput, v as string);
+          });
+        }
         setLoading(false);
       });
     }
@@ -39,7 +45,7 @@ export default function TeacherFormPage({ params }: PageProps) {
 
   const onSubmit = async (data: TeacherInput) => {
     const result = isNew ? await createTeacher(data) : await updateTeacher(id, data);
-    if (result.success) { toast.success(isNew ? "Teacher created!" : "Teacher updated!"); router.push(`/${locale}/admin/teachers`); }
+    if (result.success) { toast.success(isNew ? "Teacher created!" : "Teacher updated!"); router.push(adminHref(locale, "teachers")); }
     else toast.error(result.error ?? "Failed to save");
   };
 
@@ -49,7 +55,7 @@ export default function TeacherFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/teachers`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, "teachers")}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមគ្រូបង្រៀន" : "New Teacher") : (locale === "km" ? "កែគ្រូបង្រៀន" : "Edit Teacher")}
@@ -166,8 +172,52 @@ export default function TeacherFormPage({ params }: PageProps) {
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+              <h2 className="font-semibold text-gray-900">Contact</h2>
+              <div className="space-y-1.5">
+                <Label>
+                  <Phone className="w-3.5 h-3.5 inline mr-1 text-gray-400" />
+                  Phone
+                </Label>
+                <Input {...register("phone")} placeholder="e.g. 095 85 85 45" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>
+                  <User className="w-3.5 h-3.5 inline mr-1 text-gray-400" />
+                  Gender
+                </Label>
+                <Controller
+                  name="gender"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ""} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
               <h2 className="font-semibold text-gray-900">Photo</h2>
-              <Input {...register("photo_url")} placeholder="Photo URL" />
+              <Controller
+                name="photo_url"
+                control={control}
+                render={({ field }) => (
+                  <ImageUploader
+                    value={field.value}
+                    onChange={(url) => field.onChange(url ?? "")}
+                    bucket="SCHOOL_IMAGES"
+                    folder="teachers"
+                    label="Upload teacher photo"
+                  />
+                )}
+              />
             </div>
 
             <Button type="submit" className="w-full bg-school-blue-800 hover:bg-school-blue-900" disabled={isSubmitting} size="lg">

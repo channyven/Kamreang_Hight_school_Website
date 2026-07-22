@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { governanceItemSchema, type GovernanceItemInput } from "@/schemas/validations";
 import { createGovernanceItem, updateGovernanceItem, getGovernanceItemById } from "@/actions/governance";
 import { GOVERNANCE_ICON_NAMES, getGovernanceIcon } from "@/lib/governance-icons";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 import type { GovernanceSection } from "@/types";
 
 interface PageProps { params: Promise<{ id: string }>; }
@@ -57,7 +57,7 @@ export default function GovernanceItemFormPage({ params }: PageProps) {
 
   const onSubmit = async (data: GovernanceItemInput) => {
     const result = isNew ? await createGovernanceItem(data) : await updateGovernanceItem(id, data);
-    if (result.success) { toast.success(isNew ? "Item created!" : "Item updated!"); router.push(`/${locale}/admin/governance?section=${data.section}`); }
+    if (result.success) { toast.success(isNew ? "Item created!" : "Item updated!"); router.push(adminHref(locale, `governance?section=${data.section}`)); }
     else toast.error(result.error ?? "Failed to save");
   };
 
@@ -67,7 +67,7 @@ export default function GovernanceItemFormPage({ params }: PageProps) {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/governance?section=${currentSection}`}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
+          <Link href={adminHref(locale, `governance?section=${currentSection}`)}><ArrowLeft className="w-4 h-4 mr-1" />{locale === "km" ? "ត្រឡប់" : "Back"}</Link>
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isNew ? (locale === "km" ? "បន្ថែមធាតុ" : "New Item") : (locale === "km" ? "កែធាតុ" : "Edit Item")}
