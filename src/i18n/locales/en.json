@@ -177,7 +177,6 @@
     "edit_operations": "Edit Operations Report",
     "new_file": "New Report File",
     "edit_file": "Edit Report File",
-    "title": "Title",
     "published": "Published",
     "draft": "Draft",
     "academic_year": "Academic Year",
@@ -215,9 +214,18 @@
     "category": "Category",
     "all": "All",
     "back": "Back",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "delete_confirm_title": "Are you sure?",
+    "delete_confirm_desc_1": "This action cannot be undone. This will permanently delete the report file",
+    "delete_confirm_desc_2": ".",
+    "delete_success": "Report file deleted.",
+    "delete_error": "Failed to delete report file.",
+    "loading_error": "Failed to load report files.",
+    "cancel": "Cancel",
+    "delete": "Delete"
   },
   "auth": {
+    "login": "Login",
     "logout": "Sign Out",
     "email": "Email address",
     "password": "Password",

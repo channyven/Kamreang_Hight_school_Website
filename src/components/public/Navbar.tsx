@@ -76,8 +76,12 @@ export default function Navbar() {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === `/${locale}`) return pathname === `/${locale}`;
-      return pathname.startsWith(href);
+      if (href === `/${locale}`) {
+        return pathname === `/${locale}` || pathname === `/${locale}/`;
+      }
+      // Match the exact path or a proper sub-path (e.g., /en/news matches /en/news/article-1
+      // but not /en/news-foo or /en/report-extra matching /en/report)
+      return pathname === href || pathname.startsWith(href + "/");
     },
     [locale, pathname]
   );

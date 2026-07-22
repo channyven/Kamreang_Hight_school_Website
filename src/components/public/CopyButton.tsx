@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
@@ -9,8 +9,17 @@ export default function CopyButton({ value }: { value: string }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
   };
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
 
   return (
     <button
