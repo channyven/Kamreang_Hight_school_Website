@@ -55,9 +55,10 @@ export function formatShortDate(date: string | Date, locale = "en"): string {
 // ─── String helpers ───────────────────────────────────────────
 
 export function slugify(text: string): string {
+  // Khmer character range: \u1780-\u17FF
   let slug = text
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[^\u1780-\u17FFa-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .trim();

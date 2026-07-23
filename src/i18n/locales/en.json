@@ -72,7 +72,28 @@
     "vision": "Vision",
     "mission": "Mission",
     "values": "Core Values",
-    "leadership": "Leadership"
+    "leadership": "Leadership",
+    "established": "Established",
+    "land_area": "Land Area",
+    "students": "Students",
+    "teachers": "Teachers",
+    "classes": "Classes",
+    "pass_rate": "BAC Pass Rate",
+    "hero_subtitle": "A public secondary school in Kamrieng district, Battambang province, serving this rural community since 2000, committed to expanding access to quality education for every student.",
+    "our_vision": "Our Vision",
+    "our_mission": "Our Mission",
+    "what_we_stand_for": "WHAT WE STAND FOR",
+    "our_core_values": "Our Core Values",
+    "biography": "Biography",
+    "position": "Position",
+    "our_direction": "OUR DIRECTION",
+    "vision_mission": "Vision & Mission",
+    "about_our_school": "ABOUT OUR SCHOOL",
+    "learn_more": "Learn more about our archives",
+    "school_photo": "School photo",
+    "established_2000": "Established 2000",
+    "school_principal": "School Principal",
+    "click_details": "Click for details"
   },
   "governance": {
     "title": "School Governance"
@@ -167,7 +188,9 @@
     "reports": "Reports",
     "audit_logs": "Audit Logs",
     "logout": "Sign Out",
-    "profile": "Profile"
+    "profile": "Profile",
+    "admin_portal": "Admin Portal",
+    "create_new_post": "Create New Post"
   },
   "reportAdmin": {
     "title": "Reports",

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   Target,
   ArrowRight,
@@ -66,7 +67,7 @@ function isValidUrl(url: string | null | undefined): url is string {
 
 interface StatConfig {
   icon: React.ReactNode;
-  label: string;
+  translationKey: string;
   color: string;
   /** Raw numeric value to animate from 0 */
   getNumericValue: (s: Statistics) => number;
@@ -81,7 +82,7 @@ interface StatConfig {
 const STAT_HEADERS: Record<string, StatConfig> = {
   established: {
     icon: <Calendar className="w-5 h-5" />,
-    label: "Established",
+    translationKey: "established",
     color: "bg-amber-100 text-amber-700",
     getNumericValue: () => 2000,
     suffix: "",
@@ -89,7 +90,7 @@ const STAT_HEADERS: Record<string, StatConfig> = {
   },
   landArea: {
     icon: <MapPin className="w-5 h-5" />,
-    label: "Land Area",
+    translationKey: "land_area",
     color: "bg-emerald-100 text-emerald-700",
     getNumericValue: () => 21253,
     suffix: " m²",
@@ -97,7 +98,7 @@ const STAT_HEADERS: Record<string, StatConfig> = {
   },
   students: {
     icon: <Users className="w-5 h-5" />,
-    label: "Students",
+    translationKey: "students",
     color: "bg-blue-100 text-blue-700",
     getNumericValue: (s) => s.total_students ?? 0,
     suffix: "",
@@ -105,21 +106,21 @@ const STAT_HEADERS: Record<string, StatConfig> = {
   },
   teachers: {
     icon: <GraduationCap className="w-5 h-5" />,
-    label: "Teachers",
+    translationKey: "teachers",
     color: "bg-violet-100 text-violet-700",
     getNumericValue: (s) => s.total_teachers ?? 0,
     suffix: "",
   },
   classes: {
     icon: <BookOpen className="w-5 h-5" />,
-    label: "Classes",
+    translationKey: "classes",
     color: "bg-rose-100 text-rose-700",
     getNumericValue: (s) => s.total_classes ?? 0,
     suffix: "",
   },
   passRate: {
     icon: <TrendingUp className="w-5 h-5" />,
-    label: "BAC Pass Rate",
+    translationKey: "pass_rate",
     color: "bg-cyan-100 text-cyan-700",
     getNumericValue: (s) => s.pass_rate ?? s.graduation_rate ?? 0,
     suffix: "%",
@@ -133,7 +134,7 @@ const STAT_HEADERS: Record<string, StatConfig> = {
 
 function AnimatedStatCard({
   icon,
-  label,
+  translationKey,
   color,
   numericValue,
   suffix,
@@ -142,7 +143,7 @@ function AnimatedStatCard({
   instant,
 }: {
   icon: React.ReactNode;
-  label: string;
+  translationKey: string;
   color: string;
   numericValue: number;
   suffix: string;
@@ -150,6 +151,7 @@ function AnimatedStatCard({
   delay: number;
   instant?: boolean;
 }) {
+  const t = useTranslations("about");
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useIsInView(ref);
   const animatedCount = useCounter(numericValue, isVisible);
@@ -181,7 +183,9 @@ function AnimatedStatCard({
             </>
           )}
         </p>
-        <p className="text-sm text-gray-500 mt-1 font-medium">{label}</p>
+        <p className="text-sm text-gray-500 mt-1 font-medium">
+          {translationKey ? t(translationKey) : ""}
+        </p>
       </div>
     </ScrollReveal>
   );
@@ -311,7 +315,7 @@ function LeaderDetailDialog({
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-0.5">
-                  {km ? "ទូរស័ព្ទ" : "Phone"}
+                  {tc("phone")}
                 </p>
                 <p className="text-sm font-medium text-gray-800">
                   {leader.phone}
@@ -328,7 +332,7 @@ function LeaderDetailDialog({
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-school-blue-500 mb-0.5">
-                  {km ? "តួនាទី" : "Position"}
+                  {t("position")}
                 </p>
                 <p className={cn("text-sm font-medium text-gray-800", km && "font-khmer")}>
                   {getLocalizedText(leader.title_km, leader.title_en, locale)}
@@ -345,7 +349,7 @@ function LeaderDetailDialog({
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-500 mb-0.5">
-                  {km ? "ជីវប្រវត្តិ" : "Biography"}
+                  {t("biography")}
                 </p>
                 <p className={cn("text-sm leading-relaxed text-gray-600 italic", km && "font-khmer")}>
                   &ldquo;{getLocalizedText(leader.bio_km, leader.bio_en, locale)}&rdquo;
@@ -378,6 +382,8 @@ export default function AboutPageClient({
   statistics,
   locale,
 }: AboutPageClientProps) {
+  const t = useTranslations("about");
+  const tc = useTranslations("common");
   const km = locale === "km";
 
   const infoMap = useMemo(
@@ -435,7 +441,7 @@ export default function AboutPageClient({
               transition={{ delay: 0.15, duration: 0.5 }}
               className="font-khmer text-xl md:text-2xl mb-3 text-school-gold-400"
             >
-              អំពីសាលារបស់យើង
+              {t("about_our_school")}
             </motion.p>
 
             <motion.h1
@@ -447,7 +453,7 @@ export default function AboutPageClient({
                 km && "font-khmer"
               )}
             >
-              {km ? "អំពីសាលារៀន" : "About School"}
+              {t("title")}
             </motion.h1>
 
             <motion.div
@@ -466,9 +472,7 @@ export default function AboutPageClient({
                 km && "font-khmer"
               )}
             >
-              {km
-                ? "សាលារៀនសាធារណៈនៅស្រុកកំរៀង ខេត្តបាត់ដំបង បម្រើសហគមន៍ជនបទនេះតាំងពីឆ្នាំ ២០០០ ប្ដេជ្ញាពង្រីកលទ្ធភាពទទួលបានការអប់រំប្រកបដោយគុណភាពសម្រាប់សិស្សគ្រប់រូប។"
-                : "A public secondary school in Kamrieng district, Battambang province, serving this rural community since 2000, committed to expanding access to quality education for every student."}
+              {t("hero_subtitle")}
             </motion.p>
           </div>
 
@@ -504,7 +508,7 @@ export default function AboutPageClient({
                 <AnimatedStatCard
                   key={key}
                   icon={config.icon}
-                  label={config.label}
+                  translationKey={config.translationKey}
                   color={config.color}
                   numericValue={numericValue}
                   suffix={config.suffix}
@@ -524,10 +528,10 @@ export default function AboutPageClient({
           <ScrollReveal variant="fade-up">
             <div className="text-center mb-16">
               <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-goldMain mb-3">
-                {km ? "ទិសដៅរបស់យើង" : "OUR DIRECTION"}
+                {t("our_direction")}
               </p>
               <h2 className={cn("text-4xl md:text-5xl font-extrabold text-school-navy mb-5 tracking-tight", km && "font-khmer")}>
-                {km ? "ចក្ខុវិស័យ និងបេសកកម្ម" : "Vision & Mission"}
+                {t("vision_mission")}
               </h2>
               <div className="w-14 h-1.5 bg-school-goldMain mx-auto rounded-full" />
             </div>
@@ -544,7 +548,7 @@ export default function AboutPageClient({
                       <Telescope className="w-10 h-10 text-school-goldMain" />
                     </div>
                     <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
-                      {km ? "ចក្ខុវិស័យរបស់យើង" : "Our Vision"}
+                      {t("our_vision")}
                     </h3>
                   </div>
                   <div
@@ -571,7 +575,7 @@ export default function AboutPageClient({
                       <Target className="w-10 h-10 text-[#1e3a8a]" />
                     </div>
                     <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
-                      {km ? "បេសកកម្មរបស់យើង" : "Our Mission"}
+                      {t("our_mission")}
                     </h3>
                   </div>
                   <div
@@ -595,10 +599,10 @@ export default function AboutPageClient({
             <ScrollReveal variant="fade-up" delay={0.25}>
               <div className="text-center mb-16">
                 <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-goldMain mb-3">
-                  {km ? "អ្វីដែលយើងប្រកាន់ខ្ជាប់" : "WHAT WE STAND FOR"}
+                  {t("what_we_stand_for")}
                 </p>
                 <h2 className={cn("text-4xl md:text-5xl font-extrabold text-school-navy mb-5 tracking-tight", km && "font-khmer")}>
-                  {km ? "គុណតម្លៃស្នូលរបស់យើង" : "Our Core Values"}
+                  {t("our_core_values")}
                 </h2>
                 <div className="w-14 h-1.5 bg-school-goldMain mx-auto rounded-full" />
               </div>
@@ -643,7 +647,7 @@ export default function AboutPageClient({
                         <ValueIcon className="w-10 h-10 text-school-goldMain transition-transform duration-500 group-hover:rotate-12" />
                       </div>
                       <h4 className={cn("text-2xl font-bold text-school-navy mb-5", km && "font-khmer")}>
-                        {km ? v.km : v.en}
+                        {km ? v.km : v.en.toUpperCase()}
                       </h4>
                       <p className={cn("text-[15px] text-gray-500 leading-relaxed font-medium", km && "font-khmer")}>
                         {km ? v.desc_km : v.desc_en}
@@ -689,7 +693,7 @@ export default function AboutPageClient({
                     km && "font-khmer"
                   )}
                 >
-                  {km ? "ស្វែងយល់បន្ថែម" : "Learn more about our archives"}
+                  {t("learn_more")}
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </a>
               </div>
@@ -929,7 +933,7 @@ export default function AboutPageClient({
                     <Quote className="absolute -top-2 right-6 w-24 h-24 pointer-events-none text-school-blue-800/5" />
 
                     <span className="relative self-start inline-flex items-center text-xs tracking-[0.15em] uppercase font-semibold px-3 py-1.5 rounded-full mb-4 bg-school-blue-50 text-school-blue-800">
-                      {km ? "នាយកសាលា" : "School Principal"}
+                      {t("school_principal")}
                     </span>
 
                     <h3
@@ -956,7 +960,7 @@ export default function AboutPageClient({
                     <div className="relative flex flex-wrap gap-3">
                       <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-school-blue-800 shadow-md shadow-school-blue-800/20">
                         <Mail className="w-4 h-4" />
-                        {km ? "ចុចមើលព័ត៌មានលម្អិត" : "Click for details"}
+                        {t("click_details")}
                       </span>
                     </div>
                   </div>

@@ -94,7 +94,9 @@ export default function AdminSidebar() {
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white leading-tight">Admin Portal</p>
+            <p className="text-sm font-bold text-white leading-tight">
+              {t("admin_portal")}
+            </p>
             <p className="text-xs leading-tight mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
               {process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School"}
             </p>
@@ -111,7 +113,7 @@ export default function AdminSidebar() {
             style={{ background: "#fdbc13", color: "#0d1b38" }}
           >
             <Plus className="w-4 h-4" />
-            Create New Post
+            {t("create_new_post")}
           </Link>
         </div>
       )}
@@ -121,7 +123,7 @@ export default function AdminSidebar() {
             href={`/${locale}/admin/news/new`}
             className="flex items-center justify-center w-full py-2.5 rounded-xl transition-all duration-200 hover:opacity-90"
             style={{ background: "#fdbc13", color: "#0d1b38" }}
-            title="Create New Post"
+            title={t("create_new_post")}
           >
             <Plus className="w-4 h-4" />
           </Link>
