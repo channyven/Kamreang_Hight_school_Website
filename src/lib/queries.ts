@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, SchoolReport as DbSchoolReport, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -9,7 +9,7 @@ import {
   mockStats,
   mockGovernanceItems,
 } from "@/lib/mock-data";
-import { schoolReport, mapDbReportToFrontend } from "@/lib/report-data";
+import { schoolReport, dbToUiSchoolReport } from "@/lib/report-data";
 import type { SchoolReport as FrontendSchoolReport } from "@/lib/report-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
@@ -206,7 +206,10 @@ export const getPublishedSchoolReport = unstable_cache(
         .limit(1)
         .maybeSingle();
 
-      if (data) return mapDbReportToFrontend(data as never);
+      if (data) {
+        const mapped = dbToUiSchoolReport(data as DbSchoolReport);
+        if (mapped) return mapped;
+      }
     } catch {
       // fall through to local fallback
     }
