@@ -185,112 +185,32 @@ export interface ReportFile {
   updated_at: string;
 }
 
-/** Shape of the editable annual Operations Report content (JSONB). */
-export interface OperationsReportContent {
-  general?: {
-    principal_km?: string;
-    principal_en?: string;
-    total_staff?: number;
-    total_students?: number;
-    total_classes?: number;
-    land_area_sqm?: number;
-    established_year?: number;
-    summary_km?: string;
-    summary_en?: string;
-  };
-  teaching_hours?: {
-    weekly_hours?: number;
-    notes_km?: string;
-    notes_en?: string;
-  };
-  regular_testing?: {
-    monthly_tests_km?: string;
-    monthly_tests_en?: string;
-    semester_tests_km?: string;
-    semester_tests_en?: string;
-    notes_km?: string;
-    notes_en?: string;
-  };
-  planning?: {
-    school_improvement_plan_km?: string;
-    school_improvement_plan_en?: string;
-    teacher_development_plan_km?: string;
-    teacher_development_plan_en?: string;
-    student_support_plan_km?: string;
-    student_support_plan_en?: string;
-  };
-  agreements?: {
-    teacher_contracts_km?: string;
-    teacher_contracts_en?: string;
-    community_partnerships_km?: string;
-    community_partnerships_en?: string;
-  };
-  self_assessment?: {
-    model_school_standard_km?: string;
-    model_school_standard_en?: string;
-    last_assessment_date_km?: string;
-    last_assessment_date_en?: string;
-    score?: number;
-    max_score?: number;
-  };
-  awards?: {
-    awards?: { title_km: string; title_en: string; year: number }[];
-  };
-  timetables?: {
-    grade7_km?: string;
-    grade7_en?: string;
-    grade8_km?: string;
-    grade8_en?: string;
-    grade9_km?: string;
-    grade9_en?: string;
-    grade10_km?: string;
-    grade10_en?: string;
-    grade11_km?: string;
-    grade11_en?: string;
-    grade12_km?: string;
-    grade12_en?: string;
-  };
-  student_stats?: {
-    items?: { label_km: string; label_en: string; value: number; suffix?: string }[];
-    notes_km?: string;
-    notes_en?: string;
-  };
-  feeder_schools?: {
-    schools?: { name_km: string; name_en: string; student_count: number }[];
-  };
-  academic_results?: {
-    grade9_pass_rate?: number;
-    grade12_pass_rate?: number;
-    top_students?: { name: string; score: number }[];
-  };
-  staff_status?: { label_km: string; label_en: string; count: number }[];
-  facilities?: {
-    items?: { label_km: string; label_en: string; detail_km: string; detail_en: string }[];
-    textbook_status?: { subject_km: string; subject_en: string; student_ratio: number }[];
-    notes_km?: string;
-    notes_en?: string;
-  };
-  budget?: {
-    currency?: string;
-    total_budget?: number;
-    community_support?: number;
-    expenditure?: { label_km: string; label_en: string; amount: number }[];
-    remaining_balance?: number;
-    notes_km?: string;
-    notes_en?: string;
-  };
-  challenges?: { title_km: string; title_en: string; detail_km: string; detail_en: string }[];
-  future_direction?: { km: string; en: string }[];
+// ─── Dynamic, admin-created report sections (report_custom_sections) ───────
+
+export type ReportBlock =
+  | { type: "keyvalue"; rows: { label_km: string; label_en: string; value: string }[] }
+  | { type: "table"; columns: { km: string; en: string }[]; rows: string[][]; note_km?: string; note_en?: string }
+  | { type: "list"; items: { km: string; en: string }[] }
+  | { type: "paragraph"; paragraphs: { km: string; en: string }[] };
+
+export interface ReportSubsection {
+  key: string;
+  title_km: string;
+  title_en: string;
+  blocks: ReportBlock[];
 }
 
-export interface SchoolReport {
+export interface ReportCustomSection {
   id: string;
-  academic_year: string;
-  content: OperationsReportContent;
-  is_published: boolean;
+  section_number: number;
+  title_km: string;
+  title_en: string;
+  is_active: boolean;
+  subsections: ReportSubsection[];
   created_at: string;
   updated_at: string;
 }
+
 
 export interface AuditLog {
   id: string;

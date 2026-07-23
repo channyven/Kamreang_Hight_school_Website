@@ -123,16 +123,16 @@ export const reportFileSchema = z.object({
 });
 export type ReportFileInput = z.infer<typeof reportFileSchema>;
 
-// ─── Operations Report (annual, JSONB content) ───────────────
+// ─── Custom Report Sections (dynamic, admin-created) ─────────
 
-export const operationsReportSchema = z.object({
-  academic_year: z
-    .string()
-    .regex(/^\d{4}-\d{4}$/, "Format must be YYYY-YYYY (e.g. 2024-2025)"),
-  is_published: z.boolean().default(false),
-  content: z.record(z.any()).default({}),
+export const reportCustomSectionSchema = z.object({
+  section_number: z.coerce.number().int().min(1).default(1),
+  title_km: z.string().min(1, "Khmer title is required").max(300),
+  title_en: z.string().min(1, "English title is required").max(300),
+  is_active: z.boolean().default(true),
+  subsections: z.array(z.record(z.any())).default([]),
 });
-export type OperationsReportInput = z.infer<typeof operationsReportSchema>;
+export type ReportCustomSectionInput = z.infer<typeof reportCustomSectionSchema>;
 
 // ─── Student ──────────────────────────────────────────────────
 

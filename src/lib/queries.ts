@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, BankAccount, DonationPurpose, DonationQr, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, SchoolInfo, SchoolReport as DbSchoolReport, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, BankAccount, DonationPurpose, DonationQr, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, ReportCustomSection, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -11,8 +11,6 @@ import {
   mockBankAccounts,
   mockDonationPurposes,
 } from "@/lib/mock-data";
-import { schoolReport, dbToUiSchoolReport } from "@/lib/report-data";
-import type { SchoolReport as FrontendSchoolReport } from "@/lib/report-data";
 
 // Public-site reads are wrapped in `unstable_cache` so navigating between
 // pages doesn't pay a fresh Supabase round-trip on every request (each one
@@ -298,27 +296,20 @@ export const getCurrentStatistics = unstable_cache(
   { tags: ["statistics"], revalidate: 60 }
 );
 
-export const getPublishedSchoolReport = unstable_cache(
-  async (): Promise<FrontendSchoolReport> => {
+export const getPublishedCustomReportSections = unstable_cache(
+  async (): Promise<ReportCustomSection[]> => {
     try {
       const supabase = createServerClient();
       const { data } = await supabase
-        .from("school_reports")
+        .from("report_custom_sections")
         .select("*")
-        .eq("is_published", true)
-        .order("academic_year", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (data) {
-        const mapped = dbToUiSchoolReport(data as DbSchoolReport);
-        if (mapped) return mapped;
-      }
+        .eq("is_active", true)
+        .order("section_number", { ascending: true });
+      return (data ?? []) as ReportCustomSection[];
     } catch {
-      // fall through to local fallback
+      return [];
     }
-    return schoolReport;
   },
-  ["published-school-report"],
-  { tags: ["school_reports"], revalidate: 300 }
+  ["published-custom-report-sections"],
+  { tags: ["report_custom_sections"], revalidate: 300 }
 );

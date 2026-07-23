@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { reportFileSchema, type ReportFileInput } from "@/schemas/validations";
 import { createReportFile, updateReportFile, getReportFileById } from "@/actions/Report";
 import { REPORT_FILE_CATEGORIES, type ReportFileCategory } from "@/types";
+import { adminHref } from "@/utils";
 
 interface ReportFileFormProps {
   id?: string;
@@ -84,7 +85,7 @@ export default function ReportFileForm({ id }: ReportFileFormProps) {
           });
         } else if (!file && active) {
           toast.error(locale === "km" ? "រកមិនឃើញ" : "Not found");
-          router.push(`/${locale}/admin/reports`);
+          router.push(adminHref(locale, "reports"));
         }
       } catch (err) {
         console.error("Failed to load report file:", err);
@@ -103,7 +104,7 @@ export default function ReportFileForm({ id }: ReportFileFormProps) {
     if (result.success) {
       toast.success(locale === "km" ? "បានរក្សាទុក!" : "Saved!");
       reset();
-      router.push(`/${locale}/admin/reports`);
+      router.push(adminHref(locale, "reports"));
     } else {
       toast.error(result.error ?? (locale === "km" ? "រក្សាទុកមិនបាន" : "Failed to save"));
     }
@@ -115,7 +116,7 @@ export default function ReportFileForm({ id }: ReportFileFormProps) {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/${locale}/admin/reports`}>
+            <Link href={adminHref(locale, "reports")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {t("back")}
             </Link>
@@ -292,7 +293,7 @@ export default function ReportFileForm({ id }: ReportFileFormProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/${locale}/admin/reports`)}
+              onClick={() => router.push(adminHref(locale, "reports"))}
             >
               Cancel
             </Button>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createServerClient } from "@/lib/supabase";
-import { dbToUiSchoolReport } from "@/lib/report-data";
 import ReportClient from "@/components/public/report/ReportClient";
-import type { SchoolReport as DbSchoolReport } from "@/types";
+import type { ReportCustomSection } from "@/types";
 import type { Locale } from "@/i18n/config";
 import { FileBarChart } from "lucide-react";
 
@@ -18,17 +17,13 @@ export default async function ReportPage() {
   const t = await getTranslations("report");
   const locale = (await getLocale()) as Locale;
 
-  // Fetch the latest published operations report from the database.
   const supabase = createServerClient();
-  const { data: dbReport } = await supabase
-    .from("school_reports")
+  const { data: customSectionsData } = await supabase
+    .from("report_custom_sections")
     .select("*")
-    .eq("is_published", true)
-    .order("academic_year", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const report = dbToUiSchoolReport(dbReport as DbSchoolReport | null);
+    .eq("is_active", true)
+    .order("section_number", { ascending: true });
+  const customSections = (customSectionsData ?? []) as ReportCustomSection[];
 
   return (
     <section className="min-h-screen bg-gray-50 pt-24 pb-16">
@@ -42,9 +37,9 @@ export default async function ReportPage() {
           <p className="mt-2 text-gray-600 max-w-2xl">{t("subtitle")}</p>
         </header>
 
-        {report ? (
+        {customSections.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-8">
-            <ReportClient report={report} locale={locale} />
+            <ReportClient locale={locale} customSections={customSections} />
           </div>
         ) : (
           <NoReportPlaceholder locale={locale} />
@@ -54,7 +49,7 @@ export default async function ReportPage() {
   );
 }
 
-/** Shown when no published report exists in the database yet. */
+/** Shown when no sections have been added to the report yet. */
 function NoReportPlaceholder({ locale }: { locale: Locale }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 md:p-16">

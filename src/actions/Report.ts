@@ -4,15 +4,14 @@ import { createServerClient } from "@/lib/supabase";
 import type {
   ReportFile,
   ReportFileCategory,
-  SchoolReport,
-  OperationsReportContent,
+  ReportCustomSection,
   ActionResult,
 } from "@/types";
 import {
   reportFileSchema,
-  operationsReportSchema,
+  reportCustomSectionSchema,
   type ReportFileInput,
-  type OperationsReportInput,
+  type ReportCustomSectionInput,
 } from "@/schemas/validations";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
@@ -25,7 +24,7 @@ const REPORT_REVALIDATE = [
 /** Revalidate both the route paths and the cached query tag. */
 function revalidateReports() {
   REPORT_REVALIDATE.forEach((p) => revalidatePath(p, "page"));
-  revalidateTag("school_reports");
+  revalidateTag("report_custom_sections");
 }
 
 // ─── Report Files (library) ──────────────────────────────────
@@ -183,36 +182,9 @@ export async function deleteReportFile(id: string): Promise<ActionResult> {
   return { success: true };
 }
 
-// ─── Operations Report (annual, JSONB) ──────────────────────
+// ─── Custom Report Sections (dynamic, admin-created) ────────
 
-export async function getOperationsReport(
-  academicYear?: string
-): Promise<SchoolReport | null> {
-  try {
-    await requireAdmin();
-  } catch {
-    return null;
-  }
-  const supabase = createServerClient();
-
-  let query = supabase
-    .from("school_reports")
-    .select("*")
-    .order("academic_year", { ascending: false });
-
-  if (academicYear) {
-    query = query.eq("academic_year", academicYear);
-  }
-
-  const { data, error } = await query.limit(1).maybeSingle();
-  if (error) {
-    console.error("Get operations report error:", error);
-    return null;
-  }
-  return data as SchoolReport | null;
-}
-
-export async function getAllOperationsReports(): Promise<SchoolReport[]> {
+export async function getReportCustomSections(): Promise<ReportCustomSection[]> {
   try {
     await requireAdmin();
   } catch {
@@ -220,47 +192,117 @@ export async function getAllOperationsReports(): Promise<SchoolReport[]> {
   }
   const supabase = createServerClient();
   const { data, error } = await supabase
-    .from("school_reports")
+    .from("report_custom_sections")
     .select("*")
-    .order("academic_year", { ascending: false });
+    .order("section_number", { ascending: true });
 
   if (error) {
-    console.error("Get all operations reports error:", error);
+    console.error("Get report custom sections error:", error);
     return [];
   }
-  return (data ?? []) as SchoolReport[];
+  return (data ?? []) as ReportCustomSection[];
 }
 
-/**
- * Insert or update the operations report for a given academic year.
- * The full section content is stored in the JSONB `content` column.
- */
-export async function upsertOperationsReport(
-  data: OperationsReportInput
+export async function getReportCustomSectionById(
+  id: string
+): Promise<ReportCustomSection | null> {
+  try {
+    await requireAdmin();
+  } catch {
+    return null;
+  }
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from("report_custom_sections")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Get report custom section by ID error:", error);
+    return null;
+  }
+  return data as ReportCustomSection;
+}
+
+export async function createReportCustomSection(
+  data: ReportCustomSectionInput
 ): Promise<ActionResult<void>> {
   try {
     await requireAdmin();
   } catch {
     return { success: false, error: "Unauthorized" };
   }
-  const parsed = operationsReportSchema.safeParse(data);
+  const parsed = reportCustomSectionSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.errors[0]?.message };
   }
 
   const supabase = createServerClient();
-  const { error } = await supabase.from("school_reports").upsert(
-    {
-      academic_year: parsed.data.academic_year,
-      content: parsed.data.content as OperationsReportContent,
-      is_published: parsed.data.is_published,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "academic_year" }
-  );
+  const { error } = await supabase.from("report_custom_sections").insert({
+    section_number: parsed.data.section_number,
+    title_km: parsed.data.title_km,
+    title_en: parsed.data.title_en,
+    is_active: parsed.data.is_active,
+    subsections: parsed.data.subsections,
+  });
 
   if (error) {
-    console.error("Upsert operations report error:", error);
+    console.error("Create report custom section error:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidateReports();
+  return { success: true };
+}
+
+export async function updateReportCustomSection(
+  id: string,
+  data: ReportCustomSectionInput
+): Promise<ActionResult<void>> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+  const parsed = reportCustomSectionSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0]?.message };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("report_custom_sections")
+    .update({
+      section_number: parsed.data.section_number,
+      title_km: parsed.data.title_km,
+      title_en: parsed.data.title_en,
+      is_active: parsed.data.is_active,
+      subsections: parsed.data.subsections,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Update report custom section error:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidateReports();
+  return { success: true };
+}
+
+export async function deleteReportCustomSection(id: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { success: false, error: "Unauthorized" };
+  }
+  const supabase = createServerClient();
+  const { error } = await supabase.from("report_custom_sections").delete().eq("id", id);
+
+  if (error) {
+    console.error("Delete report custom section error:", error);
     return { success: false, error: error.message };
   }
 

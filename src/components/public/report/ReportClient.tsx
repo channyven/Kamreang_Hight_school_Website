@@ -4,43 +4,28 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/utils";
-import { reportSections, type SchoolReport } from "@/lib/report-data";
 import type { Locale } from "@/i18n/config";
+import type { ReportCustomSection } from "@/types";
 import {
   SectionShell,
   getSectionIcon,
-  GeneralInfoSection,
-  TeachingHoursSection,
-  RegularTestingSection,
-  PlanningSection,
-  AgreementsSection,
-  SelfAssessmentSection,
-  AwardsSection,
-  TimetablesSection,
-  StudentStatsSection,
-  FeederSchoolsSection,
-  AcademicResultsSection,
-  StaffStatusSection,
-  FacilitiesSection,
-  BudgetSection,
-  ChallengesSection,
-  FutureDirectionSection,
+  CustomSection,
   BackToTop,
 } from "./ReportSections";
 
 export default function ReportClient({
-  report,
   locale,
+  customSections,
 }: {
-  report: SchoolReport;
   locale: Locale;
+  customSections: ReportCustomSection[];
 }) {
-  // Note: the parent always provides a non-null report (it renders
-  // NoReportPlaceholder when the DB has no published report).
-
   const t = useTranslations("report");
-  const [active, setActive] = useState(reportSections[0].id);
+  const firstId = customSections[0] ? `custom-${customSections[0].id}` : "";
+  const [active, setActive] = useState(firstId);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const customSectionIds = customSections.map((cs) => `custom-${cs.id}`);
 
   // Scrollspy: highlight the section currently in view.
   useEffect(() => {
@@ -52,22 +37,22 @@ export default function ReportClient({
       },
       { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
     );
-    reportSections.forEach((s) => {
-      const el = document.getElementById(s.id);
+    customSectionIds.forEach((id) => {
+      const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [customSectionIds]);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
     setMobileNavOpen(false);
   };
 
-  const navItems = reportSections.map((s) => ({
-    id: s.id,
-    label: t(s.id as Parameters<typeof t>[0]),
-    icon: getSectionIcon(s.icon),
+  const navItems = customSections.map((cs) => ({
+    id: `custom-${cs.id}`,
+    label: locale === "km" ? cs.title_km : cs.title_en,
+    icon: getSectionIcon("FileText"),
   }));
 
   return (
@@ -99,9 +84,11 @@ export default function ReportClient({
               );
             })}
           </nav>
-          <div className="mt-4 px-3">
-            <BackToTop label={t("back_to_top")} onClick={() => scrollTo(reportSections[0].id)} />
-          </div>
+          {firstId && (
+            <div className="mt-4 px-3">
+              <BackToTop label={t("back_to_top")} onClick={() => scrollTo(firstId)} />
+            </div>
+          )}
         </div>
       </aside>
 
@@ -144,73 +131,22 @@ export default function ReportClient({
 
       {/* ─── Content ─── */}
       <div className="min-w-0">
-        <SectionShell id="general" title={t("general")} icon={getSectionIcon("Info")}>
-          <GeneralInfoSection data={report.general} locale={locale} />
-        </SectionShell>
+        {customSections.map((cs) => (
+          <SectionShell
+            key={cs.id}
+            id={`custom-${cs.id}`}
+            title={locale === "km" ? cs.title_km : cs.title_en}
+            icon={getSectionIcon("FileText")}
+          >
+            <CustomSection subsections={cs.subsections} locale={locale} />
+          </SectionShell>
+        ))}
 
-        <SectionShell id="teachingHours" title={t("teachingHours")} icon={getSectionIcon("Clock")}>
-          <TeachingHoursSection data={report.teachingHours} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="regularTesting" title={t("regularTesting")} icon={getSectionIcon("ClipboardCheck")}>
-          <RegularTestingSection data={report.regularTesting} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="planning" title={t("planning")} icon={getSectionIcon("Book")}>
-          <PlanningSection data={report.planning} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="agreements" title={t("agreements")} icon={getSectionIcon("FileText")}>
-          <AgreementsSection data={report.agreements} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="selfAssessment" title={t("selfAssessment")} icon={getSectionIcon("Award")}>
-          <SelfAssessmentSection data={report.selfAssessment} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="awards" title={t("awards")} icon={getSectionIcon("Trophy")}>
-          <AwardsSection data={report.awards} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="timetables" title={t("timetables")} icon={getSectionIcon("Calendar")}>
-          <TimetablesSection data={report.timetables} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="studentStats" title={t("studentStats")} icon={getSectionIcon("Users")}>
-          <StudentStatsSection data={report.studentStats} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="feederSchools" title={t("feederSchools")} icon={getSectionIcon("Building")}>
-          <FeederSchoolsSection data={report.feederSchools} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="academicResults" title={t("academicResults")} icon={getSectionIcon("BarChart2")}>
-          <AcademicResultsSection data={report.academicResults} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="staffStatus" title={t("staffStatus")} icon={getSectionIcon("UserCheck")}>
-          <StaffStatusSection data={report.staffStatus} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="textbookStatus" title={t("textbookStatus")} icon={getSectionIcon("BookOpen")}>
-          <FacilitiesSection data={report.facilities} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="budget" title={t("budget")} icon={getSectionIcon("Wallet")}>
-          <BudgetSection data={report.budget} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="challenges" title={t("challenges")} icon={getSectionIcon("AlertTriangle")}>
-          <ChallengesSection data={report.challenges} locale={locale} />
-        </SectionShell>
-
-        <SectionShell id="futureDirection" title={t("futureDirection")} icon={getSectionIcon("Rocket")}>
-          <FutureDirectionSection data={report.futureDirection} locale={locale} />
-        </SectionShell>
-
-        <div className="pt-6 lg:hidden">
-          <BackToTop label={t("back_to_top")} onClick={() => scrollTo(reportSections[0].id)} />
-        </div>
+        {firstId && (
+          <div className="pt-6 lg:hidden">
+            <BackToTop label={t("back_to_top")} onClick={() => scrollTo(firstId)} />
+          </div>
+        )}
       </div>
     </div>
   );

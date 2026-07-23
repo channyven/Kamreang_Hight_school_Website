@@ -5,19 +5,21 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   Loader2, FileBarChart, FileText, Plus, Pencil, Trash2, ExternalLink,
-  Search, Info, Clock, Users, Building2, Wallet, AlertTriangle,
-  Rocket, UserCheck, Eye, Calendar,
+  Search, Calendar,
   X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import Link from "next/link";
 
-import { getReportFiles, deleteReportFile } from "@/actions/Report";
+import {
+  getReportFiles, deleteReportFile,
+  getReportCustomSections, deleteReportCustomSection,
+} from "@/actions/Report";
 import { supabase } from "@/lib/supabase";
-import type { ReportFile, ReportFileCategory } from "@/types";
+import type { ReportFile, ReportFileCategory, ReportCustomSection } from "@/types";
 import { REPORT_FILE_CATEGORIES } from "@/types";
-import { cn } from "@/utils";
+import { cn, adminHref } from "@/utils";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,28 +33,7 @@ import { Input } from "@/components/ui/input";
 
 type Tab = "operations" | "files";
 
-// ─── Section icons for the operations summary ───────────────
-const SECTION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  general: Info,
-  teaching_hours: Clock,
-  student_stats: Users,
-  staff_status: UserCheck,
-  facilities: Building2,
-  budget: Wallet,
-  challenges: AlertTriangle,
-  future_direction: Rocket,
-};
-
-const SECTION_COLORS: Record<string, string> = {
-  general: "from-blue-500 to-blue-600",
-  teaching_hours: "from-emerald-500 to-emerald-600",
-  student_stats: "from-violet-500 to-violet-600",
-  staff_status: "from-cyan-500 to-cyan-600",
-  facilities: "from-amber-500 to-amber-600",
-  budget: "from-rose-500 to-rose-600",
-  challenges: "from-orange-500 to-orange-600",
-  future_direction: "from-indigo-500 to-indigo-600",
-};
+const SECTION_ICON_GRADIENT = "from-school-blue-700 to-school-blue-800";
 
 export default function AdminReportsPage() {
   const t = useTranslations("reportAdmin");
@@ -149,14 +130,14 @@ export default function AdminReportsPage() {
           <p className="text-sm text-gray-500 mt-1">{t("subtitle")}</p>
         </div>
         {tab === "files" ? (
-          <Button onClick={() => router.push(`/${locale}/admin/reports/files/new`)}>
+          <Button onClick={() => router.push(adminHref(locale, "reports/files/new"))}>
             <Plus className="w-4 h-4 mr-2" />
             {t("new_file")}
           </Button>
         ) : (
-          <Button onClick={() => router.push(`/${locale}/admin/reports/operations`)}>
-            <Pencil className="w-4 h-4 mr-2" />
-            {t("edit_operations")}
+          <Button onClick={() => router.push(adminHref(locale, "reports/sections/new"))}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("add_section")}
           </Button>
         )}
       </div>
@@ -164,7 +145,7 @@ export default function AdminReportsPage() {
       {/* Styled Tabs */}
       <div className="flex gap-1 border-b border-gray-200">
         <TabButton active={tab === "operations"} onClick={() => handleTabChange("operations")} icon={FileBarChart}>
-          {t("operations")}
+          {t("sections_nav")}
         </TabButton>
         <TabButton active={tab === "files"} onClick={() => handleTabChange("files")} icon={FileText}>
           {t("files")}
@@ -184,11 +165,7 @@ export default function AdminReportsPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
           >
-            <OperationsSummary
-              locale={locale}
-              onEdit={() => router.push(`/${locale}/admin/reports/operations`)}
-              onView={() => window.open(`/${locale}/report`, "_blank")}
-            />
+            <OperationsSummary locale={locale} />
           </motion.div>
         ) : (
           <motion.div
@@ -246,7 +223,7 @@ export default function AdminReportsPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/80">
-                        <th className="text-left font-semibold text-gray-600 p-3 pl-5 w-2/5">{t("title")}</th>
+                        <th className="text-left font-semibold text-gray-600 p-3 pl-5 w-2/5">{t("section_title")}</th>
                         <th className="text-left font-semibold text-gray-600 p-3 hidden md:table-cell">{t("academic_year")}</th>
                         <th className="text-left font-semibold text-gray-600 p-3 hidden sm:table-cell">{t("category")}</th>
                         <th className="text-left font-semibold text-gray-600 p-3">{t("published")}</th>
@@ -273,7 +250,7 @@ export default function AdminReportsPage() {
                               action={
                                 <Button
                                   size="sm"
-                                  onClick={() => router.push(`/${locale}/admin/reports/files/new`)}
+                                  onClick={() => router.push(adminHref(locale, "reports/files/new"))}
                                 >
                                   <Plus className="w-4 h-4 mr-1.5" />
                                   {t("new_file")}
@@ -289,11 +266,11 @@ export default function AdminReportsPage() {
                             initial={{ opacity: 0, y: 4 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.03 }}
-                            className="group hover:bg-blue-50/40 transition-colors"
+                            className="group hover:bg-school-blue-50/40 transition-colors"
                           >
                             <td className="p-3 pl-5">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shrink-0 group-hover:from-blue-100 group-hover:to-blue-200 transition-colors">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-school-blue-50 to-school-blue-100 flex items-center justify-center shrink-0 group-hover:from-school-blue-100 group-hover:to-school-blue-200 transition-colors">
                                   <FileText className="w-4 h-4 text-school-blue-700" />
                                 </div>
                                 <div className="min-w-0">
@@ -348,7 +325,7 @@ export default function AdminReportsPage() {
                                   className="h-8 w-8 text-gray-400 hover:text-amber-600 hover:bg-amber-50"
                                   asChild
                                 >
-                                  <Link href={`/${locale}/admin/reports/files/${file.id}`} title={t("edit_file")}>
+                                  <Link href={adminHref(locale, `reports/files/${file.id}`)} title={t("edit_file")}>
                                     <Pencil className="w-3.5 h-3.5" />
                                   </Link>
                                 </Button>
@@ -476,82 +453,181 @@ function FilterChip({
 }
 
 function OperationsSummary({
-  locale, onEdit, onView,
+  locale,
 }: {
-  locale: "km" | "en"; onEdit: () => void; onView: () => void;
+  locale: "km" | "en";
 }) {
   const t = useTranslations("reportAdmin");
+  const router = useRouter();
+  const [customSections, setCustomSections] = useState<ReportCustomSection[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const sections = [
-    { key: "general", label: t("general") },
-    { key: "teaching_hours", label: t("teaching_hours") },
-    { key: "student_stats", label: t("student_stats") },
-    { key: "staff_status", label: t("staff_status") },
-    { key: "facilities", label: t("facilities") },
-    { key: "budget", label: t("budget") },
-    { key: "challenges", label: t("challenges") },
-    { key: "future_direction", label: t("future_direction") },
-  ];
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [sectionToDelete, setSectionToDelete] = useState<ReportCustomSection | null>(null);
+
+  const loadCustomSections = useCallback(async () => {
+    try {
+      const sections = await getReportCustomSections();
+      setCustomSections(sections);
+    } catch (err) {
+      console.error("Failed to load custom report sections:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCustomSections();
+  }, [loadCustomSections]);
+
+  const customSectionBlockCount = (cs: ReportCustomSection) =>
+    cs.subsections.reduce((sum, sub) => sum + sub.blocks.length, 0);
+
+  const subsectionsSummary = (cs: ReportCustomSection) =>
+    `${t("subsections_count", { count: cs.subsections.length })} · ${t("blocks_count", { count: customSectionBlockCount(cs) })}`;
+
+  const handleDeleteSection = async () => {
+    if (!sectionToDelete) return;
+    startDeleteTransition(async () => {
+      const result = await deleteReportCustomSection(sectionToDelete.id);
+      if (result.success) {
+        toast.success(t("delete_success"));
+        setSectionToDelete(null);
+        loadCustomSections();
+      } else {
+        toast.error(result.error ?? t("delete_error"));
+      }
+    });
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="p-5 sm:p-6 border-b border-gray-100">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-school-blue-800 to-school-blue-700 flex items-center justify-center shrink-0 shadow-md shadow-blue-200">
-              <FileBarChart className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{t("operations")}</h2>
-              <p className="text-sm text-gray-500 mt-1 max-w-xl">
-                {locale === "km"
-                  ? "របាយការណ៍ប្រតិបត្តិការប្រចាំឆ្នាំរបស់សាលា ដែលបង្ហាញនៅទំព័រសាធារណៈ។"
-                  : "The annual school operations report shown on the public site."}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button variant="outline" size="sm" onClick={onView}>
-              <Eye className="w-4 h-4 mr-1.5" />
-              {locale === "km" ? "មើល" : "Preview"}
-            </Button>
-            <Button onClick={onEdit} size="sm">
-              <Pencil className="w-4 h-4 mr-1.5" />
-              {t("edit_operations")}
-            </Button>
-          </div>
-        </div>
+      {/* Sections table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-100 bg-gray-50/80">
+              <th className="text-left font-semibold text-gray-600 p-3 pl-5 w-12">#</th>
+              <th className="text-left font-semibold text-gray-600 p-3">{t("section_title")}</th>
+              <th className="text-left font-semibold text-gray-600 p-3 hidden sm:table-cell">{t("content_summary")}</th>
+              <th className="text-left font-semibold text-gray-600 p-3">{t("status")}</th>
+              <th className="text-right font-semibold text-gray-600 p-3 pr-5"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <tr key={i}>
+                  <td className="p-3 pl-5"><Skeleton className="h-5 w-6" /></td>
+                  <td className="p-3"><Skeleton className="h-5 w-40" /></td>
+                  <td className="p-3 hidden sm:table-cell"><Skeleton className="h-5 w-20" /></td>
+                  <td className="p-3"><Skeleton className="h-6 w-16 rounded-full" /></td>
+                  <td className="p-3 pr-5"><div className="flex justify-end gap-1"><Skeleton className="h-8 w-8 rounded-md" /><Skeleton className="h-8 w-8 rounded-md" /></div></td>
+                </tr>
+              ))
+            ) : customSections.length === 0 ? (
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    icon={FileBarChart}
+                    title={t("no_sections")}
+                  />
+                </td>
+              </tr>
+            ) : (
+              customSections.map((cs, i) => (
+                <motion.tr
+                  key={cs.id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.02 }}
+                  className="group hover:bg-school-blue-50/40 transition-colors"
+                >
+                  <td className="p-3 pl-5 text-gray-400 font-medium">{i + 1}</td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${SECTION_ICON_GRADIENT} flex items-center justify-center shrink-0`}>
+                        <FileText className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="font-medium text-gray-900">
+                        {locale === "km" ? cs.title_km : cs.title_en}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-gray-500 hidden sm:table-cell">
+                    {subsectionsSummary(cs)}
+                  </td>
+                  <td className="p-3">
+                    <Badge variant={cs.is_active ? "success" : "secondary"} className="text-xs font-medium">
+                      {cs.is_active ? t("active") : t("draft")}
+                    </Badge>
+                  </td>
+                  <td className="p-3 pr-5">
+                    <div className="flex items-center justify-end gap-0.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-400 hover:text-school-blue-700 hover:bg-school-blue-50"
+                        onClick={() => router.push(adminHref(locale, `reports/sections/${cs.id}`))}
+                        title={t("edit_section")}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => setSectionToDelete(cs)}
+                        title={t("remove_item")}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* Sections grid */}
-      <div className="p-5 sm:p-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {sections.map(({ key, label }, i) => {
-            const Icon = SECTION_ICONS[key] ?? FileText;
-            const gradient = SECTION_COLORS[key] ?? "from-gray-500 to-gray-600";
-            return (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.3 }}
-                className="group relative rounded-xl border border-gray-100 bg-white p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default overflow-hidden"
-              >
-                {/* Icon */}
-                <div className={`inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} text-white mb-3 shadow-sm`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                  {label}
-                </p>
-                {/* Hover accent bar */}
-                <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${gradient} scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!sectionToDelete} onOpenChange={(open) => !open && setSectionToDelete(null)}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
+              <Trash2 className="w-6 h-6 text-red-600" />
+            </div>
+            <DialogTitle className="text-center">{t("delete_confirm_title")}</DialogTitle>
+            <DialogDescription className="text-center">
+              {t("delete_section_confirm_desc_1")}
+              <span className="font-semibold mx-1 text-gray-700">
+                {sectionToDelete && (locale === "km" ? sectionToDelete.title_km : sectionToDelete.title_en)}
+              </span>
+              {t("delete_confirm_desc_2")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setSectionToDelete(null)}
+              disabled={isDeleting}
+              className="flex-1 sm:flex-none"
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteSection}
+              disabled={isDeleting}
+              className="flex-1 sm:flex-none"
+            >
+              {isDeleting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              {t("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
