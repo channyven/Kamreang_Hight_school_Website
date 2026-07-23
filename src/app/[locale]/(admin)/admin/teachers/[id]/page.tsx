@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Save, Loader2, Phone, User } from "lucide-react";
 import { adminHref } from "@/utils";
 import Link from "next/link";
-import ImageUploader from "@/components/admin/ImageUploader";
+import PhotoCropUploader from "@/components/admin/PhotoCropUploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -209,7 +209,7 @@ export default function TeacherFormPage({ params }: PageProps) {
                 name="photo_url"
                 control={control}
                 render={({ field }) => (
-                  <ImageUploader
+                  <PhotoCropUploader
                     value={field.value}
                     onChange={(url) => field.onChange(url ?? "")}
                     bucket="SCHOOL_IMAGES"

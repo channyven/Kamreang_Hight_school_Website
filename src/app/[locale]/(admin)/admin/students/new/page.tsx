@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Save, Loader2, Camera, User, Phone, Mail, MapPin,
-  GraduationCap, ShieldCheck, X, Calendar, IdCard,
+  ArrowLeft, Save, Loader2, User, Phone, Mail, MapPin,
+  GraduationCap, ShieldCheck, Calendar, IdCard, Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PhotoCropUploader from "@/components/admin/PhotoCropUploader";
 import { studentSchema, type StudentInput } from "@/schemas/validations";
 import { createStudent } from "@/actions/students";
-import { adminHref } from "@/utils";
+import { adminHref, convertGoogleDriveUrl } from "@/utils";
 
 // ─── Config ──────────────────────────────────────────────────
 
@@ -67,11 +67,8 @@ function DatePickerField({
 export default function NewStudentPage() {
   const locale = useLocale();
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [submitting, setSubmitting] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } =
@@ -81,6 +78,7 @@ export default function NewStudentPage() {
         status: "active", nationality: "Khmer",
         faculty: "", major: "", academic_year: "", class_name: "",
         study_year: "", semester: "",
+        father_name: "", father_name_km: "", mother_name: "", mother_name_km: "",
         phone_number: "", email: "", street_address: "",
         province: "", district: "", commune: "", village: "",
         gpa: undefined, credits_earned: undefined,
@@ -91,37 +89,17 @@ export default function NewStudentPage() {
 
 
   // ─── Photo upload ──────────────────────────────────────────
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast.error("File must be smaller than 10MB"); return; }
-    setUploadingPhoto(true);
-
-    const img = document.createElement("img");
-    const reader = new FileReader();
-    reader.onload = () => {
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX = 400;
-        let w = img.naturalWidth, h = img.naturalHeight;
-        if (w > MAX || h > MAX) {
-          const ratio = Math.min(MAX / w, MAX / h);
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
-        }
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
-        setPhotoPreview(dataUrl);
-        setPhotoUrl(dataUrl);
-        setValue("photo", dataUrl);
-        setUploadingPhoto(false);
-      };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
+  // Auto-convert Google Drive share links pasted into ImageUploader's URL
+  // field into our proxy format, same pattern used by the other admin forms.
+  useEffect(() => {
+    if (photoUrl) {
+      const converted = convertGoogleDriveUrl(photoUrl);
+      if (converted !== photoUrl) {
+        setPhotoUrl(converted);
+        setValue("photo", converted);
+      }
+    }
+  }, [photoUrl, setValue]);
 
   // ─── Submit ────────────────────────────────────────────────
   const onSubmit = async (data: StudentInput) => {
@@ -177,29 +155,14 @@ export default function NewStudentPage() {
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row gap-8">
                 {/* Photo */}
-                <div className="flex flex-col items-center gap-3 shrink-0">
-                  <div className="relative">
-                    <Avatar className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 bg-gray-50">
-                      <AvatarImage src={photoPreview ?? undefined} />
-                      <AvatarFallback className="bg-gray-50"><Camera className="w-10 h-10 text-gray-400" /></AvatarFallback>
-                    </Avatar>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploadingPhoto}
-                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                    >
-                      {uploadingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload} />
-                  <p className="text-[11px] text-gray-400 text-center max-w-[140px] leading-tight">JPG, PNG supported<br />Max 10MB</p>
-                  {photoPreview && (
-                    <button type="button" onClick={() => { setPhotoPreview(null); setPhotoUrl(""); setValue("photo", ""); }}
-                      className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
-                      <X className="w-3 h-3" /> Remove
-                    </button>
-                  )}
+                <div className="w-full lg:w-[240px] shrink-0">
+                  <PhotoCropUploader
+                    value={photoUrl}
+                    onChange={(url) => { setPhotoUrl(url ?? ""); setValue("photo", url ?? ""); }}
+                    bucket="STUDENT_PHOTOS"
+                    folder="students"
+                    label="Student Photo (upload, URL, or Google Drive link)"
+                  />
                 </div>
 
                 <div className="flex-1 space-y-5">
@@ -302,6 +265,38 @@ export default function NewStudentPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="Commune"><Input {...register("commune")} placeholder="Enter commune" className="h-12 rounded-xl" /></FormField>
                 <FormField label="Village"><Input {...register("village")} placeholder="Enter village" className="h-12 rounded-xl" /></FormField>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ═══ PARENT INFORMATION ═══ */}
+          <Card className="border border-[#E5E7EB] shadow-sm rounded-xl overflow-hidden">
+            <CardHeader className="bg-white border-b border-[#E5E7EB] px-6 py-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                <CardTitle className="text-base font-semibold text-gray-900">Parent Information</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Father's Name (English) *">
+                  <Input {...register("father_name")} className="h-12 rounded-xl" placeholder="Enter father's full name" />
+                  {errors.father_name && <p className="text-xs text-red-500">{errors.father_name.message}</p>}
+                </FormField>
+                <FormField label="Father's Name (Khmer) *">
+                  <Input {...register("father_name_km")} className="font-khmer h-12 rounded-xl" placeholder="ឈ្មោះឪពុក" />
+                  {errors.father_name_km && <p className="text-xs text-red-500">{errors.father_name_km.message}</p>}
+                </FormField>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <FormField label="Mother's Name (English) *">
+                  <Input {...register("mother_name")} className="h-12 rounded-xl" placeholder="Enter mother's full name" />
+                  {errors.mother_name && <p className="text-xs text-red-500">{errors.mother_name.message}</p>}
+                </FormField>
+                <FormField label="Mother's Name (Khmer) *">
+                  <Input {...register("mother_name_km")} className="font-khmer h-12 rounded-xl" placeholder="ឈ្មោះម្តាយ" />
+                  {errors.mother_name_km && <p className="text-xs text-red-500">{errors.mother_name_km.message}</p>}
+                </FormField>
               </div>
             </CardContent>
           </Card>

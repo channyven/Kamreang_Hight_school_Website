@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -82,13 +82,35 @@ export default function AdminSidebar() {
     [allNavItems, hasPermission]
   );
 
-  const isActive = useCallback(
-    (href: string) => {
-      if (href === adminHref(locale)) return pathname === adminHref(locale);
-      return pathname.startsWith(href);
-    },
-    [locale, pathname]
-  );
+  // Compute the single best-matching nav item so that parent routes like
+  // /students don't stay highlighted when a child route like /students/123/edit is active.
+  const activeHref = useMemo(() => {
+    let best = "";
+    let bestLen = 0;
+    const base = adminHref(locale);
+
+    for (const item of visibleItems) {
+      const href = item.href;
+
+      // Dashboard: exact match only
+      if (href === base) {
+        if (pathname === base) return href;
+        continue;
+      }
+
+      // Check if pathname matches this href as a proper URL segment boundary.
+      // This prevents /students from matching /students-cards or /students_extra,
+      // while still matching /students/123.
+      if (pathname === href || pathname.startsWith(href + "/")) {
+        if (href.length > bestLen) {
+          best = href;
+          bestLen = href.length;
+        }
+      }
+    }
+
+    return best;
+  }, [visibleItems, pathname, locale]);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full relative">
@@ -168,7 +190,7 @@ export default function AdminSidebar() {
               )}
               <div className="space-y-0.5">
                 {groupItems.map((item) => {
-                  const active = isActive(item.href);
+                  const active = item.href === activeHref;
                   return (
                     <Link
                       key={item.key}
@@ -296,7 +318,7 @@ export default function AdminSidebar() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40",
+          "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40 print:hidden",
           collapsed ? "w-16" : "w-60"
         )}
         style={{ background: "hsl(var(--admin-sidebar-bg))" }}
@@ -312,7 +334,7 @@ export default function AdminSidebar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+              className="lg:hidden fixed inset-0 bg-black/50 z-40 print:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
@@ -320,7 +342,7 @@ export default function AdminSidebar() {
               animate={{ x: 0 }}
               exit={{ x: -256 }}
               transition={{ type: "tween", duration: 0.25 }}
-              className="lg:hidden fixed top-0 left-0 h-full w-60 z-50"
+              className="lg:hidden fixed top-0 left-0 h-full w-60 z-50 print:hidden"
               style={{ background: "hsl(var(--admin-sidebar-bg))" }}
             >
               <button

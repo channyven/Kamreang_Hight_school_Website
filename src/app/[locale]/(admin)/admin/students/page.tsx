@@ -9,6 +9,7 @@ import {
   Plus, Search, Loader2, Users, Download,
   ChevronLeft, ChevronRight, Filter, X, GraduationCap,
   MoreHorizontal, Eye, Edit, Trash2, BookOpen, Calendar,
+  Printer, Archive, Check,
 } from "lucide-react";
 import {
   useReactTable,
@@ -22,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -30,6 +32,8 @@ import type { Student } from "@/types";
 import { toast } from "sonner";
 import { deleteStudent, getStudents } from "@/actions/students";
 import { exportStudentsToExcel } from "@/lib/export";
+import { downloadQrCode } from "@/lib/qrcode";
+import { openPrintWindow } from "@/lib/student-card-print";
 import { adminHref } from "@/utils";
 
 
@@ -65,10 +69,12 @@ export default function AdminStudentsPage() {
   const [academicYearFilter, setAcademicYearFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
   const [sorting, setSorting] = useState<SortingState>([]);
-  
 
   // Store the full data separately so we can compute filter options from it
   const [fullData, setFullData] = useState<Student[]>([]);
+
+  // Selection state (for bulk print / QR download)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const hasActiveFilters =
     statusFilter !== "all" ||
@@ -128,6 +134,7 @@ export default function AdminStudentsPage() {
     } catch {
       setItems([]);
     }
+    setSelectedIds(new Set());
     setLoading(false);
   }, [search, statusFilter, facultyFilter, majorFilter, academicYearFilter, genderFilter]);
 
@@ -140,7 +147,88 @@ export default function AdminStudentsPage() {
     else toast.error(result.error ?? "Failed to delete");
   };
 
+  // ── Selection handlers ─────────────────────────────────────
+  // "All selected" is derived from selectedIds directly (not a separate
+  // boolean), so the header checkbox never goes stale relative to
+  // one-by-one row selection.
+  const toggleSelectAllOnPage = useCallback((pageIds: string[]) => {
+    setSelectedIds((prev) => {
+      const allSelected = pageIds.length > 0 && pageIds.every((id) => prev.has(id));
+      if (allSelected) {
+        const next = new Set(prev);
+        pageIds.forEach((id) => next.delete(id));
+        return next;
+      }
+      return new Set([...prev, ...pageIds]);
+    });
+  }, []);
 
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectedStudents = useMemo(
+    () => items.filter((s) => selectedIds.has(s.id)),
+    [items, selectedIds]
+  );
+  const hasSelection = selectedIds.size > 0;
+
+  // ── QR / card handlers ──────────────────────────────────────
+  const handlePrintSelected = useCallback(() => {
+    if (selectedStudents.length === 0) {
+      toast.error("No students selected");
+      return;
+    }
+    const opened = openPrintWindow(
+      selectedStudents,
+      "Student Cards",
+      `Student Identification Cards — ${selectedStudents.length} students`
+    );
+    if (opened) toast.success(`Printing ${selectedStudents.length} student cards`);
+    else toast.error("Popup blocked — please allow popups for this site and try again");
+  }, [selectedStudents]);
+
+  const handleDownloadSelectedQr = useCallback(() => {
+    if (selectedStudents.length === 0) {
+      toast.error("No students selected");
+      return;
+    }
+    let downloaded = 0;
+    let skipped = 0;
+    selectedStudents.forEach((s) => {
+      if (s.qr_code) {
+        downloadQrCode(s.qr_code, `${s.student_id}-${s.english_last_name}`);
+        downloaded++;
+      } else {
+        skipped++;
+      }
+    });
+    if (downloaded > 0) {
+      toast.success(`Downloaded ${downloaded} QR code${downloaded > 1 ? "s" : ""}`);
+    }
+    if (skipped > 0) {
+      toast.warning(`${skipped} student${skipped > 1 ? "s" : ""} had no QR code`);
+    }
+  }, [selectedStudents]);
+
+  const handleDownloadAllQr = useCallback(() => {
+    const allWithQr = fullData.filter((s) => s.qr_code);
+    if (allWithQr.length === 0) {
+      toast.error("No QR codes available to download");
+      return;
+    }
+    allWithQr.forEach((s) => {
+      if (s.qr_code) {
+        downloadQrCode(s.qr_code, `${s.student_id}-${s.english_last_name}`);
+      }
+    });
+    toast.success(`Downloaded ${allWithQr.length} QR codes`);
+  }, [fullData]);
 
   const getStatusLabel = (status: string) =>
     STATUS_LABELS[locale as keyof typeof STATUS_LABELS]?.[status] ?? status;
@@ -161,6 +249,30 @@ export default function AdminStudentsPage() {
   const columns = useMemo(
     () => [
       columnHelper.display({
+        id: "select",
+        header: (props) => {
+          const pageIds = props.table.getRowModel().rows.map((r) => r.original.id);
+          const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+          return (
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={() => toggleSelectAllOnPage(pageIds)}
+              aria-label="Select all"
+            />
+          );
+        },
+        cell: (info) => {
+          const id = info.row.original.id;
+          return (
+            <Checkbox
+              checked={selectedIds.has(id)}
+              onCheckedChange={() => toggleSelect(id)}
+              aria-label={`Select ${info.row.original.english_first_name}`}
+            />
+          );
+        },
+      }),
+      columnHelper.display({
         id: "photo_name",
         header: () => <span className="font-medium">Student</span>,
         cell: (info) => {
@@ -180,8 +292,8 @@ export default function AdminStudentsPage() {
                   />
                 </div>
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center shrink-0 ring-2 ring-blue-50">
-                  <Users className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-school-blue-50 to-school-blue-100 flex items-center justify-center shrink-0 ring-2 ring-school-blue-50">
+                  <Users className="w-5 h-5 text-school-blue-400" />
                 </div>
               )}
               <div className="min-w-0">
@@ -238,7 +350,7 @@ export default function AdminStudentsPage() {
                   <MoreHorizontal className="w-4 h-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem asChild>
                   <Link href={adminHref(locale, `students/${s.id}`)} className="flex items-center gap-2">
                     <Eye className="w-4 h-4 text-gray-500" />
@@ -246,8 +358,14 @@ export default function AdminStudentsPage() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link href={adminHref(locale, `students/${s.id}/card`)} className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-school-green-600" />
+                    Download Card
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href={adminHref(locale, `students/${s.id}/edit`)} className="flex items-center gap-2">
-                    <Edit className="w-4 h-4 text-blue-500" />
+                    <Edit className="w-4 h-4 text-school-blue-700" />
                     Edit
                   </Link>
                 </DropdownMenuItem>
@@ -264,7 +382,7 @@ export default function AdminStudentsPage() {
         },
       }),
     ],
-    [locale, getStatusLabel, columnHelper, handleDelete]
+    [locale, getStatusLabel, columnHelper, handleDelete, selectedIds, toggleSelectAllOnPage, toggleSelect]
   );
 
   const table = useReactTable({
@@ -293,6 +411,15 @@ export default function AdminStudentsPage() {
             variant="outline"
             size="sm"
             className="h-9 text-sm gap-2"
+            onClick={handleDownloadAllQr}
+            disabled={fullData.length === 0}
+          >
+            <Archive className="w-4 h-4" /> Download All QR Codes
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 text-sm gap-2"
             onClick={() => exportStudentsToExcel(items, `students_${new Date().toISOString().split('T')[0]}`)}
             disabled={items.length === 0}
           >
@@ -300,7 +427,7 @@ export default function AdminStudentsPage() {
           </Button>
 
           <Button asChild
-            className="bg-blue-600 hover:bg-blue-700 h-9 text-sm gap-2"
+            className="bg-school-blue-800 hover:bg-school-blue-900 h-9 text-sm gap-2"
           >
             <Link href={adminHref(locale, "students/new")}>
               <Plus className="w-4 h-4" /> Add Student
@@ -406,55 +533,55 @@ export default function AdminStudentsPage() {
           <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-gray-100">
             <span className="text-xs text-gray-400 mr-1">Active filters:</span>
             {search && (
-              <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200">
                 <Search className="w-3 h-3" />
                 &ldquo;{search}&rdquo;
-                <button onClick={() => setSearch("")} className="hover:text-blue-900">
+                <button onClick={() => setSearch("")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
             {statusFilter !== "all" && (
-              <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200">
                 <Filter className="w-3 h-3" />
                 {getStatusLabel(statusFilter)}
-                <button onClick={() => setStatusFilter("all")} className="hover:text-green-900">
+                <button onClick={() => setStatusFilter("all")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
             {facultyFilter !== "all" && (
-              <span className="inline-flex items-center gap-1 text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200">
                 <GraduationCap className="w-3 h-3" />
                 {facultyFilter}
-                <button onClick={() => setFacultyFilter("all")} className="hover:text-purple-900">
+                <button onClick={() => setFacultyFilter("all")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
             {majorFilter !== "all" && (
-              <span className="inline-flex items-center gap-1 text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200">
                 <BookOpen className="w-3 h-3" />
                 {majorFilter}
-                <button onClick={() => setMajorFilter("all")} className="hover:text-orange-900">
+                <button onClick={() => setMajorFilter("all")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
             {academicYearFilter !== "all" && (
-              <span className="inline-flex items-center gap-1 text-xs bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded-full border border-cyan-200">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200">
                 <Calendar className="w-3 h-3" />
                 {academicYearFilter}
-                <button onClick={() => setAcademicYearFilter("all")} className="hover:text-cyan-900">
+                <button onClick={() => setAcademicYearFilter("all")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
             )}
             {genderFilter !== "all" && (
-              <span className="inline-flex items-center gap-1 text-xs bg-pink-50 text-pink-700 px-2 py-0.5 rounded-full border border-pink-200 capitalize">
+              <span className="inline-flex items-center gap-1 text-xs bg-school-blue-50 text-school-blue-800 px-2 py-0.5 rounded-full border border-school-blue-200 capitalize">
                 <Users className="w-3 h-3" />
                 {genderFilter}
-                <button onClick={() => setGenderFilter("all")} className="hover:text-pink-900">
+                <button onClick={() => setGenderFilter("all")} className="hover:text-school-blue-900">
                   <X className="w-3 h-3" />
                 </button>
               </span>
@@ -469,11 +596,50 @@ export default function AdminStudentsPage() {
         )}
       </div>
 
+      {/* Bulk Actions Bar */}
+      {hasSelection && (
+        <div className="bg-school-blue-50 border border-school-blue-200 rounded-xl px-4 py-3 flex items-center justify-between animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="flex items-center gap-2 text-sm text-school-blue-800">
+            <Check className="w-4 h-4" />
+            <span className="font-medium">{selectedIds.size}</span>
+            <span>student{selectedIds.size !== 1 ? "s" : ""} selected</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5 bg-white border-school-blue-200 text-school-blue-800 hover:bg-school-blue-100"
+              onClick={handlePrintSelected}
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Print Selected
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5 bg-white border-school-blue-200 text-school-blue-800 hover:bg-school-blue-100"
+              onClick={handleDownloadSelectedQr}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Download QR Codes
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs text-gray-400 hover:text-gray-600"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table Card */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-school-blue-800" />
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-20">
@@ -504,23 +670,31 @@ export default function AdminStudentsPage() {
                   ))}
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {table.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => router.push(adminHref(locale, `students/${row.original.id}`))}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className="px-4 py-3"
-                          onClick={cell.column.id === "actions" ? (e) => e.stopPropagation() : undefined}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {table.getRowModel().rows.map((row) => {
+                    const isSelected = selectedIds.has(row.original.id);
+                    return (
+                      <tr
+                        key={row.id}
+                        className={`transition-colors cursor-pointer ${
+                          isSelected ? "bg-school-blue-50/50 hover:bg-school-blue-50" : "hover:bg-gray-50"
+                        }`}
+                        onClick={() => router.push(adminHref(locale, `students/${row.original.id}`))}
+                      >
+                        {row.getVisibleCells().map((cell) => {
+                          const stopsPropagation = ["actions", "select"].includes(cell.column.id);
+                          return (
+                            <td
+                              key={cell.id}
+                              className="px-4 py-3"
+                              onClick={stopsPropagation ? (e) => e.stopPropagation() : undefined}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -567,8 +741,6 @@ export default function AdminStudentsPage() {
           </>
         )}
       </div>
-
-
     </div>
   );
 }

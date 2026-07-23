@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Loader2, Search, Phone } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn, getAvatarUrl } from "@/utils";
 import type { Teacher } from "@/types";

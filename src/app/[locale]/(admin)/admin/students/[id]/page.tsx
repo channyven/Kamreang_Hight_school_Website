@@ -14,11 +14,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import { getStudentById } from "@/actions/students";
 import type { Student } from "@/types";
 import { formatDate, adminHref } from "@/utils";
 import { exportStudentsToExcel } from "@/lib/export";
+import { openPrintWindow } from "@/lib/student-card-print";
+import { getFullName } from "@/lib/student-card-format";
 import StudentQrCard from "@/components/admin/students/StudentQrCard";
+import StudentCardModal from "@/components/admin/students/StudentCardModal";
 
 interface PageProps { params: Promise<{ id: string }>; }
 
@@ -90,6 +94,7 @@ export default function StudentDetailsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [studentLoaded, setStudentLoaded] = useState(false);
+  const [cardModalOpen, setCardModalOpen] = useState(false);
 
   useEffect(() => {
     getStudentById(id).then((data) => {
@@ -125,6 +130,11 @@ export default function StudentDetailsPage({ params }: PageProps) {
   const s = student;
   const statusConfig = STATUS_CONFIG[s.status] ?? STATUS_CONFIG.active;
 
+  const handlePrintCard = () => {
+    const opened = openPrintWindow([s], "Student Card", `Student ID Card — ${getFullName(s)}`);
+    if (!opened) toast.error("Popup blocked — please allow popups for this site and try again");
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -140,8 +150,11 @@ export default function StudentDetailsPage({ params }: PageProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 gap-2 text-sm" onClick={() => window.print()}>
+            <Button variant="outline" size="sm" className="h-9 gap-2 text-sm" onClick={handlePrintCard}>
               <Printer className="w-4 h-4" /> Print
+            </Button>
+            <Button variant="outline" size="sm" className="h-9 gap-2 text-sm" onClick={() => setCardModalOpen(true)}>
+              <CreditCard className="w-4 h-4" /> View Card
             </Button>
             <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900 h-9 gap-2 text-sm">
               <Link href={adminHref(locale, `students/${s.id}/edit`)}>
@@ -288,10 +301,11 @@ export default function StudentDetailsPage({ params }: PageProps) {
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-center py-8">
-                  <User className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-gray-500">No parents/guardians on file.</p>
-                  <p className="text-xs text-gray-400 mt-1">This will be available in a future update.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <InfoRow label="Father's Name (English)" value={s.father_name} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Father's Name (Khmer)" value={s.father_name_km} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Mother's Name (English)" value={s.mother_name} icon={<User className="w-4 h-4" />} />
+                  <InfoRow label="Mother's Name (Khmer)" value={s.mother_name_km} icon={<User className="w-4 h-4" />} />
                 </div>
               </CardContent>
             </Card>
@@ -336,9 +350,9 @@ export default function StudentDetailsPage({ params }: PageProps) {
             </Card>
           </div>
         </div>
-
-
       </div>
+
+      <StudentCardModal student={s} open={cardModalOpen} onOpenChange={setCardModalOpen} />
     </div>
   );
 }

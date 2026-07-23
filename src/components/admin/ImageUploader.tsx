@@ -189,7 +189,16 @@ export default function ImageUploader({
 
       {preview && isValidUrl(preview) ? (
         /* ── Image Preview (only for valid http/https URLs) ── */
-        <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+        <div
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className={cn(
+            "relative group rounded-xl overflow-hidden border bg-gray-50 transition-colors",
+            isDragOver ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200"
+          )}
+        >
           {/* Preview */}
           <div className="relative aspect-video max-h-[200px] w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -201,25 +210,36 @@ export default function ImageUploader({
           </div>
 
           {/* Overlay actions */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => inputRef.current?.click()}
-            >
-              <Upload className="w-3.5 h-3.5 mr-1" />
-              Replace
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={handleRemove}
-            >
-              <X className="w-3.5 h-3.5 mr-1" />
-              Remove
-            </Button>
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center justify-center gap-2 transition-opacity",
+              isDragOver ? "bg-blue-600/50 opacity-100" : "bg-black/40 opacity-0 group-hover:opacity-100"
+            )}
+          >
+            {isDragOver ? (
+              <p className="text-sm font-semibold text-white">Drop to replace</p>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <Upload className="w-3.5 h-3.5 mr-1" />
+                  Replace
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRemove}
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Remove
+                </Button>
+              </>
+            )}
           </div>
 
           {/* File URL */}

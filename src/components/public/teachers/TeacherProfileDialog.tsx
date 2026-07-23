@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { X, Phone, GraduationCap, BookOpen, User } from "lucide-react";
+import { X, Phone, GraduationCap, User } from "lucide-react";
 import { cn, getAvatarUrl } from "@/utils";
 import {
   Dialog,

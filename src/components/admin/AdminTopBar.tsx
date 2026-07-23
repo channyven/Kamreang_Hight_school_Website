@@ -49,7 +49,7 @@ export default function AdminTopBar() {
 
   return (
     <header
-      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30 bg-background border-b border-border shadow-sm"
+      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30 bg-background border-b border-border shadow-sm print:hidden"
     >
       {/* Left: mobile menu + search */}
       <div className="flex items-center gap-3 flex-1 max-w-md">
