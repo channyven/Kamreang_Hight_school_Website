@@ -31,7 +31,7 @@ export default function AdminTopBar() {
 
   return (
     <header
-      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30"
+      className="h-14 flex items-center justify-between px-5 sticky top-0 z-30 print:hidden"
       style={{
         background: "#fff",
         borderBottom: "1px solid #f4f4f4",

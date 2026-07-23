@@ -7,7 +7,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { regenerateStudentQrCode, getStudentById } from "@/actions/students";
-import { downloadQrCode, printStudentCard } from "@/lib/qrcode";
+import { downloadQrCode } from "@/lib/qrcode";
+import { openPrintWindow } from "@/lib/student-card-print";
+import { getFullName } from "@/lib/student-card-format";
 import type { Student } from "@/types";
 
 interface Props {
@@ -18,7 +20,7 @@ export default function StudentQrCard({ student }: Props) {
   const s = student;
   const [qrRegenerating, setQrRegenerating] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(s.qr_code ?? null);
-  const fullName = `${s.english_first_name} ${s.english_last_name}`;
+  const fullName = getFullName(s);
 
   const handleRegenerate = async () => {
     setQrRegenerating(true);
@@ -36,21 +38,15 @@ export default function StudentQrCard({ student }: Props) {
   };
 
   const handlePrint = () => {
-    if (qrDataUrl) {
-      printStudentCard({
-        name: fullName,
-        studentId: s.student_id,
-        qrDataUrl,
-        photo: s.photo,
-        faculty: s.faculty,
-      });
-    }
+    if (!qrDataUrl) return;
+    const opened = openPrintWindow([{ ...s, qr_code: qrDataUrl }], "Student Card", `Student ID Card — ${fullName}`);
+    if (!opened) toast.error("Popup blocked — please allow popups for this site and try again");
   };
 
   return (
     <div className="flex flex-col items-center gap-5 py-2">
       {/* Large, clean QR Code */}
-      <div className="bg-white rounded-2xl border-2 border-blue-100 p-4 shadow-sm">
+      <div className="bg-white rounded-2xl border-2 border-school-blue-100 p-4 shadow-sm">
         {qrDataUrl ? (
           <img
             src={qrDataUrl}
@@ -58,10 +54,10 @@ export default function StudentQrCard({ student }: Props) {
             className="w-48 h-48 object-contain"
           />
         ) : (
-          <div className="w-48 h-48 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center">
+          <div className="w-48 h-48 bg-gradient-to-br from-school-blue-50 to-school-blue-100 rounded-xl flex items-center justify-center">
             <div className="text-center">
-              <QrCode className="w-16 h-16 text-blue-300 mx-auto mb-2" />
-              <p className="text-xs text-blue-400 font-mono">No QR yet</p>
+              <QrCode className="w-16 h-16 text-school-blue-300 mx-auto mb-2" />
+              <p className="text-xs text-school-blue-400 font-mono">No QR yet</p>
             </div>
           </div>
         )}
@@ -82,7 +78,7 @@ export default function StudentQrCard({ student }: Props) {
         <Button
           variant="default"
           size="sm"
-          className="w-full h-10 gap-2 text-sm justify-center bg-blue-600 hover:bg-blue-700"
+          className="w-full h-10 gap-2 text-sm justify-center bg-school-blue-800 hover:bg-school-blue-900"
           disabled={!qrDataUrl}
           onClick={() => {
             if (qrDataUrl) {
@@ -104,7 +100,7 @@ export default function StudentQrCard({ student }: Props) {
         <Button
           variant="outline"
           size="sm"
-          className="w-full h-10 gap-2 text-sm justify-center text-blue-600 border-blue-200 hover:bg-blue-50"
+          className="w-full h-10 gap-2 text-sm justify-center text-school-blue-800 border-school-blue-200 hover:bg-school-blue-50"
           onClick={handleRegenerate}
           disabled={qrRegenerating}
         >

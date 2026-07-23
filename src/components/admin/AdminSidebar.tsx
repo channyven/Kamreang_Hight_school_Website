@@ -29,7 +29,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { labelKey: "nav_group_overview", keys: ["dashboard", "statistics"] },
-  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "student_cards", "governance", "news", "achievements", "documents", "contact", "donate"] },
+  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "governance", "news", "achievements", "documents", "contact", "donate"] },
   { labelKey: "nav_group_inbox", keys: ["messages"] },
   { labelKey: "nav_group_system", keys: ["users", "settings"] },
 ];
@@ -50,7 +50,6 @@ export default function AdminSidebar() {
       { key: "about", href: adminHref(locale, "about"), icon: <FileText className="w-4 h-4" /> },
       { key: "teachers", href: adminHref(locale, "teachers"), icon: <GraduationCap className="w-4 h-4" /> },
       { key: "students", href: adminHref(locale, "students"), icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
-      { key: "student_cards", href: adminHref(locale, "students/cards"), icon: <BookOpen className="w-4 h-4" />, permission: "canManageStudents" },
       { key: "governance", href: adminHref(locale, "governance"), icon: <Landmark className="w-4 h-4" /> },
       { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
       { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
@@ -73,7 +72,7 @@ export default function AdminSidebar() {
   );
 
   // Compute the single best-matching nav item so that parent routes like
-  // /students don't stay highlighted when a child route like /students/cards is active.
+  // /students don't stay highlighted when a child route like /students/123/edit is active.
   const activeHref = useMemo(() => {
     let best = "";
     let bestLen = 0;
@@ -271,7 +270,7 @@ export default function AdminSidebar() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40",
+          "hidden lg:flex flex-col fixed top-0 left-0 h-full transition-all duration-300 z-40 print:hidden",
           collapsed ? "w-16" : "w-60"
         )}
         style={{ background: "#191845" }}
@@ -287,7 +286,7 @@ export default function AdminSidebar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+              className="lg:hidden fixed inset-0 bg-black/50 z-40 print:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
@@ -295,7 +294,7 @@ export default function AdminSidebar() {
               animate={{ x: 0 }}
               exit={{ x: -256 }}
               transition={{ type: "tween", duration: 0.25 }}
-              className="lg:hidden fixed top-0 left-0 h-full w-60 z-50"
+              className="lg:hidden fixed top-0 left-0 h-full w-60 z-50 print:hidden"
               style={{ background: "#191845" }}
             >
               <button
