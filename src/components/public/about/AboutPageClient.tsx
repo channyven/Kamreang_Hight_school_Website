@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Quote,
   Mail,
-  Phone,
   Calendar,
   MapPin,
   Users,
@@ -20,17 +19,13 @@ import {
   Telescope,
   Star,
   HeartHandshake,
+  Search,
 } from "lucide-react";
 import { cn, getLocalizedText, getAvatarUrl } from "@/utils";
 import type { SchoolInfo, Leadership, Milestone, Teacher, Statistics } from "@/types";
 import OrganizationSection from "./OrganizationSection";
 import ScrollReveal from "./ScrollReveal";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import TeacherProfileDialog from "@/components/public/teachers/TeacherProfileDialog";
 
 // ─── Animated Counter Hook ────────────────────────────────────
 
@@ -62,11 +57,24 @@ function isValidUrl(url: string | null | undefined): url is string {
   return url.startsWith("http://") || url.startsWith("https://");
 }
 
+/** Strip common Khmer honorific prefixes from a name for matching */
+function stripHonorific(name: string): string {
+  // Remove zero-width characters FIRST (they can be embedded IN the prefix)
+  const cleaned = name.trim().replace(/[\u200B-\u200D\uFEFF]/g, "");
+  const prefixes = ["លោក", "លោកស្រី", "អ្នកគ្រូ", "អ្នកស្រី", "អ្នក"];
+  for (const prefix of prefixes) {
+    if (cleaned.startsWith(prefix)) {
+      return cleaned.slice(prefix.length).trim();
+    }
+  }
+  return cleaned;
+}
+
 // ─── Data ──────────────────────────────────────────────────────
 
 interface StatConfig {
   icon: React.ReactNode;
-  label: string;
+  label: { km: string; en: string };
   color: string;
   /** Raw numeric value to animate from 0 */
   getNumericValue: (s: Statistics) => number;
@@ -78,49 +86,51 @@ interface StatConfig {
   instant?: boolean;
 }
 
+// Single color throughout: navy (main/primary brand color) for every icon,
+// matching the home page StatsSection.
 const STAT_HEADERS: Record<string, StatConfig> = {
   established: {
     icon: <Calendar className="w-5 h-5" />,
-    label: "Established",
-    color: "bg-amber-100 text-amber-700",
+    label: { km: "ឆ្នាំបង្កើត", en: "Established" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: () => 2000,
     suffix: "",
     instant: true,
   },
   landArea: {
     icon: <MapPin className="w-5 h-5" />,
-    label: "Land Area",
-    color: "bg-emerald-100 text-emerald-700",
+    label: { km: "ផ្ទៃដី", en: "Land Area" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: () => 21253,
     suffix: " m²",
     formatNumber: (n) => n.toLocaleString("en-US"),
   },
   students: {
     icon: <Users className="w-5 h-5" />,
-    label: "Students",
-    color: "bg-blue-100 text-blue-700",
+    label: { km: "សិស្ស", en: "Students" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: (s) => s.total_students ?? 0,
     suffix: "",
     formatNumber: (n) => n.toLocaleString("en-US"),
   },
   teachers: {
     icon: <GraduationCap className="w-5 h-5" />,
-    label: "Teachers",
-    color: "bg-violet-100 text-violet-700",
+    label: { km: "គ្រូបង្រៀន", en: "Teachers" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: (s) => s.total_teachers ?? 0,
     suffix: "",
   },
   classes: {
     icon: <BookOpen className="w-5 h-5" />,
-    label: "Classes",
-    color: "bg-rose-100 text-rose-700",
+    label: { km: "ថ្នាក់រៀន", en: "Classes" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: (s) => s.total_classes ?? 0,
     suffix: "",
   },
   passRate: {
     icon: <TrendingUp className="w-5 h-5" />,
-    label: "BAC Pass Rate",
-    color: "bg-cyan-100 text-cyan-700",
+    label: { km: "អត្រាប្រឡងជាប់ BAC", en: "BAC Pass Rate" },
+    color: "bg-school-blue-100 text-school-blue-700",
     getNumericValue: (s) => s.pass_rate ?? s.graduation_rate ?? 0,
     suffix: "%",
     formatNumber: (n) => n.toFixed(1),
@@ -140,6 +150,7 @@ function AnimatedStatCard({
   formatNum,
   delay,
   instant,
+  km,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -149,6 +160,7 @@ function AnimatedStatCard({
   formatNum?: (n: number) => string;
   delay: number;
   instant?: boolean;
+  km?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useIsInView(ref);
@@ -161,10 +173,10 @@ function AnimatedStatCard({
     : Math.floor(count).toString();
 
   return (
-    <ScrollReveal delay={delay} duration={0.5} variant="fade-up">
+    <ScrollReveal delay={delay} duration={0.5} variant="fade-up" className="h-full">
       <div
         ref={ref}
-        className="group relative bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl border border-gray-100/80"
+        className="group relative h-full flex flex-col items-center justify-start bg-white rounded-2xl p-6 pt-8 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl border border-gray-100/80"
       >
         <div
           className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 transition-transform duration-300 group-hover:scale-110 ${color}`}
@@ -181,7 +193,7 @@ function AnimatedStatCard({
             </>
           )}
         </p>
-        <p className="text-sm text-gray-500 mt-1 font-medium">{label}</p>
+        <p className={cn("text-sm text-gray-500 mt-1 font-medium", km && "font-khmer")}>{label}</p>
       </div>
     </ScrollReveal>
   );
@@ -239,123 +251,64 @@ function SectionHeading({
   );
 }
 
-// ─── Leader Detail Dialog ─────────────────────────────────────
+// ─── Staff Card ────────────────────────────────────────────
 
-function LeaderDetailDialog({
-  leader,
-  open,
-  onOpenChange,
-  km,
-  locale,
-}: {
-  leader: Leadership | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  km: boolean;
-  locale: string;
-}) {
-  if (!leader) return null;
+function StaffCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 gap-0">
-        {/* Header with photo and name */}
-        <div className="bg-gradient-to-r from-school-blue-800 to-school-blue-700 px-6 pt-8 pb-6 text-center">
-          <div className="relative w-24 h-24 mx-auto rounded-2xl overflow-hidden ring-4 ring-white/30 shadow-xl mb-4">
-            {isValidUrl(leader.photo_url) ? (
-              <Image
-                src={leader.photo_url}
-                alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            ) : (
-              <Image
-                src={getAvatarUrl(
-                  getLocalizedText(leader.name_km, leader.name_en, locale),
-                  96
-                )}
-                alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            )}
-          </div>
-          <DialogTitle className={cn("text-xl font-bold text-white mb-0.5 flex items-center justify-center gap-2", km && "font-khmer")}>
-            <span>{getLocalizedText(leader.name_km, leader.name_en, locale)}</span>
-            {leader.gender && (
-              <span className="text-lg text-white/80">{leader.gender}</span>
-            )}
-          </DialogTitle>
-          {leader.name_km && leader.name_en && (
-            <p className="text-sm text-white/70 mb-1 font-khmer">
-              {km ? leader.name_en : leader.name_km}
-            </p>
-          )}
-          {(leader.position_km || leader.position_en) && (
-            <DialogDescription className={cn("inline-flex items-center gap-1.5 text-xs text-white/80 bg-white/15 rounded-full px-4 py-1.5 mt-1", km && "font-khmer")}>
-              {getLocalizedText(leader.position_km, leader.position_en, locale)}
-            </DialogDescription>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group bg-white rounded-xl p-3 text-center border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg w-full cursor-pointer"
+        style={{ borderColor: "#d7d6f1", boxShadow: "0px 1px 6px rgba(44,42,122,0.04)" }}
+      >
+        <div className="relative w-20 h-20 mx-auto rounded-full mb-3 overflow-hidden ring-2 ring-[#f4f4fb] transition-all duration-300 group-hover:ring-[#dfad32]/40 group-hover:shadow-md">
+          {teacher.photo_url ? (
+            <Image
+              src={teacher.photo_url}
+              alt={teacher.name_km}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-110"
+              sizes="80px"
+            />
+          ) : (
+            <Image
+              src={getAvatarUrl(teacher.name_km, 80)}
+              alt={teacher.name_km}
+              fill
+              className="object-cover"
+              sizes="80px"
+            />
           )}
         </div>
-
-        {/* Details body */}
-        <div className="px-6 py-5 space-y-3">
-          {/* Phone */}
-          {leader.phone && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80">
-              <div className="w-9 h-9 rounded-lg bg-gray-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Phone className="w-4 h-4 text-gray-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-0.5">
-                  {km ? "ទូរស័ព្ទ" : "Phone"}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  {leader.phone}
-                </p>
-              </div>
-            </div>
+        <h4
+          className={cn(
+            "font-semibold text-sm leading-tight truncate transition-colors group-hover:text-[#2c2a7a]",
+            km && "font-khmer"
           )}
-
-          {/* Title */}
-          {(leader.title_km || leader.title_en) && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-school-blue-50/50">
-              <div className="w-9 h-9 rounded-lg bg-school-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <GraduationCap className="w-4 h-4 text-school-blue-700" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-school-blue-500 mb-0.5">
-                  {km ? "តួនាទី" : "Position"}
-                </p>
-                <p className={cn("text-sm font-medium text-gray-800", km && "font-khmer")}>
-                  {getLocalizedText(leader.title_km, leader.title_en, locale)}
-                </p>
-              </div>
-            </div>
+          style={{ color: "#2c2a7a" }}
+        >
+          <span>{teacher.name_km || teacher.name_en}</span>
+          {teacher.gender && (
+            <span className="inline-block ml-0.5 text-[9px] opacity-50">
+              {teacher.gender === "Male" ? "♂" : "♀"}
+            </span>
           )}
+        </h4>
+        <p className={cn("text-xs leading-snug truncate", km && "font-khmer")} style={{ color: "#636363" }}>
+          {teacher.department_km || teacher.subject_km || teacher.department_en || teacher.subject_en || (km ? "គ្រូបង្រៀន" : "Teacher")}
+        </p>
+      </button>
 
-          {/* Bio */}
-          {(leader.bio_km || leader.bio_en) && (
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-50/60">
-              <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Quote className="w-4 h-4 text-amber-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-500 mb-0.5">
-                  {km ? "ជីវប្រវត្តិ" : "Biography"}
-                </p>
-                <p className={cn("text-sm leading-relaxed text-gray-600 italic", km && "font-khmer")}>
-                  &ldquo;{getLocalizedText(leader.bio_km, leader.bio_en, locale)}&rdquo;
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+      <TeacherProfileDialog
+        teacher={teacher}
+        open={open}
+        onOpenChange={setOpen}
+        km={km}
+      />
+    </>
   );
 }
 
@@ -393,17 +346,40 @@ export default function AboutPageClient({
     [leadership]
   );
   const principal = leaders[0];
-  const viceLeaders = leaders.slice(1);
-  const [selectedLeader, setSelectedLeader] = useState<Leadership | null>(null);
+  const [principalOpen, setPrincipalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'leadership' | 'teachers'>('all');
+  const [staffSearchQuery, setStaffSearchQuery] = useState('');
+
+  const filteredStaff = useMemo(() => {
+    let list = teachers.filter(t => t.is_active);
+    if (activeFilter === 'leadership') {
+      // Build set of cleaned leadership names (strip honorific prefixes)
+      // Include ALL leadership members (principal + vice principals)
+      const leaderNames = new Set(
+        leadership.map(l => stripHonorific(l.name_km))
+      );
+      list = list.filter(t => leaderNames.has(t.name_km));
+    }
+    if (staffSearchQuery.trim()) {
+      const q = staffSearchQuery.trim().toLowerCase();
+      list = list.filter(t =>
+        (t.name_km ?? '').toLowerCase().includes(q) ||
+        (t.subject_km ?? '').toLowerCase().includes(q) ||
+        (t.department_km ?? '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [teachers, leadership, activeFilter, staffSearchQuery]);
+
   const vision = infoMap["vision"];
   const mission = infoMap["mission"];
   const history = infoMap["history"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8f9ff] via-white to-[#f8f9ff] overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#f8f7fc] via-white to-[#f8f7fc] overflow-x-hidden">
       {/* ─── HERO ─── */}
       <ScrollReveal variant="fade-in" duration={0.8}>
-        <section className="relative pt-24 pb-20 overflow-hidden">
+        <section className="relative pt-36 pb-32 overflow-hidden">
           {/* Banner Image Background */}
           <div className="absolute inset-0">
             <Image
@@ -477,7 +453,7 @@ export default function AboutPageClient({
             <svg viewBox="0 0 1440 40" fill="none" className="w-full">
               <path
                 d="M0 40L1440 40L1440 12C1200 36 960 44 720 32C480 20 240 0 0 12L0 40Z"
-                fill="#f8f9ff"
+                fill="#f8f7fc"
               />
             </svg>
           </div>
@@ -486,7 +462,7 @@ export default function AboutPageClient({
 
       {/* ─── STATISTICS ─── */}
       <section className="py-16 relative">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-screen-2xl mx-auto px-6">
           <ScrollReveal variant="fade-up">
             <SectionHeading
               khmer="ស្ថិតិសាលារៀន"
@@ -504,13 +480,14 @@ export default function AboutPageClient({
                 <AnimatedStatCard
                   key={key}
                   icon={config.icon}
-                  label={config.label}
+                  label={km ? config.label.km : config.label.en}
                   color={config.color}
                   numericValue={numericValue}
                   suffix={config.suffix}
                   formatNum={config.formatNumber}
                   instant={config.instant}
                   delay={Object.keys(STAT_HEADERS).indexOf(key) * 0.08}
+                  km={km}
                 />
               );
             })}
@@ -534,22 +511,32 @@ export default function AboutPageClient({
           </ScrollReveal>
 
           {/* Vision + Mission row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-20">
-            {/* Vision */}
-            <ScrollReveal variant="fade-up" delay={0.1}>
-              <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full border-l-[6px] border-l-school-goldMain">
-                <div className="p-10 md:p-12">
-                  <div className="mb-10">
-                    <div className="w-20 h-20 rounded-2xl bg-[#fff9eb] flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 mb-8">
-                      <Telescope className="w-10 h-10 text-school-goldMain" />
-                    </div>
-                    <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
-                      {km ? "ចក្ខុវិស័យរបស់យើង" : "Our Vision"}
-                    </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20 items-stretch">
+            {/* Vision — dark panel */}
+            <ScrollReveal variant="fade-up" delay={0.1} className="h-full">
+              <div
+                className="group relative h-full rounded-3xl overflow-hidden p-10 md:p-12 flex flex-col"
+                style={{ background: "linear-gradient(135deg, #191845 0%, #2c2a7a 100%)" }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-4 -right-2 text-[150px] font-black text-white/[0.04] leading-none select-none pointer-events-none"
+                >
+                  01
+                </span>
+                <div className="relative flex-1">
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm ring-1 ring-white/10 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <Telescope className="w-8 h-8 text-school-gold-400" />
                   </div>
+                  <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-gold-400 mb-2">
+                    {km ? "ចក្ខុវិស័យ" : "Vision"}
+                  </p>
+                  <h3 className={cn("text-2xl md:text-3xl font-bold text-white mb-6", km && "font-khmer")}>
+                    {km ? "ចក្ខុវិស័យរបស់យើង" : "Our Vision"}
+                  </h3>
                   <div
                     className={cn(
-                      "prose prose-lg max-w-prose prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
+                      "prose prose-lg prose-invert max-w-none prose-p:text-white/70",
                       km ? "prose-khmer font-khmer" : "prose-english"
                     )}
                     dangerouslySetInnerHTML={{
@@ -559,24 +546,32 @@ export default function AboutPageClient({
                     }}
                   />
                 </div>
+                <div className="relative w-14 h-1.5 bg-school-gold-400 rounded-full mt-10" />
               </div>
             </ScrollReveal>
 
-            {/* Mission */}
-            <ScrollReveal variant="fade-up" delay={0.2}>
-              <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full border-l-[6px] border-l-[#1e3a8a]">
-                <div className="p-10 md:p-12">
-                  <div className="mb-10">
-                    <div className="w-20 h-20 rounded-2xl bg-[#eff4ff] flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 mb-8">
-                      <Target className="w-10 h-10 text-[#1e3a8a]" />
-                    </div>
-                    <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy", km && "font-khmer")}>
-                      {km ? "បេសកកម្មរបស់យើង" : "Our Mission"}
-                    </h3>
+            {/* Mission — light panel */}
+            <ScrollReveal variant="fade-up" delay={0.2} className="h-full">
+              <div className="group relative h-full rounded-3xl overflow-hidden p-10 md:p-12 flex flex-col bg-white border border-gray-100 shadow-[0_10px_40px_-15px_rgba(44,42,122,0.08)] hover:shadow-[0_20px_60px_-15px_rgba(44,42,122,0.12)] transition-shadow duration-500">
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-4 -right-2 text-[150px] font-black text-gray-50 leading-none select-none pointer-events-none"
+                >
+                  02
+                </span>
+                <div className="relative flex-1">
+                  <div className="w-16 h-16 rounded-2xl bg-school-blue-50 flex items-center justify-center mb-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <Target className="w-8 h-8 text-school-blue-800" />
                   </div>
+                  <p className="text-xs tracking-[0.25em] uppercase font-bold text-school-blue-800 mb-2">
+                    {km ? "បេសកកម្ម" : "Mission"}
+                  </p>
+                  <h3 className={cn("text-2xl md:text-3xl font-bold text-school-navy mb-6", km && "font-khmer")}>
+                    {km ? "បេសកកម្មរបស់យើង" : "Our Mission"}
+                  </h3>
                   <div
                     className={cn(
-                      "prose prose-lg max-w-prose prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
+                      "prose prose-lg max-w-none prose-headings:text-school-blue-900 prose-a:text-school-blue-700",
                       km ? "prose-khmer font-khmer" : "prose-english"
                     )}
                     dangerouslySetInnerHTML={{
@@ -586,6 +581,7 @@ export default function AboutPageClient({
                     }}
                   />
                 </div>
+                <div className="relative w-14 h-1.5 bg-school-blue-800 rounded-full mt-10" />
               </div>
             </ScrollReveal>
           </div>
@@ -639,7 +635,7 @@ export default function AboutPageClient({
                 return (
                   <ScrollReveal key={v.en} variant="fade-up" delay={0.3 + i * 0.1}>
                     <div className="group bg-white rounded-2xl p-10 text-center border border-gray-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 h-full flex flex-col items-center">
-                      <div className="w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center mb-10 transition-all duration-500 group-hover:scale-110 group-hover:bg-[#fff9eb] group-hover:shadow-lg group-hover:shadow-school-goldMain/10">
+                      <div className="w-24 h-24 rounded-full bg-gray-50 flex items-center justify-center mb-10 transition-all duration-500 group-hover:scale-110 group-hover:bg-[#fefbf6] group-hover:shadow-lg group-hover:shadow-school-goldMain/10">
                         <ValueIcon className="w-10 h-10 text-school-goldMain transition-transform duration-500 group-hover:rotate-12" />
                       </div>
                       <h4 className={cn("text-2xl font-bold text-school-navy mb-5", km && "font-khmer")}>
@@ -732,7 +728,7 @@ export default function AboutPageClient({
             className="w-full h-full"
             style={{
               backgroundImage:
-                "radial-gradient(circle, #1e3a8a 1px, transparent 1px)",
+                "radial-gradient(circle, #2c2a7a 1px, transparent 1px)",
               backgroundSize: "30px 30px",
             }}
           />
@@ -756,7 +752,7 @@ export default function AboutPageClient({
 
             {(milestones ?? []).map((m, i) => {
               const isLeft = i % 2 === 0;
-              const m_color = m.color ?? "#1e3a8a";
+              const m_color = m.color ?? "#2c2a7a";
               return (
                 <ScrollReveal
                   key={m.id}
@@ -891,8 +887,8 @@ export default function AboutPageClient({
             <ScrollReveal variant="fade-up" delay={0.1}>
               <button
                 type="button"
-                onClick={() => setSelectedLeader(principal)}
-                className="relative bg-white rounded-3xl overflow-hidden mb-10 shadow-[0_8px_30px_rgba(30,58,138,0.10)] hover:shadow-[0_12px_40px_rgba(30,58,138,0.15)] transition-all duration-500 w-full text-left cursor-pointer group"
+                onClick={() => setPrincipalOpen(true)}
+                className="relative bg-white rounded-3xl overflow-hidden mb-10 shadow-[0_8px_30px_rgba(44,42,122,0.10)] hover:shadow-[0_12px_40px_rgba(44,42,122,0.15)] transition-all duration-500 w-full text-left cursor-pointer group"
               >
                 {/* Top accent strip */}
                 <div className="h-1.5 w-full bg-gradient-to-r from-school-blue-800 to-school-gold-500" />
@@ -904,21 +900,18 @@ export default function AboutPageClient({
                       {isValidUrl(principal.photo_url) ? (
                         <Image
                           src={principal.photo_url}
-                          alt={getLocalizedText(principal.name_km, principal.name_en, locale)}
-                          fill
-                          className="object-cover"
-                          sizes="208px"
-                        />
-                      ) : (
-                        <Image
-                          src={getAvatarUrl(
-                            getLocalizedText(principal.name_km, principal.name_en, locale),
-                            208
-                          )}
-                          alt={getLocalizedText(principal.name_km, principal.name_en, locale)}
-                          fill
-                          className="object-cover"
-                          sizes="208px"
+                        alt={principal.name_en}
+                        fill
+                        className="object-cover"
+                        sizes="208px"
+                      />
+                    ) : (
+                      <Image
+                        src={getAvatarUrl(principal.name_en, 208)}
+                        alt={principal.name_en}
+                        fill
+                        className="object-cover"
+                        sizes="208px"
                         />
                       )}
                     </div>
@@ -938,7 +931,7 @@ export default function AboutPageClient({
                         km && "font-khmer"
                       )}
                     >
-                      {getLocalizedText(principal.name_km, principal.name_en, locale)}
+                      {principal.name_en}
                     </h3>
 
                     {(principal.bio_en || principal.bio_km) && (
@@ -947,7 +940,7 @@ export default function AboutPageClient({
                           "relative text-base italic leading-relaxed mb-7 pl-5 border-l-[3px] text-gray-500",
                           km && "font-khmer"
                         )}
-                        style={{ borderColor: "#f59e0b" }}
+                        style={{ borderColor: "#dfad32" }}
                       >
                         {`"${getLocalizedText(principal.bio_km, principal.bio_en, locale)}"`}
                       </blockquote>
@@ -965,66 +958,142 @@ export default function AboutPageClient({
             </ScrollReveal>
           )}
 
-          {/* Vice leaders */}
-          {viceLeaders.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {viceLeaders.map((leader, i) => (
-                <ScrollReveal key={leader.id} variant="fade-up" delay={0.1 + i * 0.1}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedLeader(leader)}
-                    className="group bg-white rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg border border-gray-100/80 hover:border-school-blue-100 w-full cursor-pointer"
-                  >
-                    <div className="relative w-24 h-24 mx-auto rounded-full mb-4 overflow-hidden ring-4 ring-blue-50 transition-all duration-500 group-hover:ring-school-gold-500/40">
-                      {isValidUrl(leader.photo_url) ? (
-                        <Image
-                          src={leader.photo_url}
-                          alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-110"
-                          sizes="96px"
-                        />
-                      ) : (
-                        <Image
-                          src={getAvatarUrl(
-                            getLocalizedText(leader.name_km, leader.name_en, locale),
-                            96
-                          )}
-                          alt={getLocalizedText(leader.name_km, leader.name_en, locale)}
-                          fill
-                          className="object-cover"
-                          sizes="96px"
-                        />
-                      )}
-                    </div>
-                    <h4
-                      className={cn(
-                        "font-bold text-base mb-1 transition-colors group-hover:text-school-blue-800",
-                        km && "font-khmer"
-                      )}
-                      style={{ color: "#1f2937" }}
-                    >
-                      {getLocalizedText(leader.name_km, leader.name_en, locale)}
-                    </h4>
-                    <p className={cn("text-sm text-gray-500", km && "font-khmer")}>
-                      {getLocalizedText(leader.position_km, leader.position_en, locale)}
-                    </p>
-                  </button>
-                </ScrollReveal>
-              ))}
+          {/* ─── CLICKABLE STATS + SEARCH ─── */}
+          <ScrollReveal variant="fade-up" delay={0.2}>
+            <div className="flex flex-col items-center gap-6 mb-12">
+              {/* Filter stat buttons */}
+              <div className="flex flex-wrap items-stretch justify-center gap-4 sm:gap-6">
+                {/* Total Staff */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('all')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'all'
+                      ? "bg-school-blue-800 border-school-blue-800 text-white shadow-md shadow-school-blue-800/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-school-blue-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {teachers.filter(t => t.is_active).length + leadership.filter(l => l.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "បុគ្គលិកសរុប" : "Total Staff"}
+                  </p>
+                </button>
+
+                {/* Leadership */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('leadership')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'leadership'
+                      ? "bg-school-gold-500 border-school-gold-500 text-white shadow-md shadow-school-gold-500/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-school-gold-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {leadership.filter(l => l.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "គណៈគ្រប់គ្រង" : "Leadership"}
+                  </p>
+                </button>
+
+                {/* Teachers */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFilter('teachers')}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-2xl px-6 py-3.5 text-center border transition-all duration-200 cursor-pointer min-w-[120px]",
+                    activeFilter === 'teachers'
+                      ? "bg-school-green-500 border-school-green-500 text-white shadow-md shadow-school-green-500/20"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-school-green-300 hover:shadow-sm"
+                  )}
+                >
+                  <p className="text-2xl font-bold tabular-nums leading-none">
+                    {teachers.filter(t => t.is_active).length}
+                  </p>
+                  <p className={cn("text-[11px] mt-1.5 opacity-80 font-medium", km && "font-khmer")}>
+                    {km ? "គ្រូបង្រៀន" : "Teachers"}
+                  </p>
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="relative w-full max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={staffSearchQuery}
+                  onChange={(e) => setStaffSearchQuery(e.target.value)}
+                  placeholder={km ? "ស្វែងរកឈ្មោះគ្រូ..." : "Search staff by name..."}
+                  className={cn(
+                    "w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-sm transition-all outline-none focus:border-school-blue-400 focus:ring-2 focus:ring-school-blue-100 placeholder:text-gray-400 shadow-sm",
+                    km && "font-khmer"
+                  )}
+                />
+              </div>
             </div>
-          )}
+          </ScrollReveal>
+
+          {/* ─── FILTERED STAFF GRID ─── */}
+          <ScrollReveal variant="fade-up" delay={0.3}>
+            <div>
+              <div className="text-center mb-4">
+                <p className="text-xs" style={{ color: '#727272' }}>
+                  {km
+                    ? `បង្ហាញ ${filteredStaff.length} នាក់`
+                    : `Showing ${filteredStaff.length} staff`}
+                  {staffSearchQuery.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => setStaffSearchQuery('')}
+                      className="ml-2 text-school-blue-600 hover:text-school-blue-800 underline text-[10px]"
+                    >
+                      {km ? 'សម្អាត' : 'Clear'}
+                    </button>
+                  )}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                {filteredStaff.map((teacher) => (
+                  <StaffCard key={teacher.id} teacher={teacher} km={km} />
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      {/* ─── LEADER DIALOG ─── */}
-      <LeaderDetailDialog
-        leader={selectedLeader}
-        open={selectedLeader !== null}
-        onOpenChange={(open) => { if (!open) setSelectedLeader(null); }}
-        km={km}
-        locale={locale}
-      />
+      {/* ─── PRINCIPAL DIALOG (same style as teachers) ─── */}
+      {principal && (
+        <TeacherProfileDialog
+          teacher={{
+            id: principal.id,
+            name_km: principal.name_km,
+            name_en: principal.name_en,
+            subject_km: principal.title_km,
+            subject_en: principal.title_en,
+            department_km: principal.position_km,
+            department_en: principal.position_en,
+            qualification_km: principal.bio_km,
+            qualification_en: principal.bio_en,
+            photo_url: principal.photo_url,
+            phone: principal.phone,
+            gender: principal.gender,
+            is_active: principal.is_active,
+            sort_order: principal.sort_order,
+            created_at: principal.created_at,
+            updated_at: principal.updated_at,
+          }}
+          open={principalOpen}
+          onOpenChange={setPrincipalOpen}
+          km={km}
+        />
+      )}
 
       {/* ─── ORGANIZATION & TEACHERS ─── */}
       <OrganizationSection teachers={teachers} locale={locale} />

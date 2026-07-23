@@ -99,6 +99,9 @@ export interface FacilitiesSection {
   notes: LocalizedText;
 }
 
+/** Legacy DB seed shape for a budget line item (`budget.items`), before it was renamed to `budget.expenditure`. */
+type BudgetItem = { label_km: string; label_en: string; amount: number };
+
 export interface BudgetSection {
   currency: string;
   totalBudget: number;
@@ -549,12 +552,14 @@ export function dbToUiSchoolReport(
       communitySupport: c.budget?.community_support ?? 0,
       // The DB seed uses `budget.items` but the UI expects `budget.expenditure`.
       // Check both keys, preferring `expenditure`.
-      expenditure: (c.budget?.expenditure ?? (c.budget as any)?.items ?? []).map(
-        (item: any) => ({
-          label: lt(item.label_km, item.label_en),
-          amount: item.amount,
-        }),
-      ),
+      expenditure: (
+        c.budget?.expenditure ??
+        (c.budget as { items?: BudgetItem[] } | undefined)?.items ??
+        []
+      ).map((item: BudgetItem) => ({
+        label: lt(item.label_km, item.label_en),
+        amount: item.amount,
+      })),
       remainingBalance: c.budget?.remaining_balance ?? 0,
       notes: lt(c.budget?.notes_km, c.budget?.notes_en),
     },

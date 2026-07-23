@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, Heart, LogIn, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { Menu, X, Globe, Heart, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils";
-import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
+import { cn, adminHref } from "@/utils";
+import { locales, localeNames, type Locale } from "@/i18n/config";
 
 interface NavLink {
   key: string;
@@ -127,8 +127,8 @@ export default function Navbar() {
                   isActive(link.href)
                     ? "bg-school-blue-800 text-white"
                     : isTransparent
-                    ? "text-white/90 hover:text-white hover:bg-white/10"
-                    : "text-gray-700 hover:text-school-blue-800 hover:bg-gray-100"
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : "text-gray-700 hover:text-school-blue-800 hover:bg-gray-100"
                 )}
               >
                 {t(link.key as Parameters<typeof t>[0])}
@@ -221,43 +221,50 @@ export default function Navbar() {
             </Link>
 
             {/* Locale switcher */}
-            <div className="flex items-center gap-1">
+            <div className="relative flex items-center gap-1">
               <Globe
                 className={cn("w-4 h-4", isTransparent ? "text-white/80" : "text-gray-600")}
               />
-              {locales.map((loc) => (
-                <button
-                  key={loc}
-                  onClick={() => switchLocale(loc)}
-                  className={cn(
-                    "text-xs px-2 py-1 rounded font-medium transition-colors",
-                    loc === locale
-                      ? "bg-school-gold-500 text-white"
-                      : isTransparent
-                      ? "text-white/80 hover:bg-white/10"
-                      : "text-gray-600 hover:bg-gray-100"
-                  )}
-                  title={localeNames[loc]}
-                >
-                  {localeFlags[loc]}
-                </button>
-              ))}
+              <LayoutGroup>
+                <div className="flex items-center">
+                  {locales.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => switchLocale(loc)}
+                      className={cn(
+                        "relative flex items-center gap-1 text-xs px-2 py-1 rounded font-medium transition-colors duration-150",
+                        loc === locale
+                          ? "text-white"
+                          : isTransparent
+                            ? "text-white/80 hover:text-white"
+                            : "text-gray-600 hover:text-gray-900"
+                      )}
+                      title={localeNames[loc]}
+                    >
+                      {loc === locale && (
+                        <motion.div
+                          layoutId="active-nav-lang"
+                          className="absolute inset-0 rounded bg-school-gold-500"
+                          transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                        />
+                      )}
+                      <span className="relative z-10 flex items-center gap-1">
+                        <span className="relative w-4 h-3 overflow-hidden rounded-sm shrink-0">
+                          <Image
+                            src={`/icons/flag-${loc}.svg`}
+                            alt={localeNames[loc]}
+                            fill
+                            className="object-contain"
+                            sizes="16px"
+                          />
+                        </span>
+                        <span>{loc.toUpperCase()}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </LayoutGroup>
             </div>
-
-            {/* Admin sign-in */}
-            <Link
-              href={`/${locale}/admin`}
-              aria-label={t("admin")}
-              title={t("admin")}
-              className={cn(
-                "hidden lg:inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors",
-                isTransparent
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : "text-gray-600 hover:text-school-blue-800 hover:bg-gray-100"
-              )}
-            >
-              <LogIn className="w-[18px] h-[18px]" />
-            </Link>
 
             {/* Mobile menu toggle */}
             <button
@@ -365,7 +372,7 @@ export default function Navbar() {
               })}
               <div className="pt-2 border-t">
                 <Button asChild size="sm" className="w-full bg-school-blue-800">
-                  <Link href={`/${locale}/admin`} onClick={() => setMobileOpen(false)}>
+                  <Link href={adminHref(locale)} onClick={() => setMobileOpen(false)}>
                     {t("admin")}
                   </Link>
                 </Button>

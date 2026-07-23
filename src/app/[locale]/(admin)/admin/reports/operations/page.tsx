@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { getOperationsReport, upsertOperationsReport } from "@/actions/Report";
 import type { OperationsReportContent } from "@/types";
 import { cn } from "@/utils";

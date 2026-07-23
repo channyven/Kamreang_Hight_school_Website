@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales, type Locale } from "@/i18n/config";
 import LocaleHtmlSync from "@/components/LocaleHtmlSync";
@@ -47,10 +47,18 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  // Admin routes are served through a middleware rewrite (see middleware.ts)
+  // that bypasses next-intl's own middleware, so `requestLocale` (the
+  // header-based mechanism getMessages()/getLocale() normally rely on)
+  // never gets set for them and silently falls back to the default locale.
+  // Seeding the request-scoped cache here with the locale we already know
+  // from the URL segment fixes locale resolution for every route.
+  setRequestLocale(locale);
+
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <LocaleHtmlSync />
       {children}
       <Toaster

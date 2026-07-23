@@ -33,19 +33,19 @@ const getIcon = (name?: string) => {
 
 const NODE_STYLES: Record<OrgNodeData["tier"], { wrapper: string; icon: string }> = {
   root: {
-    wrapper: "bg-school-blue-800 text-white border-transparent shadow-[0_4px_12px_rgba(30,58,138,0.25)]",
+    wrapper: "bg-school-blue-800 text-white border-transparent shadow-[0_4px_12px_rgba(44,42,122,0.25)]",
     icon: "bg-white/20 text-white",
   },
   vice: {
-    wrapper: "bg-school-goldMain text-white border-transparent shadow-[0_4px_10px_rgba(253,188,19,0.2)]",
+    wrapper: "bg-school-goldMain text-white border-transparent shadow-[0_4px_10px_rgba(223,173,50,0.2)]",
     icon: "bg-white/20 text-white",
   },
   head: {
-    wrapper: "bg-school-goldMain text-white border-transparent shadow-[0_4px_10px_rgba(253,188,19,0.2)]",
+    wrapper: "bg-school-goldMain text-white border-transparent shadow-[0_4px_10px_rgba(223,173,50,0.2)]",
     icon: "bg-white/20 text-white",
   },
   leaf: {
-    wrapper: "bg-white text-school-navy border border-[#e6eeff] shadow-[0_2px_8px_rgba(30,78,140,0.05)]",
+    wrapper: "bg-white text-school-navy border border-[#d7d6f1] shadow-[0_2px_8px_rgba(44,42,122,0.05)]",
     icon: "bg-school-blue-50 text-school-blue-800",
   },
 };
@@ -118,7 +118,7 @@ export default function OrgChart({ data, km }: OrgChartProps) {
       <div className="min-w-[1000px] flex justify-center px-4">
         <Tree
           lineWidth={"1.5px"}
-          lineColor={"#cbd5e1"}
+          lineColor={"#d8d8d8"}
           lineHeight={"35px"}
           lineBorderRadius={"12px"}
           label={<NodeBadge data={data} km={km} />}

@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   Clock,
   Archive,
-  Sparkles,
   Link as LinkIcon,
   AlertTriangle,
 } from "lucide-react";
@@ -46,7 +45,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { generateUniqueSlug, convertGoogleDriveUrl } from "@/utils";
+import { generateUniqueSlug, convertGoogleDriveUrl, adminHref } from "@/utils";
 import PhotoGallery from "@/components/admin/PhotoGallery";
 import { createNews, updateNews, getAdminNewsById } from "@/actions/news";
 import type { NewsCategory } from "@/types";
@@ -76,6 +75,7 @@ export default function NewsFormPage({ params }: PageProps) {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [pendingImageUrl, setPendingImageUrl] = useState("");
+  const [previewError, setPreviewError] = useState(false);
 
   const {
     register,
@@ -97,6 +97,22 @@ export default function NewsFormPage({ params }: PageProps) {
   const excerptEn = watch("excerpt_en");
   const excerptKm = watch("excerpt_km");
   const currentStatus = watch("status");
+  const featuredImageUrl = watch("featured_image");
+
+  // Auto-convert Google Drive URLs for featured_image
+  useEffect(() => {
+    if (featuredImageUrl) {
+      const converted = convertGoogleDriveUrl(featuredImageUrl);
+      if (converted !== featuredImageUrl) {
+        setValue("featured_image", converted);
+      }
+    }
+  }, [featuredImageUrl, setValue]);
+
+  // Reset preview error when featured image URL changes
+  useEffect(() => {
+    setPreviewError(false);
+  }, [featuredImageUrl]);
 
   // Auto-generate slug from English title
   useEffect(() => {
@@ -150,7 +166,7 @@ export default function NewsFormPage({ params }: PageProps) {
 
     if (result.success) {
       toast.success(isNew ? "Article created!" : "Article updated!");
-      router.push(`/${locale}/admin/news`);
+      router.push(adminHref(locale, "news"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -196,7 +212,7 @@ export default function NewsFormPage({ params }: PageProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm" className="-ml-2 text-gray-500 hover:text-gray-900">
-            <Link href={`/${locale}/admin/news`}>
+            <Link href={adminHref(locale, "news")}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               {locale === "km" ? "ត្រឡប់" : "Back"}
             </Link>
@@ -229,7 +245,7 @@ export default function NewsFormPage({ params }: PageProps) {
 
         {!isNew && (
           <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link href={`/${locale}/news/${watch("slug")}`} target="_blank">
+            <Link              href={`/${locale}/news/${watch("slug")}`} target="_blank">
               <Eye className="w-4 h-4 mr-1.5" />
               {locale === "km" ? "មើលព័ត៌មាន" : "Preview"}
             </Link>
@@ -470,7 +486,6 @@ export default function NewsFormPage({ params }: PageProps) {
                 {/* Featured Toggle */}
                 <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-amber-50/50 border border-amber-100/60">
                   <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
                     <div>
                       <Label className="text-sm font-medium text-amber-800 cursor-pointer">
                         {locale === "km" ? "ព័ត៌មានពិសេស" : "Featured Article"}
@@ -544,28 +559,33 @@ export default function NewsFormPage({ params }: PageProps) {
                   </span>
                 )}
               </div>
-              <div className="p-5">
+              <div className="p-5 space-y-3">
                 <Input
-                  {...register("featured_image", {
-                    onBlur: (e) => {
-                      const converted = convertGoogleDriveUrl(e.target.value);
-                      if (converted !== e.target.value) {
-                        setValue("featured_image", converted);
-                      }
-                    },
-                  })}
+                  {...register("featured_image")}
                   placeholder={locale === "km" ? "បិទភ្ជាប់តំណ Google Drive..." : "Paste Google Drive link"}
-                  onPaste={(e) => {
-                    setTimeout(() => {
-                      const input = e.target as HTMLInputElement;
-                      const converted = convertGoogleDriveUrl(input.value);
-                      if (converted !== input.value) {
-                        setValue("featured_image", converted);
-                      }
-                    }, 0);
-                  }}
                   className="text-sm"
                 />
+                {featuredImageUrl && (
+                  <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-100">
+                    <img
+                      key={featuredImageUrl}
+                      src={featuredImageUrl}
+                      alt="Featured image preview"
+                      className={`object-cover w-full h-full transition-opacity duration-300 ${previewError ? 'opacity-0' : 'opacity-100'}`}
+                      onLoad={() => setPreviewError(false)}
+                      onError={() => setPreviewError(true)}
+                    />
+                    {previewError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                        <p className="text-[11px] text-gray-400 px-3 text-center">
+                          {locale === "km"
+                            ? "មិនអាចផ្ទុករូបភាព"
+                            : "Could not load image"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

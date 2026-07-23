@@ -16,7 +16,6 @@ export function generateSchoolJsonLd() {
     email: process.env.NEXT_PUBLIC_SCHOOL_EMAIL,
     sameAs: [
       process.env.NEXT_PUBLIC_SCHOOL_FACEBOOK,
-      process.env.NEXT_PUBLIC_SCHOOL_YOUTUBE,
       process.env.NEXT_PUBLIC_SCHOOL_TIKTOK,
     ].filter(Boolean),
   };

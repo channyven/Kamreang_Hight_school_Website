@@ -324,10 +324,10 @@ export default function AdminReportsPage() {
                             </td>
                             <td className="p-3">
                               <Badge
-                                variant={file.is_published ? "success" : "secondary"}
+                                variant={file.is_active ? "success" : "secondary"}
                                 className="text-xs font-medium"
                               >
-                                {file.is_published ? t("published") : t("draft")}
+                                {file.is_active ? t("published") : t("draft")}
                               </Badge>
                             </td>
                             <td className="p-3 pr-5">
@@ -379,7 +379,7 @@ export default function AdminReportsPage() {
                       {search && ` · "${search}"`}
                     </span>
                     <span className="text-gray-300">
-                      {files.filter(f => f.is_published).length} {t("published").toLowerCase()}
+                      {files.filter(f => f.is_active).length} {t("published").toLowerCase()}
                     </span>
                   </div>
                 )}

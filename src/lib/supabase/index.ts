@@ -1,23 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
 // Browser / public client (anon key — respects RLS)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const supabase = createClient<any>(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<any>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-// Server-side admin client (service role — bypasses RLS)
-// Only use in Server Actions / Route Handlers
+/**
+ * Server-side admin client (service role — bypasses RLS).
+ *
+ * Reads env vars at CALL time (not module-load time) so Next.js can
+ * resolve them from the correct env-file priority order
+ * (.env.local > .env.development > .env).
+ */
 export function createServerClient() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return createClient<any>(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  return createClient<any>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
 }
 
 // Storage helpers
@@ -32,6 +40,7 @@ export const STORAGE_BUCKETS = {
   AVATARS: "school-avatars",
   SETTINGS: "settings-images",
   SCHOOL_IMAGES: "school-images",
+  STUDENT_PHOTOS: "student-photos",
 } as const;
 
 export type StorageBucket =

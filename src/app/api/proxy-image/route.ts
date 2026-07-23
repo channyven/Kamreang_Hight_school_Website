@@ -51,18 +51,58 @@ export async function GET(request: NextRequest) {
     });
     clearTimeout(timeout);
 
-    if (!response.ok) {
-      console.error(`Proxy fetch failed: ${response.status} for ${urlParam}`);
-      return new NextResponse(`Upstream fetch failed: ${response.status}`, {
-        status: response.status,
-      });
-    }
-
-    // Get the content type — bail if upstream didn't return an image
     const contentType = response.headers.get("content-type") || "";
-    if (!contentType.startsWith("image/")) {
+
+    // The primary download endpoint can return 200 OK with an HTML page
+    // instead of image bytes — e.g. when the file isn't shared as "Anyone
+    // with the link", or Google shows a virus-scan interstitial. That's
+    // not just a bad status, so we check content-type too, not just !ok.
+    if (!response.ok || !contentType.startsWith("image/")) {
+      // Try Google's thumbnail endpoint as a fallback.
+      // It returns a 302 redirect that fetch() follows to lh3.googleusercontent.com.
+      const fileIdMatch = urlParam.match(/[?&]id=([a-zA-Z0-9_\-.]+)/);
+      if (fileIdMatch && urlParam.includes("drive.usercontent.google.com/download")) {
+        const fallbackTimeout = setTimeout(() => controller.abort(), 15000);
+        const fallbackUrl = `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w2000`;
+        const fallbackResponse = await fetch(fallbackUrl, {
+          signal: controller.signal,
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          },
+        });
+        clearTimeout(fallbackTimeout);
+
+        if (fallbackResponse.ok) {
+          const fallbackContentType = fallbackResponse.headers.get("content-type") || "";
+          if (fallbackContentType.startsWith("image/")) {
+            const fallbackHeaders: Record<string, string> = {
+              "Content-Type": fallbackContentType,
+              "Cache-Control": "public, max-age=86400, s-maxage=86400",
+              "Access-Control-Allow-Origin": "*",
+            };
+            const fallbackDisposition = fallbackResponse.headers.get("content-disposition");
+            if (fallbackDisposition && fallbackDisposition.startsWith("attachment")) {
+              fallbackHeaders["Content-Disposition"] = "inline";
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return new NextResponse(fallbackResponse.body as any, { status: 200, headers: fallbackHeaders });
+          }
+        }
+        console.error(`Proxy fallback also failed for ${urlParam}`);
+      }
+
+      if (!response.ok) {
+        console.error(`Proxy fetch failed: ${response.status} for ${urlParam}`);
+        return new NextResponse(`Upstream fetch failed: ${response.status}`, {
+          status: response.status,
+        });
+      }
       console.error(`Proxy: upstream returned non-image content-type: ${contentType} for ${urlParam}`);
-      return new NextResponse("Upstream did not return an image", { status: 502 });
+      return new NextResponse(
+        "Upstream did not return an image — make sure the Google Drive file is shared as \"Anyone with the link\"",
+        { status: 502 }
+      );
     }
 
     // Build response headers for the client

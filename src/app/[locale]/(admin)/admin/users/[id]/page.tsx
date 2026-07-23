@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { adminHref } from "@/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,7 @@ export default function UserFormPage({ params }: PageProps) {
 
     if (result.success) {
       toast.success(isNew ? "User created!" : "User updated!");
-      router.push(`/${locale}/admin/users`);
+      router.push(adminHref(locale, "users"));
     } else {
       toast.error(result.error ?? "Failed to save");
     }
@@ -89,7 +90,7 @@ export default function UserFormPage({ params }: PageProps) {
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link href={`/${locale}/admin/users`}>
+          <Link href={adminHref(locale, "users")}>
             <ArrowLeft className="w-4 h-4 mr-1" />
             {locale === "km" ? "ត្រឡប់" : "Back"}
           </Link>

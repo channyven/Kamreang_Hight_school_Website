@@ -433,7 +433,6 @@ export function FeederSchoolsSection({
 
 export function AcademicResultsSection({
   data,
-  locale,
 }: {
   data: SchoolReport["academicResults"];
   locale: Locale;

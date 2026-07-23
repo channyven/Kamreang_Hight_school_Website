@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@/types";
-import { formatShortDate, getInitials } from "@/utils";
+import { formatShortDate, getInitials, adminHref } from "@/utils";
 import { toast } from "sonner";
 import { deleteUser, toggleUserActive } from "@/actions/users";
 import { useAuth } from "@/providers/AuthContext";
@@ -70,7 +70,7 @@ export default function AdminUsersPage() {
           <p className="text-gray-500 text-sm mt-1">{users.length} users</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/users/new`}>
+          <Link href={adminHref(locale, "users/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "Add User"}
           </Link>
@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
                           {u.is_active ? <ToggleRight className="w-4 h-4 text-green-500" /> : <ToggleLeft className="w-4 h-4 text-gray-400" />}
                         </Button>
                         <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                          <Link href={`/${locale}/admin/users/${u.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                          <Link href={adminHref(locale, `users/${u.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(u.id, u.full_name)}>
                           <Trash2 className="w-4 h-4 text-red-500" />

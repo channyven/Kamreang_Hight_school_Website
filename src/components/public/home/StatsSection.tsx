@@ -7,20 +7,20 @@ import { Users, GraduationCap, BookOpen, Award, TrendingUp } from "lucide-react"
 import type { Statistics } from "@/types";
 import { formatNumber } from "@/utils";
 
+// Single color throughout: navy (main/primary brand color) for every icon.
 const STAT_ICONS = [
-  { icon: Users, accent: "blue" },
-  { icon: GraduationCap, accent: "emerald" },
-  { icon: BookOpen, accent: "violet" },
-  { icon: Award, accent: "amber" },
-  { icon: TrendingUp, accent: "rose" },
+  { icon: Users, accent: "navy" },
+  { icon: GraduationCap, accent: "navy" },
+  { icon: BookOpen, accent: "navy" },
+  { icon: Award, accent: "navy" },
+  { icon: TrendingUp, accent: "navy" },
 ] as const;
 
 const ACCENT_MAP: Record<string, { bg: string; text: string; ring: string }> = {
-  blue:    { bg: "bg-blue-50",    text: "text-blue-600",   ring: "ring-blue-200/50" },
-  emerald: { bg: "bg-emerald-50", text: "text-emerald-600", ring: "ring-emerald-200/50" },
-  violet:  { bg: "bg-violet-50",  text: "text-violet-600",  ring: "ring-violet-200/50" },
-  amber:   { bg: "bg-amber-50",   text: "text-amber-600",   ring: "ring-amber-200/50" },
-  rose:    { bg: "bg-rose-50",    text: "text-rose-600",    ring: "ring-rose-200/50" },
+  navy:  { bg: "bg-school-blue-50",  text: "text-school-blue-700",  ring: "ring-school-blue-200/50" },
+  gold:  { bg: "bg-school-gold-50",  text: "text-school-gold-700",  ring: "ring-school-gold-200/50" },
+  gray:  { bg: "bg-gray-100",        text: "text-gray-600",         ring: "ring-gray-300/50" },
+  green: { bg: "bg-school-green-50", text: "text-school-green-700", ring: "ring-school-green-200/50" },
 };
 
 function useCounter(target: number, active: boolean, duration = 2000) {
@@ -46,7 +46,7 @@ function StatCard({ icon, label, value, suffix = "", delay = 0, accent: accentKe
   const inView = useInView(ref, { once: true, margin: "-50px" });
   const count = useCounter(value, inView);
   const locale = useLocale();
-  const colors = ACCENT_MAP[accentKey] ?? ACCENT_MAP.blue;
+  const colors = ACCENT_MAP[accentKey] ?? ACCENT_MAP.navy;
 
   return (
     <motion.div
@@ -96,16 +96,16 @@ function GenderCard({ male, female, total }: { male: number; female: number; tot
       </div>
       <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
         <motion.div initial={{ width: 0 }} animate={inView ? { width: `${malePct}%` } : {}} transition={{ duration: 1, delay: 0.35, ease: "easeOut" }} className="absolute inset-y-0 left-0 rounded-full bg-school-blue-500" />
-        <motion.div initial={{ width: 0 }} animate={inView ? { width: `${femalePct}%` } : {}} transition={{ duration: 1, delay: 0.55, ease: "easeOut" }} className="absolute inset-y-0 right-0 rounded-full bg-amber-400" style={{ left: `${malePct}%` }} />
+        <motion.div initial={{ width: 0 }} animate={inView ? { width: `${femalePct}%` } : {}} transition={{ duration: 1, delay: 0.55, ease: "easeOut" }} className="absolute inset-y-0 right-0 rounded-full bg-school-gold-500" style={{ left: `${malePct}%` }} />
       </div>
       <div className="flex justify-between mt-3">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-school-blue-500 ring-1 ring-blue-200" />
+          <span className="w-2.5 h-2.5 rounded-full bg-school-blue-500 ring-1 ring-school-blue-200" />
           <span className="text-xs sm:text-sm text-gray-600">{locale === "km" ? "ប្រុស" : "Male"}</span>
           <span className="text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">{formatNumber(male, locale)}<span className="text-gray-400 font-normal ml-1">({malePct.toFixed(1)}%)</span></span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-200" />
+          <span className="w-2.5 h-2.5 rounded-full bg-school-gold-500 ring-1 ring-school-gold-200" />
           <span className="text-xs sm:text-sm text-gray-600">{locale === "km" ? "ស្រី" : "Female"}</span>
           <span className="text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">{formatNumber(female, locale)}<span className="text-gray-400 font-normal ml-1">({femalePct.toFixed(1)}%)</span></span>
         </div>
@@ -149,7 +149,7 @@ export default function StatsSection({ stats }: StatsSectionProps) {
           })}
         </div>
 
-        <div className="mt-6 sm:mt-8 max-w-2xl mx-auto">
+        <div className="mt-6 sm:mt-8">
           <GenderCard male={stats.male_students ?? 0} female={stats.female_students ?? 0} total={stats.total_students ?? 0} />
         </div>
       </div>

@@ -20,12 +20,25 @@ async function getContactInfo(locale: string) {
     hours:
       (km ? settings.school_hours_km : settings.school_hours_en) ??
       (km ? "ច័ន្ទ - សុក្រ: ម៉ោង ៧:០០ - ១១:០០, ១៤:០០ - ១៧:០០" : "Mon - Fri: 7:00 - 11:00, 14:00 - 17:00"),
+    campusPhoto: settings.school_campus_photo ?? "",
+    facebook: settings.school_facebook ?? "",
+    tiktok: settings.school_tiktok ?? "",
   };
 }
 
 export default async function ContactPage() {
   const locale = await getLocale();
-  const { address, phone, email, hours } = await getContactInfo(locale);
+  const { address, phone, email, hours, campusPhoto, facebook, tiktok } = await getContactInfo(locale);
 
-  return <ContactPageClient address={address} phone={phone} email={email} hours={hours} />;
+  return (
+    <ContactPageClient
+      address={address}
+      phone={phone}
+      email={email}
+      hours={hours}
+      campusPhoto={campusPhoto}
+      facebook={facebook}
+      tiktok={tiktok}
+    />
+  );
 }

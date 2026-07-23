@@ -2,9 +2,11 @@
 
 import { Copy, Check } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useLocale } from "next-intl";
 
 export default function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
+  const locale = useLocale();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
@@ -25,7 +27,7 @@ export default function CopyButton({ value }: { value: string }) {
     <button
       onClick={handleCopy}
       className="p-1 rounded hover:bg-gray-100 transition-colors"
-      title="Copy"
+      title={locale === "km" ? "ចម្លង" : "Copy"}
     >
       {copied
         ? <Check className="w-3.5 h-3.5 text-green-500" />

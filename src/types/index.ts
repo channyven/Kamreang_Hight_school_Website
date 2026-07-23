@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 
 export type UserRole = "administrator" | "director" | "editor";
+export type StudentStatus = "active" | "inactive" | "graduated" | "suspended" | "transferred" | "expelled";
 export type ContentStatus = "draft" | "published" | "archived";
 export type AchievementType = "student" | "teacher" | "school";
 export type AwardLevel = "national" | "provincial" | "district" | "school";
@@ -98,6 +99,7 @@ export interface Achievement {
   achievement_date?: string;
   participant_name?: string;
   image_url?: string;
+  gallery_images?: string[];
   is_featured?: boolean;
   status: ContentStatus;
   created_by?: string;
@@ -387,6 +389,46 @@ export interface GovernanceItem {
   updated_at: string;
 }
 
+export interface BankAccount {
+  id: string;
+  bank_name_km: string;
+  bank_name_en: string;
+  account_name_km: string;
+  account_name_en: string;
+  account_number: string;
+  currency: string;
+  logo_color: string;
+  logo_url?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DonationPurpose {
+  id: string;
+  icon: string;
+  title_km: string;
+  title_en: string;
+  desc_km?: string;
+  desc_en?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DonationQr {
+  id: string;
+  label_km?: string;
+  label_en?: string;
+  image_url: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface HeroSlide {
   id: string;
   title_km: string;
@@ -435,6 +477,82 @@ export interface ActionResult<T = unknown> {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Department & Class Models
+// ─────────────────────────────────────────────────────────────
+
+export interface Department {
+  id: string;
+  name_km: string;
+  name_en: string;
+  code: string;
+  description?: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Class {
+  id: string;
+  name_km: string;
+  name_en: string;
+  code: string;
+  grade_level: number;
+  section?: string;
+  department_id?: string;
+  room?: string;
+  capacity: number;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  department?: Department;
+}
+
+export interface Student {
+  id: string;
+  student_id: string;
+  qr_code?: string;
+  qr_token?: string;
+  photo?: string;
+  khmer_first_name?: string;
+  khmer_last_name?: string;
+  english_first_name: string;
+  english_last_name: string;
+  gender?: string;
+  date_of_birth?: string;
+  place_of_birth?: string;
+  nationality: string;
+  phone_number?: string;
+  email?: string;
+  street_address?: string;
+  province?: string;
+  district?: string;
+  commune?: string;
+  village?: string;
+  faculty?: string;
+  major?: string;
+  academic_year?: string;
+  class_name?: string;
+  study_year?: string;
+  semester?: string;
+  gpa?: number;
+  credits_earned?: number;
+  father_name?: string;
+  father_name_km?: string;
+  mother_name?: string;
+  mother_name_km?: string;
+  status: StudentStatus;
+  card_issue_date?: string;
+  card_expiry_date?: string;
+  created_by?: string;
+  updated_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Form Types
 // ─────────────────────────────────────────────────────────────
 
@@ -470,6 +588,7 @@ export interface RolePermissions {
   canManageAchievements: boolean;
   canManageNews: boolean;
   canManageMessages: boolean;
+  canManageStudents: boolean;
 }
 
 export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
@@ -483,6 +602,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canManageAchievements: true,
     canManageNews: true,
     canManageMessages: true,
+    canManageStudents: true,
   },
   director: {
     canManageUsers: false,
@@ -494,6 +614,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canManageAchievements: true,
     canManageNews: true,
     canManageMessages: true,
+    canManageStudents: true,
   },
   editor: {
     canManageUsers: false,
@@ -505,5 +626,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canManageAchievements: false,
     canManageNews: true,
     canManageMessages: false,
+    canManageStudents: false,
   },
 };

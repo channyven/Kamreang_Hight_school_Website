@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/lib/upload";
@@ -23,8 +23,14 @@ interface ImageUploaderProps {
   label?: string;
 }
 
-/** Returns true if url is a valid http/https URL (not a file:// or other protocol) */
+/**
+ * Returns true if url is displayable as an <img src> — either a valid
+ * http/https URL, or our own same-origin Google Drive proxy path
+ * (see convertGoogleDriveUrl in src/utils), which is relative and would
+ * otherwise fail the `new URL()` parse below.
+ */
 function isValidUrl(url: string): boolean {
+  if (url.startsWith("/api/proxy-image?url=")) return true;
   try {
     const parsed = new URL(url);
     return parsed.protocol === "http:" || parsed.protocol === "https:";
@@ -43,9 +49,19 @@ export default function ImageUploader({
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value ?? null);
+  const [urlDraft, setUrlDraft] = useState(value ?? "");
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropCountRef = useRef(0);
+
+  // Resync local preview/draft when the parent reassigns `value` out from
+  // under us (e.g. the Google Drive share-link auto-converter effects in
+  // the hero-slides/news/achievements/donate admin forms run *after* this
+  // component already committed the raw pasted URL via onChange).
+  useEffect(() => {
+    setPreview(value ?? null);
+    setUrlDraft(value ?? "");
+  }, [value]);
 
   // ─── Upload a file to Supabase Storage ───────────────────────
 
@@ -83,6 +99,7 @@ export default function ImageUploader({
         );
 
         setPreview(result.url);
+        setUrlDraft(result.url);
         onChange(result.url);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -158,6 +175,7 @@ export default function ImageUploader({
 
   const handleRemove = useCallback(() => {
     setPreview(null);
+    setUrlDraft("");
     onChange(null);
   }, [onChange]);
 
@@ -171,7 +189,16 @@ export default function ImageUploader({
 
       {preview && isValidUrl(preview) ? (
         /* ── Image Preview (only for valid http/https URLs) ── */
-        <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+        <div
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className={cn(
+            "relative group rounded-xl overflow-hidden border bg-gray-50 transition-colors",
+            isDragOver ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200"
+          )}
+        >
           {/* Preview */}
           <div className="relative aspect-video max-h-[200px] w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -183,25 +210,36 @@ export default function ImageUploader({
           </div>
 
           {/* Overlay actions */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => inputRef.current?.click()}
-            >
-              <Upload className="w-3.5 h-3.5 mr-1" />
-              Replace
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={handleRemove}
-            >
-              <X className="w-3.5 h-3.5 mr-1" />
-              Remove
-            </Button>
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center justify-center gap-2 transition-opacity",
+              isDragOver ? "bg-blue-600/50 opacity-100" : "bg-black/40 opacity-0 group-hover:opacity-100"
+            )}
+          >
+            {isDragOver ? (
+              <p className="text-sm font-semibold text-white">Drop to replace</p>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <Upload className="w-3.5 h-3.5 mr-1" />
+                  Replace
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleRemove}
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Remove
+                </Button>
+              </>
+            )}
           </div>
 
           {/* File URL */}
@@ -302,16 +340,28 @@ export default function ImageUploader({
         <div className="flex-1">
           <input
             type="text"
-            value={preview && isValidUrl(preview) ? preview : ""}
-            onChange={(e) => {
-              const val = e.target.value;
-              // Only accept http/https URLs, reject file://
-              if (val && !isValidUrl(val)) {
+            value={urlDraft}
+            onChange={(e) => setUrlDraft(e.target.value)}
+            onBlur={() => {
+              const val = urlDraft.trim();
+              if (!val) {
+                setPreview(null);
+                onChange(null);
+                return;
+              }
+              if (!isValidUrl(val)) {
                 toast.error("Please enter a valid http or https URL");
                 return;
               }
-              setPreview(val || null);
-              onChange(val || null);
+              setPreview(val);
+              setUrlDraft(val);
+              onChange(val);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.currentTarget.blur();
+              }
             }}
             placeholder="Or paste image URL..."
             className="w-full text-xs rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-gray-500 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400"

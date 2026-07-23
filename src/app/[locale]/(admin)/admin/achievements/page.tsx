@@ -4,13 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { Plus, Search, Edit, Trash2, Loader2, Trophy } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Loader2, Trophy, Award, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import type { Achievement } from "@/types";
-import { formatShortDate, getLocalizedText } from "@/utils";
+import { formatShortDate, getLocalizedText, convertGoogleDriveUrl, adminHref } from "@/utils";
 import { toast } from "sonner";
 import { deleteAchievement } from "@/actions/achievements";
 
@@ -18,7 +18,13 @@ const LEVEL_COLORS: Record<string, string> = {
   national: "bg-red-100 text-red-700",
   provincial: "bg-orange-100 text-orange-700",
   district: "bg-blue-100 text-blue-700",
-  school: "bg-green-100 text-green-700",
+  school: "bg-emerald-100 text-emerald-700",
+};
+
+const TYPE_LABELS: Record<string, { en: string; km: string }> = {
+  student: { en: "Student", km: "សិស្ស" },
+  teacher: { en: "Teacher", km: "គ្រូ" },
+  school: { en: "School", km: "សាលា" },
 };
 
 const STATUS_COLORS: Record<string, "default" | "success" | "warning" | "destructive"> = {
@@ -67,7 +73,7 @@ export default function AdminAchievementsPage() {
           <p className="text-gray-500 text-sm mt-1">{items.length} achievements</p>
         </div>
         <Button asChild className="bg-school-blue-800 hover:bg-school-blue-900">
-          <Link href={`/${locale}/admin/achievements/new`}>
+          <Link href={adminHref(locale, "achievements/new")}>
             <Plus className="w-4 h-4 mr-2" />
             {locale === "km" ? "បន្ថែម" : "New Achievement"}
           </Link>
@@ -115,20 +121,35 @@ export default function AdminAchievementsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {item.image_url ? (
-                            <div className="w-10 h-8 rounded overflow-hidden shrink-0">
-                              <Image src={item.image_url} alt={title} width={40} height={32} className="object-cover w-full h-full" />
+                            <div className="w-10 h-8 rounded overflow-hidden shrink-0 bg-gray-50">
+                              <Image
+                                src={convertGoogleDriveUrl(item.image_url)}
+                                alt={title}
+                                width={40}
+                                height={32}
+                                className="object-cover w-full h-full"
+                                unoptimized={item.image_url.includes("google")}
+                              />
                             </div>
                           ) : (
-                            <div className="w-10 h-8 rounded bg-yellow-50 flex items-center justify-center shrink-0">
-                              <Trophy className="w-4 h-4 text-yellow-500" />
+                            <div className="w-10 h-8 rounded bg-school-blue-50 flex items-center justify-center shrink-0">
+                              <Trophy className="w-4 h-4 text-school-blue-500" />
                             </div>
                           )}
-                          <p className={`font-medium text-gray-900 truncate max-w-[200px] ${locale === "km" ? "font-khmer" : ""}`}>{title}</p>
+                          <div className="min-w-0">
+                            <p className={`font-medium text-gray-900 truncate max-w-[180px] ${locale === "km" ? "font-khmer" : ""}`}>{title}</p>
+                            {item.achievement_type && (
+                              <p className="text-[11px] text-gray-400 truncate">
+                                {TYPE_LABELS[item.achievement_type]?.[locale === "km" ? "km" : "en"] ?? item.achievement_type}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         {item.award_level && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${LEVEL_COLORS[item.award_level] ?? "bg-gray-100 text-gray-700"}`}>
+                          <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${LEVEL_COLORS[item.award_level] ?? "bg-gray-100 text-gray-700"}`}>
+                            <Award className="w-3 h-3" />
                             {item.award_level}
                           </span>
                         )}
@@ -142,7 +163,10 @@ export default function AdminAchievementsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                            <Link href={`/${locale}/admin/achievements/${item.id}`}><Edit className="w-4 h-4 text-blue-500" /></Link>
+                            <Link href={adminHref(locale, `achievements/${item.id}/view`)}><Eye className="w-4 h-4 text-gray-500" /></Link>
+                          </Button>
+                          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                            <Link href={adminHref(locale, `achievements/${item.id}`)}><Edit className="w-4 h-4 text-blue-500" /></Link>
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(item.id, title)}>
                             <Trash2 className="w-4 h-4 text-red-500" />
