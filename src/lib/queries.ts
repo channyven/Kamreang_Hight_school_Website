@@ -20,14 +20,23 @@ import {
 export const getSiteSettings = unstable_cache(
   async (): Promise<Record<string, string>> => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
-      const { data } = await supabase.from("settings").select("key, value");
+      const { data, error } = await supabase.from("settings").select("key, value");
+      
+      if (error) {
+        console.error(`[getSiteSettings] Supabase error (${Date.now() - start}ms):`, error);
+        return {};
+      }
+      
       const settings: Record<string, string> = {};
       (data ?? []).forEach((s: { key: string; value: string }) => {
         settings[s.key] = s.value;
       });
+      console.log(`[getSiteSettings] Success (${Date.now() - start}ms)`);
       return settings;
-    } catch {
+    } catch (err) {
+      console.error("[getSiteSettings] Unexpected error:", err);
       return {};
     }
   },
@@ -38,16 +47,27 @@ export const getSiteSettings = unstable_cache(
 export const getAboutPageData = unstable_cache(
   async () => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
-      const [{ data: info }, { data: leaders }, { data: teacherRows }, { data: milestoneRows }] = await Promise.all([
+      const [{ data: info, error: e1 }, { data: leaders, error: e2 }, { data: teacherRows, error: e3 }, { data: milestoneRows, error: e4 }] = await Promise.all([
         supabase.from("school_info").select("*"),
         supabase.from("leadership").select("*").eq("is_active", true).order("sort_order"),
         supabase.from("teachers").select("*").eq("is_active", true).order("sort_order"),
         supabase.from("milestones").select("*").eq("is_active", true).order("sort_order"),
       ]);
 
-      // Check if Supabase data is still placeholder/seed content (e.g. "Phnom Penh High School")
-      // If so, fall back to mock data which has the correct Kamrieng High School content
+      console.log(`[getAboutPageData] Parallel query took ${Date.now() - start}ms`);
+
+      if (e1 || e2 || e3 || e4) {
+        console.error("[getAboutPageData] One or more queries failed:", { e1, e2, e3, e4 });
+        // Fall back to mocks if any major query fails
+        return {
+          schoolInfo: mockSchoolInfo,
+          leadership: mockLeadership,
+          teachers: mockTeachers,
+          milestones: mockMilestones,
+        };
+      }
       const hasPlaceholderData = info?.some(
         (row: Record<string, unknown>) =>
           typeof row.content_en === "string" &&
@@ -179,6 +199,7 @@ export const getGovernanceItems = unstable_cache(
 export const getActiveBankAccounts = unstable_cache(
   async (): Promise<BankAccount[]> => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
       const { data, error } = await supabase
         .from("bank_accounts")
@@ -186,11 +207,16 @@ export const getActiveBankAccounts = unstable_cache(
         .eq("is_active", true)
         .order("sort_order")
         .order("created_at");
-      // Fall back to mocks only when the query fails (e.g. table missing);
-      // an empty result means the admin hid every account on purpose.
-      if (error) return mockBankAccounts;
+      
+      console.log(`[getActiveBankAccounts] Query took ${Date.now() - start}ms`);
+      
+      if (error) {
+        console.error("[getActiveBankAccounts] Supabase error:", error);
+        return mockBankAccounts;
+      }
       return (data ?? []) as BankAccount[];
-    } catch {
+    } catch (err) {
+      console.error("[getActiveBankAccounts] Unexpected error:", err);
       return mockBankAccounts;
     }
   },
@@ -201,6 +227,7 @@ export const getActiveBankAccounts = unstable_cache(
 export const getActiveDonationPurposes = unstable_cache(
   async (): Promise<DonationPurpose[]> => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
       const { data, error } = await supabase
         .from("donation_purposes")
@@ -208,11 +235,16 @@ export const getActiveDonationPurposes = unstable_cache(
         .eq("is_active", true)
         .order("sort_order")
         .order("created_at");
-      // Fall back to mocks only when the query fails (e.g. table missing);
-      // an empty result means the admin hid every card on purpose.
-      if (error) return mockDonationPurposes;
+      
+      console.log(`[getActiveDonationPurposes] Query took ${Date.now() - start}ms`);
+
+      if (error) {
+        console.error("[getActiveDonationPurposes] Supabase error:", error);
+        return mockDonationPurposes;
+      }
       return (data ?? []) as DonationPurpose[];
-    } catch {
+    } catch (err) {
+      console.error("[getActiveDonationPurposes] Unexpected error:", err);
       return mockDonationPurposes;
     }
   },
@@ -223,17 +255,24 @@ export const getActiveDonationPurposes = unstable_cache(
 export const getActiveDonationQrCodes = unstable_cache(
   async (): Promise<DonationQr[]> => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("donation_qr_codes")
         .select("*")
         .eq("is_active", true)
         .order("sort_order")
         .order("created_at");
-      // No mock fallback here: before 019 runs the donate page falls back
-      // to the legacy `donate_qr_url` settings key instead.
+      
+      console.log(`[getActiveDonationQrCodes] Query took ${Date.now() - start}ms`);
+      
+      if (error) {
+        console.error("[getActiveDonationQrCodes] Supabase error:", error);
+        return [];
+      }
       return (data ?? []) as DonationQr[];
-    } catch {
+    } catch (err) {
+      console.error("[getActiveDonationQrCodes] Unexpected error:", err);
       return [];
     }
   },
@@ -244,14 +283,23 @@ export const getActiveDonationQrCodes = unstable_cache(
 export const getHeroSlides = unstable_cache(
   async (): Promise<HeroSlide[]> => {
     try {
+      const start = Date.now();
       const supabase = createServerClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("hero_slides")
         .select("*")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
+      
+      console.log(`[getHeroSlides] Query took ${Date.now() - start}ms`);
+      
+      if (error) {
+        console.error("[getHeroSlides] Supabase error:", error);
+        return [];
+      }
       return (data ?? []) as HeroSlide[];
-    } catch {
+    } catch (err) {
+      console.error("[getHeroSlides] Unexpected error:", err);
       return [];
     }
   },
