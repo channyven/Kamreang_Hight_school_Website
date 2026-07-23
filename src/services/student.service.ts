@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { BaseService } from "./base.service";
 import type { StudentInput } from "@/schemas/validations";
 import type { Student } from "@/types";
@@ -28,6 +29,7 @@ export class StudentService extends BaseService {
 
   async create(data: StudentInput): Promise<{ id?: string; error: string | null }> {
     const insertData: Record<string, unknown> = {
+      id: randomUUID(),
       student_id: data.student_id,
       qr_token: data.qr_token || null,
       qr_code: data.qr_code || null,
