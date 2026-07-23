@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
 import type { Achievement, AppDocument, GovernanceItem, Leadership, Milestone, News, NewsCategory, SchoolInfo, SchoolReport as DbSchoolReport, Statistics, Teacher } from "@/types";
+import { REPORT_FILE_CATEGORIES } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -147,13 +148,43 @@ export const getPublishedDocuments = unstable_cache(
   async (): Promise<AppDocument[]> => {
     try {
       const supabase = createServerClient();
-      const { data } = await supabase
-        .from("downloads")
-        .select("*, category:download_categories(name_km, name_en, slug)")
+      const { data, error } = await supabase
+        .from("report_files")
+        .select("*")
         .eq("is_active", true)
+        .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false });
-      return (data ?? []) as unknown as AppDocument[];
-    } catch {
+
+      if (error) {
+        console.error("[getPublishedDocuments] Supabase query failed:", error);
+        return [];
+      }
+
+      // Map report_files to AppDocument structure
+      return (data ?? []).map((file: any) => ({
+        id: file.id,
+        title_km: file.title_km,
+        title_en: file.title_en,
+        description_km: file.description_km,
+        description_en: file.description_en,
+        file_url: file.file_url,
+        file_name: file.file_name,
+        category: {
+          slug: file.category,
+          name_km:
+            REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
+              ?.labelKm ?? file.category,
+          name_en:
+            REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
+              ?.labelEn ?? file.category,
+        },
+        is_active: file.is_active,
+        sort_order: file.sort_order,
+        created_at: file.created_at,
+        updated_at: file.updated_at,
+      })) as AppDocument[];
+    } catch (err) {
+      console.error("[getPublishedDocuments] Unexpected error:", err);
       return [];
     }
   },

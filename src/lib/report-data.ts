@@ -549,12 +549,13 @@ export function dbToUiSchoolReport(
       communitySupport: c.budget?.community_support ?? 0,
       // The DB seed uses `budget.items` but the UI expects `budget.expenditure`.
       // Check both keys, preferring `expenditure`.
-      expenditure: (c.budget?.expenditure ?? (c.budget as any)?.items ?? []).map(
-        (item: any) => ({
-          label: lt(item.label_km, item.label_en),
-          amount: item.amount,
-        }),
-      ),
+      expenditure: (
+        c.budget?.expenditure ??
+        ((c.budget as unknown as { items?: { label_km: string; label_en: string; amount: number }[] })?.items ?? [])
+      ).map((item) => ({
+        label: lt(item.label_km, item.label_en),
+        amount: item.amount,
+      })),
       remainingBalance: c.budget?.remaining_balance ?? 0,
       notes: lt(c.budget?.notes_km, c.budget?.notes_en),
     },

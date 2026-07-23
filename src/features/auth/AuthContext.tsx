@@ -19,6 +19,7 @@ import {
 } from "@/lib/firebase";
 import type { SessionUser, UserRole, RolePermissions } from "@/types";
 import { ROLE_PERMISSIONS } from "@/types";
+import { logError } from "@/lib/error-logger";
 
 interface AuthContextValue {
   user: SessionUser | null;
@@ -41,21 +42,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setSessionCookie = useCallback(
     async (fbUser: FirebaseUser | null): Promise<SessionUser | null> => {
       if (!fbUser) {
-        try { await fetch("/api/auth/session", { method: "DELETE" }); } catch { /* non-critical */ }
+        try {
+          await fetch("/api/auth/session", { method: "DELETE" });
+        } catch (error) {
+          logError(error, { severity: "low", tags: ["auth", "session-cleanup"] });
+        }
         return null;
       }
-      const idToken = await fbUser.getIdToken();
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken, firebase_uid: fbUser.uid }),
-      });
-      if (!res.ok) return null;
-      const { user } = await res.json();
-      if (!user) return null;
-      const sessionUser = user as SessionUser;
-      if (!sessionUser.is_active) throw new Error("Account is deactivated");
-      return sessionUser;
+      try {
+        const idToken = await fbUser.getIdToken();
+        const res = await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken, firebase_uid: fbUser.uid }),
+        });
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to establish session");
+        }
+        const { user } = await res.json();
+        if (!user) throw new Error("No user profile found in response");
+        const sessionUser = user as SessionUser;
+        if (!sessionUser.is_active) throw new Error("Account is deactivated");
+        return sessionUser;
+      } catch (error) {
+        logError(error, { 
+          severity: "high", 
+          tags: ["auth", "session-creation"],
+          userId: fbUser.uid 
+        });
+        return null;
+      }
     },
     []
   );
@@ -69,13 +86,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const sessionUser = await setSessionCookie(fbUser);
           if (!sessionUser) throw new Error("No account found in the system");
           setUser(sessionUser);
-        } catch {
+        } catch (error) {
+          logError(error, { 
+            severity: "medium", 
+            tags: ["auth", "onAuthStateChanged"],
+            userId: fbUser.uid 
+          });
           setUser(null);
           await signOut(auth);
         }
       } else {
         setUser(null);
-        try { await setSessionCookie(null); } catch { /* non-critical */ }
+        try {
+          await setSessionCookie(null);
+        } catch (error) {
+          logError(error, { severity: "low", tags: ["auth", "signout-cleanup"] });
+        }
       }
 
       setLoading(false);
@@ -86,19 +112,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithEmail = useCallback(
     async (email: string, password: string) => {
-      await signInWithEmailAndPassword(auth, email, password);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        logError(error, { severity: "high", tags: ["auth", "signin-email"], email });
+        throw error;
+      }
     },
     []
   );
 
   const signInWithGoogle = useCallback(async () => {
-    await signInWithPopup(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      logError(error, { severity: "high", tags: ["auth", "signin-google"] });
+      throw error;
+    }
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut(auth);
-    setUser(null);
-    setFirebaseUser(null);
+    try {
+      await signOut(auth);
+      setUser(null);
+      setFirebaseUser(null);
+    } catch (error) {
+      logError(error, { severity: "medium", tags: ["auth", "logout"] });
+      throw error;
+    }
   }, []);
 
   const permissions = user ? ROLE_PERMISSIONS[user.role as UserRole] : null;

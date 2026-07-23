@@ -277,6 +277,15 @@ export default function ContactPageClient({
                 }
               </div>
 
+              {/* Honeypot field */}
+              <div className="hidden">
+                <Input
+                  {...register("website")}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               <Button
                 type="submit"
                 className="w-full bg-school-blue-800 hover:bg-school-blue-900"

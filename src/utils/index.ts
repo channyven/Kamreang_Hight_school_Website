@@ -21,7 +21,7 @@ const KHMER_MONTHS = [
   "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ",
 ];
 
-function toKhmerNumeral(value: number | string): string {
+export function toKhmerNumeral(value: number | string): string {
   return String(value).replace(/[0-9]/g, (d) => KHMER_DIGITS[Number(d)]);
 }
 
@@ -55,16 +55,36 @@ export function formatShortDate(date: string | Date, locale = "en"): string {
 // ─── String helpers ───────────────────────────────────────────
 
 export function slugify(text: string): string {
-  // Khmer character range: \u1780-\u17FF
-  let slug = text
-    .toLowerCase()
-    .replace(/[^\u1780-\u17FFa-z0-9\s-]/g, "")
+  // Normalize Unicode characters
+  const normalized = text.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .toLowerCase();
+  
+  // For Khmer text, use transliteration or keep original
+  if (/[\u1780-\u17FF]/.test(text)) {
+    // Keep Khmer characters, replace spaces with hyphens
+    const slug = normalized
+      .replace(/[\s\u2000-\u200F\u2028-\u202F]/g, '-')
+      .replace(/[^\u1780-\u17FFa-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .trim();
+    
+    if (slug) return slug;
+  }
+  
+  // Original ASCII logic
+  const slug = normalized
+    .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, '')
     .trim();
+
   if (!slug) {
-    slug = "post-" + Array.from(text).reduce((acc, ch) => acc + ch.charCodeAt(0), 0).toString(36);
+    return "post-" + Array.from(text).reduce((acc, ch) => acc + ch.charCodeAt(0), 0).toString(36);
   }
+
   return slug;
 }
 

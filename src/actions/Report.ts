@@ -16,6 +16,7 @@ import {
 } from "@/schemas/validations";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
+import { logError } from "@/lib/error-logger";
 
 const REPORT_REVALIDATE = [
   "/[locale]/(admin)/admin/reports",
@@ -52,7 +53,7 @@ export async function getReportFiles(params?: {
 
   const { data, error } = await query;
   if (error) {
-    console.error("Get report files error:", error);
+    logError(error, { tags: ["reports", "files", "list"], severity: "medium", params });
     return [];
   }
 
@@ -82,7 +83,7 @@ export async function getReportFileById(id: string): Promise<ReportFile | null> 
     .single();
 
   if (error) {
-    console.error("Get report file by ID error:", error);
+    logError(error, { tags: ["reports", "files", "byId"], severity: "medium", id });
     return null;
   }
   return data as ReportFile;
@@ -116,7 +117,7 @@ export async function createReportFile(
   });
 
   if (error) {
-    console.error("Create report file error:", error);
+    logError(error, { tags: ["reports", "files", "create"], severity: "high" });
     return { success: false, error: error.message };
   }
 
@@ -157,7 +158,7 @@ export async function updateReportFile(
     .eq("id", id);
 
   if (error) {
-    console.error("Update report file error:", error);
+    logError(error, { tags: ["reports", "files", "update"], severity: "high", id });
     return { success: false, error: error.message };
   }
 
@@ -175,7 +176,7 @@ export async function deleteReportFile(id: string): Promise<ActionResult> {
   const { error } = await supabase.from("report_files").delete().eq("id", id);
 
   if (error) {
-    console.error("Delete report file error:", error);
+    logError(error, { tags: ["reports", "files", "delete"], severity: "high", id });
     return { success: false, error: error.message };
   }
 
@@ -206,7 +207,7 @@ export async function getOperationsReport(
 
   const { data, error } = await query.limit(1).maybeSingle();
   if (error) {
-    console.error("Get operations report error:", error);
+    logError(error, { tags: ["reports", "operations", "get"], severity: "medium", academicYear });
     return null;
   }
   return data as SchoolReport | null;
@@ -225,7 +226,7 @@ export async function getAllOperationsReports(): Promise<SchoolReport[]> {
     .order("academic_year", { ascending: false });
 
   if (error) {
-    console.error("Get all operations reports error:", error);
+    logError(error, { tags: ["reports", "operations", "list"], severity: "medium" });
     return [];
   }
   return (data ?? []) as SchoolReport[];
@@ -260,7 +261,7 @@ export async function upsertOperationsReport(
   );
 
   if (error) {
-    console.error("Upsert operations report error:", error);
+    logError(error, { tags: ["reports", "operations", "upsert"], severity: "high" });
     return { success: false, error: error.message };
   }
 

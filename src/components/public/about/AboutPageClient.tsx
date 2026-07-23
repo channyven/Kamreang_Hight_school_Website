@@ -258,6 +258,9 @@ function LeaderDetailDialog({
   km: boolean;
   locale: string;
 }) {
+  const t = useTranslations("about");
+  const tc = useTranslations("common");
+  
   if (!leader) return null;
 
   return (
@@ -383,7 +386,6 @@ export default function AboutPageClient({
   locale,
 }: AboutPageClientProps) {
   const t = useTranslations("about");
-  const tc = useTranslations("common");
   const km = locale === "km";
 
   const infoMap = useMemo(

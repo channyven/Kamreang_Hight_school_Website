@@ -45,6 +45,7 @@ src/
 │   └── admin/               # Admin components
 ├── providers/AuthContext.tsx # Firebase + Supabase auth bridge
 ├── i18n/                    # next-intl config
+│   └── locales/             # Khmer + English translations (json)
 ├── lib/
 │   ├── firebase/            # Firebase SDK client
 │   ├── supabase/            # Supabase clients + storage helpers
@@ -54,14 +55,13 @@ src/
 ├── styles/globals.css       # Tailwind base styles
 ├── types/                   # TypeScript interfaces
 └── utils/                   # Helper functions (cn, dates, formatting)
-messages/
-├── km.json                  # Khmer translations
-└── en.json                  # English translations
-supabase/migrations/
-├── 001_initial_schema.sql   # Full DB schema with RLS
-├── 002_seed_data.sql        # Seed categories + leadership
-└── 003_storage.sql          # Storage buckets + policies
 ```
+
+## Database and Storage
+Supabase migrations are located in `supabase/migrations/`:
+- `001_initial_schema.sql` — Full DB schema with RLS
+- `002_seed_data.sql` — Seed categories + leadership
+- `003_storage.sql` — Storage buckets + policies
 
 ## Setup
 
@@ -126,6 +126,43 @@ npm run dev
 Visit:
 - Public site: `http://localhost:3000/km` (Khmer) or `http://localhost:3000/en` (English)
 - Admin: `http://localhost:3000/km/admin`
+
+## Troubleshooting
+
+### Common Issues
+
+- **Database Connection Error**: Ensure Supabase environment variables are correct and the database is accessible.
+- **Firebase Auth Error**: Check if your Firebase project is correctly configured and the domain is authorized.
+- **Image Loading Issues**: If images from external sources don't load, verify they are proxied via `/api/proxy-image` or their domain is added to `next.config.ts`.
+- **Translation Missing**: If a page shows raw translation keys (e.g., `common.title`), ensure the key exists in `src/i18n/locales/km.json` and `en.json`.
+
+### Known Issues
+
+- **Duplicate Login Pages**: There are two sets of login pages (`[locale]/(auth)/login` and `[locale]/auth/login`). Use the localized one for standard auth.
+- **Large Images**: Some legacy images in `public/images/about` are in PNG format. New images should be uploaded as WebP.
+- **Lint Warnings**: There are some pre-existing lint warnings in older components that are scheduled for refactoring.
+
+## Maintenance & Monitoring
+
+### Maintenance Checklist
+
+| Frequency | Task |
+|-----------|------|
+| **Weekly** | Run `npm update` for minor dependency patches. |
+| **Monthly** | Perform a security audit via `npm audit`. |
+| **Monthly** | Verify Supabase storage usage and cleanup unused files. |
+| **Quarterly** | Run Lighthouse performance audits and optimize assets. |
+
+### Monitoring & Backups
+
+- **Error Logging**: The system uses a centralized logger in `src/lib/error-logger.ts`. Monitor server logs (Vercel/Console) for "HIGH" severity errors.
+- **Uptime**: Configure monitoring (e.g., UptimeRobot) for the production URL.
+- **Backups**: Supabase performs automatic daily backups of the database. Manual exports can be done via the Supabase Dashboard.
+- **Storage**: Ensure periodic review of uploaded files in Supabase Storage to prevent quota issues.
+
+## API Documentation
+
+See [API_DOCS.md](./API_DOCS.md) for details on internal REST endpoints.
 
 ## Deployment (Vercel)
 

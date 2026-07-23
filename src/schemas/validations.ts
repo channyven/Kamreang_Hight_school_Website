@@ -17,12 +17,15 @@ export const contactSchema = z.object({
     .string()
     .regex(/^[\d\s+\-()]+$/, "Invalid phone number")
     .optional()
-    .or(z.literal("")),
+    .or(z.literal(""))
+    .refine((val) => val === "" || !val || val.length >= 8, "Phone number too short"),
   subject: z.string().min(3, "Subject is required").max(200),
   message: z
     .string()
     .min(10, "Message must be at least 10 characters")
     .max(2000),
+  // Honeypot field - should be empty
+  website: z.string().max(0, "Spam detected").optional().or(z.literal("")),
 });
 export type ContactInput = z.infer<typeof contactSchema>;
 

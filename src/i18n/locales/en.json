@@ -98,6 +98,13 @@
   "governance": {
     "title": "School Governance"
   },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "Sorry, the page you are looking for does not exist or has been moved.",
+      "back_home": "Back to Home"
+    }
+  },
   "report": {
     "title": "School Operations Report",
     "subtitle": "An overview of the school's operations, statistics, and future direction",

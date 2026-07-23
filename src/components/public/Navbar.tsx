@@ -76,11 +76,12 @@ export default function Navbar() {
 
   const isActive = useCallback(
     (href: string) => {
+      // For home page, match exactly or with trailing slash
       if (href === `/${locale}`) {
         return pathname === `/${locale}` || pathname === `/${locale}/`;
       }
-      // Match the exact path or a proper sub-path (e.g., /en/news matches /en/news/article-1
-      // but not /en/news-foo or /en/report-extra matching /en/report)
+      // Match the exact path or a proper sub-path (e.g., /en/news matches /en/news/article-1)
+      // We check that it starts with href AND either it's the exact match or it's followed by a slash
       return pathname === href || pathname.startsWith(href + "/");
     },
     [locale, pathname]
