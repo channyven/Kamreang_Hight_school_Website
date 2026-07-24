@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { format, isToday, isTomorrow, startOfWeek, endOfWeek, addDays } from "date-fns";
 import type { CalendarEvent } from "@/types";
 import { EVENT_CATEGORIES } from "@/types";
@@ -12,7 +12,10 @@ interface Props {
 }
 
 export default function UpcomingEvents({ events, onEventClick }: Props) {
+  const locale = useLocale();
   const t = useTranslations("calendar");
+  const km = locale === "km";
+  const getTitle = (ev: CalendarEvent) => km ? (ev.title_km || ev.title) : (ev.title_en || ev.title);
 
   const today = new Date();
   const todayStr = format(today, "yyyy-MM-dd");
@@ -62,7 +65,7 @@ export default function UpcomingEvents({ events, onEventClick }: Props) {
                         style={{ background: cat?.color }}
                       />
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-gray-800 truncate leading-tight">{ev.title}</p>
+                        <p className="text-xs font-medium text-gray-800 truncate leading-tight">{getTitle(ev)}</p>
                         <p className="text-[10px] text-gray-400 mt-0.5">{formattedDate(ev)}</p>
                       </div>
                     </button>

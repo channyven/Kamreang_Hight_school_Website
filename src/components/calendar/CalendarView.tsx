@@ -104,7 +104,7 @@ export default function CalendarView({ events, admin, onCreateEvent }: Props) {
   }, []);
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full w-full">
       {/* Sidebar */}
       <CalendarSidebar
         open={sidebarOpen}

@@ -272,7 +272,11 @@ export type EventStatus = "draft" | "published" | "cancelled" | "archived";
 export interface CalendarEvent {
   id: string;
   title: string;
+  title_km?: string;
+  title_en?: string;
   description?: string;
+  description_km?: string;
+  description_en?: string;
   category: EventCategory;
   location?: string;
   organizer?: string;

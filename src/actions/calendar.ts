@@ -108,7 +108,11 @@ export async function createCalendarEvent(data: CalendarEventInput): Promise<Act
   const supabase = createServerClient();
   const { error } = await supabase.from("calendar_events").insert({
     title: parsed.data.title,
+    title_km: parsed.data.title_km || null,
+    title_en: parsed.data.title_en || null,
     description: parsed.data.description || null,
+    description_km: parsed.data.description_km || null,
+    description_en: parsed.data.description_en || null,
     category: parsed.data.category,
     location: parsed.data.location || null,
     organizer: parsed.data.organizer || null,
@@ -168,7 +172,11 @@ export async function updateCalendarEvent(
     .from("calendar_events")
     .update({
       title: parsed.data.title,
+      title_km: parsed.data.title_km || null,
+      title_en: parsed.data.title_en || null,
       description: parsed.data.description || null,
+      description_km: parsed.data.description_km || null,
+      description_en: parsed.data.description_en || null,
       category: parsed.data.category,
       location: parsed.data.location || null,
       organizer: parsed.data.organizer || null,
@@ -226,7 +234,11 @@ export async function duplicateCalendarEvent(id: string): Promise<ActionResult<v
   const ev = original.data;
   const { error } = await supabase.from("calendar_events").insert({
     title: `${ev.title} (Copy)`,
+    title_km: ev.title_km ? `${ev.title_km} (ចម្លង)` : null,
+    title_en: ev.title_en ? `${ev.title_en} (Copy)` : null,
     description: ev.description,
+    description_km: ev.description_km,
+    description_en: ev.description_en,
     category: ev.category,
     location: ev.location,
     organizer: ev.organizer,

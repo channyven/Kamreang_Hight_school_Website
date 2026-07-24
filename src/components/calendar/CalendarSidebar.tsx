@@ -44,10 +44,10 @@ export default function CalendarSidebar({
     <aside
       className={cn(
         "shrink-0 transition-all duration-300 overflow-hidden",
-        open ? "w-72" : "w-0 lg:w-0"
+        open ? "w-80" : "w-0"
       )}
     >
-      <div className="w-72 p-4 space-y-4">
+      <div className="w-80 p-4 space-y-4 overflow-y-auto h-full">
         {/* Mini Calendar */}
         <MiniCalendar
           currentDate={currentDate}

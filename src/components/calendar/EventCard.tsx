@@ -1,6 +1,7 @@
 "use client";
 
 
+import { useLocale } from "next-intl";
 import { Clock, MapPin } from "lucide-react";
 import type { CalendarEvent } from "@/types";
 import { EVENT_CATEGORIES } from "@/types";
@@ -15,7 +16,11 @@ interface Props {
 }
 
 export default function EventCard({ event, onClick, compact, view }: Props) {
+  const locale = useLocale();
+  const km = locale === "km";
   const cat = EVENT_CATEGORIES.find((c) => c.key === event.category);
+  const displayTitle = km ? (event.title_km || event.title) : (event.title_en || event.title);
+  const displayDescription = km ? (event.description_km || event.description) : (event.description_en || event.description);
 
   if (compact) {
     return (
@@ -27,9 +32,9 @@ export default function EventCard({ event, onClick, compact, view }: Props) {
           color: cat?.color ?? "#6366f1",
           borderLeft: `2px solid ${cat?.color ?? "#6366f1"}`,
         }}
-        title={event.title}
+        title={displayTitle}
       >
-        {event.title}
+        {displayTitle}
       </button>
     );
   }
@@ -55,7 +60,7 @@ export default function EventCard({ event, onClick, compact, view }: Props) {
             )}
             style={{ color: cat?.color ?? "#6366f1" }}
           >
-            {event.title}
+            {displayTitle}
           </p>
           <CategoryBadge category={event.category} className="mt-1" />
         </div>

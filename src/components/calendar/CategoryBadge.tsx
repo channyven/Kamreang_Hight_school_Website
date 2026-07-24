@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { EVENT_CATEGORIES, type EventCategory } from "@/types";
 import { cn } from "@/utils";
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function CategoryBadge({ category, className, size = "sm" }: Props) {
+  const locale = useLocale();
+  const km = locale === "km";
   const cat = EVENT_CATEGORIES.find((c) => c.key === category);
   if (!cat) return null;
 
@@ -34,7 +37,7 @@ export default function CategoryBadge({ category, className, size = "sm" }: Prop
           background: cat.color,
         }}
       />
-      {cat.labelEn}
+      {km ? cat.labelKm : cat.labelEn}
     </span>
   );
 }

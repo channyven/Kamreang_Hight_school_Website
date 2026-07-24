@@ -16,7 +16,10 @@ interface Props {
 export default function EventDetails({ event, onClose }: Props) {
   const locale = useLocale();
   const t = useTranslations("calendar");
+  const km = locale === "km";
   const cat = EVENT_CATEGORIES.find((c) => c.key === event.category);
+  const displayTitle = km ? (event.title_km || event.title) : (event.title_en || event.title);
+  const displayDescription = km ? (event.description_km || event.description) : (event.description_en || event.description);
   const vis = EVENT_VISIBILITY_OPTIONS.find((v) => v.key === event.visibility);
   const st = EVENT_STATUS_OPTIONS.find((s) => s.key === event.status);
 
@@ -48,7 +51,7 @@ export default function EventDetails({ event, onClose }: Props) {
           <Calendar className="w-6 h-6" style={{ color: cat?.color ?? "#6366f1" }} />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-xl font-bold text-gray-900 leading-tight">{event.title}</h3>
+          <h3 className="text-xl font-bold text-gray-900 leading-tight">{displayTitle}</h3>
           <div className="mt-2">
             <CategoryBadge category={event.category} size="md" />
           </div>
@@ -72,7 +75,7 @@ export default function EventDetails({ event, onClose }: Props) {
               </p>
             )}
             {event.is_all_day && (
-              <p className="text-xs text-amber-600 font-medium mt-1">All Day</p>
+              <p className="text-xs text-amber-600 font-medium mt-1">{t("allDay")}</p>
             )}
           </div>
         </div>
@@ -97,12 +100,12 @@ export default function EventDetails({ event, onClose }: Props) {
       </div>
 
       {/* Description */}
-      {event.description && (
+      {displayDescription && (
         <div>
           <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
             {t("description")}
           </h4>
-          <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{event.description}</p>
+          <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{displayDescription}</p>
         </div>
       )}
 

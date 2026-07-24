@@ -230,7 +230,11 @@ export type ScheduleInput = z.infer<typeof scheduleSchema>;
 
 export const calendarEventSchema = z.object({
   title: z.string().min(1, "Title is required").max(500),
+  title_km: z.string().max(500).optional().or(z.literal("")),
+  title_en: z.string().max(500).optional().or(z.literal("")),
   description: z.string().max(2000).optional().or(z.literal("")),
+  description_km: z.string().max(2000).optional().or(z.literal("")),
+  description_en: z.string().max(2000).optional().or(z.literal("")),
   category: z.enum([
     "academic", "examination", "holiday", "school_event", "meeting",
     "sports", "club_activity", "workshop", "seminar", "graduation",

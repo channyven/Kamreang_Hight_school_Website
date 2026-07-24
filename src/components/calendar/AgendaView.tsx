@@ -18,6 +18,8 @@ export default function AgendaView({ events, onEventClick }: Props) {
   const t = useTranslations("calendar");
   const km = locale === "km";
 
+  const getTitle = (ev: CalendarEvent) => km ? (ev.title_km || ev.title) : (ev.title_en || ev.title);
+
   const groupedEvents = useMemo(() => {
     const sorted = [...events].sort(
       (a, b) => a.start_date.localeCompare(b.start_date) || (a.start_time ?? "").localeCompare(b.start_time ?? "")
@@ -72,7 +74,7 @@ export default function AgendaView({ events, onEventClick }: Props) {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-gray-900">{ev.title}</p>
+                        <p className="text-sm font-semibold text-gray-900">{getTitle(ev)}</p>
                         {ev.is_featured && (
                           <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 shrink-0">
                             {t("featured")}

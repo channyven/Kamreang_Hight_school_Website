@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Plus, Pencil, Trash2, Loader2, Save, X, Calendar,
-  Copy, AlertTriangle, Search, Filter,
+  Copy, AlertTriangle, Search, Filter, Globe, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import {
   getAllCalendarEvents, createCalendarEvent, updateCalendarEvent,
@@ -24,9 +25,38 @@ import CategoryBadge from "@/components/calendar/CategoryBadge";
 import CalendarView from "@/components/calendar/CalendarView";
 import { format } from "date-fns";
 
-const EMPTY_FORM = {
+interface CalendarFormData {
+  title: string;
+  title_km: string;
+  title_en: string;
+  description: string;
+  description_km: string;
+  description_en: string;
+  category: EventCategory;
+  location: string;
+  organizer: string;
+  start_date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+  is_all_day: boolean;
+  is_recurring: boolean;
+  visibility: EventVisibility;
+  status: EventStatus;
+  color: string;
+  attachment_url: string;
+  grade_level: number | undefined;
+  department: string;
+  is_featured: boolean;
+}
+
+const EMPTY_FORM: CalendarFormData = {
   title: "",
+  title_km: "",
+  title_en: "",
   description: "",
+  description_km: "",
+  description_en: "",
   category: "school_event" as EventCategory,
   location: "",
   organizer: "",
@@ -40,7 +70,7 @@ const EMPTY_FORM = {
   status: "draft" as EventStatus,
   color: "",
   attachment_url: "",
-  grade_level: undefined as number | undefined,
+  grade_level: undefined,
   department: "",
   is_featured: false,
 };
@@ -55,7 +85,7 @@ export default function AdminCalendarPage() {
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState<CalendarFormData>(EMPTY_FORM);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
   const [searchFilter, setSearchFilter] = useState("");
@@ -93,7 +123,11 @@ export default function AdminCalendarPage() {
   const handleEdit = (ev: CalendarEvent) => {
     setForm({
       title: ev.title,
+      title_km: ev.title_km ?? "",
+      title_en: ev.title_en ?? "",
       description: ev.description ?? "",
+      description_km: ev.description_km ?? "",
+      description_en: ev.description_en ?? "",
       category: ev.category,
       location: ev.location ?? "",
       organizer: ev.organizer ?? "",
@@ -128,7 +162,11 @@ export default function AdminCalendarPage() {
       return;
     }
     setSaving(true);
-    const payload = form;
+    const payload = {
+      ...form,
+      // Use bilingual title as fallback for the single title field
+      title: form.title_en || form.title_km || form.title,
+    };
     const result = editingId
       ? await updateCalendarEvent(editingId, payload)
       : await createCalendarEvent(payload);
@@ -170,7 +208,12 @@ export default function AdminCalendarPage() {
     if (statusFilter !== "all" && ev.status !== statusFilter) return false;
     if (searchFilter.trim()) {
       const q = searchFilter.toLowerCase();
-      return ev.title.toLowerCase().includes(q) || (ev.description ?? "").toLowerCase().includes(q);
+      return (
+        ev.title.toLowerCase().includes(q) ||
+        (ev.title_km ?? "").toLowerCase().includes(q) ||
+        (ev.title_en ?? "").toLowerCase().includes(q) ||
+        (ev.description ?? "").toLowerCase().includes(q)
+      );
     }
     return true;
   });
@@ -214,6 +257,7 @@ export default function AdminCalendarPage() {
           {filteredEvents.map((ev) => {
             const cat = EVENT_CATEGORIES.find((c) => c.key === ev.category);
             const st = EVENT_STATUS_OPTIONS.find((s) => s.key === ev.status);
+            const displayTitle = km ? (ev.title_km || ev.title) : (ev.title_en || ev.title);
             return (
               <div
                 key={ev.id}
@@ -225,7 +269,7 @@ export default function AdminCalendarPage() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900 truncate">{ev.title}</span>
+                    <span className="text-sm font-semibold text-gray-900 truncate">{displayTitle}</span>
                     {ev.is_featured && (
                       <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-700 bg-amber-50">
                         {km ? "លេចធ្លោ" : t("featured")}
@@ -295,144 +339,241 @@ export default function AdminCalendarPage() {
       </div>
 
       <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-        {/* Basic info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5 md:col-span-2">
-            <Label className="text-xs text-gray-500">{km ? "ចំណងជើង" : "Title"} *</Label>
-            <Input value={form.title} onChange={(e) => { setForm((f) => ({ ...f, title: e.target.value })); setFieldErrors((p) => ({ ...p, title: "" })); }} className={fieldErrors.title ? "border-red-400" : ""} />
-            {fieldErrors.title && <p className="text-xs text-red-500">{fieldErrors.title}</p>}
+        {/* ═══ Bilingual Content ═══ */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <Globe className="w-4 h-4 text-school-blue-800" />
+            <h2 className="font-semibold text-gray-900 text-sm">
+              {km ? "មាតិកាពីរភាសា" : "Bilingual Content"}
+            </h2>
+            <span className="text-[11px] text-gray-400 ml-auto">
+              {km ? "បំពេញទាំងពីរភាសា" : "Fill in both languages"}
+            </span>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ប្រភេទ" : t("category")}</Label>
-            <Select value={form.category} onValueChange={(v: EventCategory) => setForm((f) => ({ ...f, category: v }))}>
-              <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {EVENT_CATEGORIES.map((c) => (
-                  <SelectItem key={c.key} value={c.key} className="text-xs">
-                    {km ? c.labelKm : c.labelEn}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ការមើលឃើញ" : t("visibility")}</Label>
-            <Select value={form.visibility} onValueChange={(v: EventVisibility) => setForm((f) => ({ ...f, visibility: v }))}>
-              <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {EVENT_VISIBILITY_OPTIONS.map((v) => (
-                  <SelectItem key={v.key} value={v.key} className="text-xs">{km ? v.labelKm : v.labelEn}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ស្ថានភាព" : t("status")}</Label>
-            <Select value={form.status} onValueChange={(v: EventStatus) => setForm((f) => ({ ...f, status: v }))}>
-              <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {EVENT_STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s.key} value={s.key} className="text-xs">{km ? s.labelKm : s.labelEn}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ពណ៌" : "Color"}</Label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={form.color || "#6366f1"}
-                onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))}
-                className="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer"
-              />
-              <Input value={form.color} onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))} className="h-9 text-xs" placeholder="#6366f1" />
+
+          <div className="p-5 sm:p-6 space-y-6">
+            {/* Title - Bilingual */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-gray-400" />
+                {km ? "ចំណងជើង" : "Title"}
+                <span className="text-red-400">*</span>
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Khmer Title */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                    <span className="text-base">🇰🇭</span> Khmer
+                  </Label>
+                  <Input
+                    value={form.title_km}
+                    onChange={(e) => setForm((f) => ({ ...f, title_km: e.target.value }))}
+                    className="font-khmer"
+                    placeholder={km ? "បញ្ចូលចំណងជើងជាភាសាខ្មែរ..." : "Enter Khmer title..."}
+                  />
+                </div>
+                {/* English Title */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                    <span className="text-base">🇺🇸</span> English
+                  </Label>
+                  <Input
+                    value={form.title_en}
+                    onChange={(e) => setForm((f) => ({ ...f, title_en: e.target.value }))}
+                    placeholder={km ? "បញ្ចូលចំណងជើងជាភាសាអង់គ្លេស..." : "Enter English title..."}
+                  />
+                </div>
+              </div>
+              {fieldErrors.title && <p className="text-xs text-red-500">{fieldErrors.title}</p>}
+            </div>
+
+            <Separator />
+
+            {/* Description - Bilingual */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-gray-400" />
+                {km ? "ការពិពណ៌នា" : t("description")}
+              </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Khmer Description */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                    <span className="text-base">🇰🇭</span> Khmer
+                  </Label>
+                  <Textarea
+                    value={form.description_km}
+                    onChange={(e) => setForm((f) => ({ ...f, description_km: e.target.value }))}
+                    rows={3}
+                    className="text-xs font-khmer"
+                    placeholder={km ? "បញ្ចូលការពិពណ៌នាជាភាសាខ្មែរ..." : "Enter Khmer description..."}
+                  />
+                </div>
+                {/* English Description */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
+                    <span className="text-base">🇺🇸</span> English
+                  </Label>
+                  <Textarea
+                    value={form.description_en}
+                    onChange={(e) => setForm((f) => ({ ...f, description_en: e.target.value }))}
+                    rows={3}
+                    className="text-xs"
+                    placeholder={km ? "បញ្ចូលការពិពណ៌នាជាភាសាអង់គ្លេស..." : "Enter English description..."}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Date/Time */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ថ្ងៃចាប់ផ្ដើម" : "Start Date"} *</Label>
-            <Input type="date" value={form.start_date} onChange={(e) => { setForm((f) => ({ ...f, start_date: e.target.value })); setFieldErrors((p) => ({ ...p, start_date: "" })); }} className={`h-9 text-xs ${fieldErrors.start_date ? "border-red-400" : ""}`} />
-            {fieldErrors.start_date && <p className="text-xs text-red-500">{fieldErrors.start_date}</p>}
+        {/* ═══ Date/Time ═══ */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <Calendar className="w-4 h-4 text-school-blue-800" />
+            <h2 className="font-semibold text-gray-900 text-sm">
+              {km ? "កាលបរិច្ឆេទ និងម៉ោង" : "Date & Time"}
+            </h2>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ថ្ងៃបញ្ចប់" : "End Date"} *</Label>
-            <Input type="date" value={form.end_date} onChange={(e) => { setForm((f) => ({ ...f, end_date: e.target.value })); setFieldErrors((p) => ({ ...p, end_date: "" })); }} className={`h-9 text-xs ${fieldErrors.end_date ? "border-red-400" : ""}`} />
-            {fieldErrors.end_date && <p className="text-xs text-red-500">{fieldErrors.end_date}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ម៉ោងចាប់ផ្ដើម" : "Start Time"}</Label>
-            <Input type="time" value={form.start_time} onChange={(e) => setForm((f) => ({ ...f, start_time: e.target.value }))} className="h-9 text-xs" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ម៉ោងបញ្ចប់" : "End Time"}</Label>
-            <Input type="time" value={form.end_time} onChange={(e) => setForm((f) => ({ ...f, end_time: e.target.value }))} className="h-9 text-xs" />
+          <div className="p-5 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ថ្ងៃចាប់ផ្ដើម" : "Start Date"} *</Label>
+                <Input type="date" value={form.start_date} onChange={(e) => { setForm((f) => ({ ...f, start_date: e.target.value })); setFieldErrors((p) => ({ ...p, start_date: "" })); }} className={`h-9 text-xs ${fieldErrors.start_date ? "border-red-400" : ""}`} />
+                {fieldErrors.start_date && <p className="text-xs text-red-500">{fieldErrors.start_date}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ថ្ងៃបញ្ចប់" : "End Date"} *</Label>
+                <Input type="date" value={form.end_date} onChange={(e) => { setForm((f) => ({ ...f, end_date: e.target.value })); setFieldErrors((p) => ({ ...p, end_date: "" })); }} className={`h-9 text-xs ${fieldErrors.end_date ? "border-red-400" : ""}`} />
+                {fieldErrors.end_date && <p className="text-xs text-red-500">{fieldErrors.end_date}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ម៉ោងចាប់ផ្ដើម" : "Start Time"}</Label>
+                <Input type="time" value={form.start_time} onChange={(e) => setForm((f) => ({ ...f, start_time: e.target.value }))} className="h-9 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ម៉ោងបញ្ចប់" : "End Time"}</Label>
+                <Input type="time" value={form.end_time} onChange={(e) => setForm((f) => ({ ...f, end_time: e.target.value }))} className="h-9 text-xs" />
+              </div>
+            </div>
+
+            {/* Toggles */}
+            <div className="flex items-center gap-6 flex-wrap pt-2">
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_all_day} onCheckedChange={(v) => setForm((f) => ({ ...f, is_all_day: v }))} />
+                <span className="text-sm text-gray-600">{km ? "ពេញមួយថ្ងៃ" : t("allDay")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_recurring} onCheckedChange={(v) => setForm((f) => ({ ...f, is_recurring: v }))} />
+                <span className="text-sm text-gray-600">{km ? "កើតឡើងវិញ" : t("recurring")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_featured} onCheckedChange={(v) => setForm((f) => ({ ...f, is_featured: v }))} />
+                <span className="text-sm text-gray-600">{km ? "លេចធ្លោ" : t("featured")}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Toggles */}
-        <div className="flex items-center gap-6 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Switch checked={form.is_all_day} onCheckedChange={(v) => setForm((f) => ({ ...f, is_all_day: v }))} />
-            <span className="text-sm text-gray-600">{km ? "ពេញមួយថ្ងៃ" : t("allDay")}</span>
+        {/* ═══ Settings ═══ */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <Filter className="w-4 h-4 text-school-blue-800" />
+            <h2 className="font-semibold text-gray-900 text-sm">
+              {km ? "ការកំណត់" : "Settings"}
+            </h2>
           </div>
-          <div className="flex items-center gap-2">
-            <Switch checked={form.is_recurring} onCheckedChange={(v) => setForm((f) => ({ ...f, is_recurring: v }))} />
-            <span className="text-sm text-gray-600">{km ? "កើតឡើងវិញ" : t("recurring")}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch checked={form.is_featured} onCheckedChange={(v) => setForm((f) => ({ ...f, is_featured: v }))} />
-            <span className="text-sm text-gray-600">{km ? "លេចធ្លោ" : t("featured")}</span>
-          </div>
-        </div>
+          <div className="p-5 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ប្រភេទ" : t("category")}</Label>
+                <Select value={form.category} onValueChange={(v: EventCategory) => setForm((f) => ({ ...f, category: v }))}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {EVENT_CATEGORIES.map((c) => (
+                      <SelectItem key={c.key} value={c.key} className="text-xs">
+                        {km ? c.labelKm : c.labelEn}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ការមើលឃើញ" : t("visibility")}</Label>
+                <Select value={form.visibility} onValueChange={(v: EventVisibility) => setForm((f) => ({ ...f, visibility: v }))}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {EVENT_VISIBILITY_OPTIONS.map((v) => (
+                      <SelectItem key={v.key} value={v.key} className="text-xs">{km ? v.labelKm : v.labelEn}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ស្ថានភាព" : t("status")}</Label>
+                <Select value={form.status} onValueChange={(v: EventStatus) => setForm((f) => ({ ...f, status: v }))}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {EVENT_STATUS_OPTIONS.map((s) => (
+                      <SelectItem key={s.key} value={s.key} className="text-xs">{km ? s.labelKm : s.labelEn}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ពណ៌" : "Color"}</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={form.color || "#6366f1"}
+                    onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))}
+                    className="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer"
+                  />
+                  <Input value={form.color} onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))} className="h-9 text-xs" placeholder="#6366f1" />
+                </div>
+              </div>
+            </div>
 
-        {/* Location & Organizer */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ទីតាំង" : t("location")}</Label>
-            <Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} className="h-9 text-xs" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "អ្នករៀបចំ" : t("organizer")}</Label>
-            <Input value={form.organizer} onChange={(e) => setForm((f) => ({ ...f, organizer: e.target.value }))} className="h-9 text-xs" />
-          </div>
-        </div>
+            {/* Location & Organizer */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ទីតាំង" : t("location")}</Label>
+                <Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} className="h-9 text-xs" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "អ្នករៀបចំ" : t("organizer")}</Label>
+                <Input value={form.organizer} onChange={(e) => setForm((f) => ({ ...f, organizer: e.target.value }))} className="h-9 text-xs" />
+              </div>
+            </div>
 
-        {/* Description */}
-        <div className="space-y-1.5">
-          <Label className="text-xs text-gray-500">{km ? "ការពិពណ៌នា" : t("description")}</Label>
-          <Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={3} className="text-xs" />
-        </div>
+            {/* Extra fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ថ្នាក់" : "Grade Level"}</Label>
+                <Select value={form.grade_level ? String(form.grade_level) : "all"} onValueChange={(v) => setForm((f) => ({ ...f, grade_level: v !== "all" ? parseInt(v) : undefined }))}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={km ? "ទាំងអស់" : "All"} /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{km ? "ទាំងអស់" : "All Grades"}</SelectItem>
+                    {[7, 8, 9, 10, 11, 12].map((g) => (
+                      <SelectItem key={g} value={String(g)} className="text-xs">
+                        {km ? `ថ្នាក់ទី${g}` : `Grade ${g}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-gray-500">{km ? "ដេប៉ាតឺម៉ង់" : "Department"}</Label>
+                <Input value={form.department} onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))} className="h-9 text-xs" />
+              </div>
+            </div>
 
-        {/* Extra fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ថ្នាក់" : "Grade Level"}</Label>
-<Select value={form.grade_level ? String(form.grade_level) : "all"} onValueChange={(v) => setForm((f) => ({ ...f, grade_level: v !== "all" ? parseInt(v) : undefined }))}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={km ? "ទាំងអស់" : "All"} /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{km ? "ទាំងអស់" : "All Grades"}</SelectItem>
-                {[7, 8, 9, 10, 11, 12].map((g) => (
-                  <SelectItem key={g} value={String(g)} className="text-xs">
-                    {km ? `ថ្នាក់ទី${g}` : `Grade ${g}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Attachment */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-gray-500">{km ? "តំណភ្ជាប់ឯកសារ" : "Attachment URL"}</Label>
+              <Input value={form.attachment_url} onChange={(e) => setForm((f) => ({ ...f, attachment_url: e.target.value }))} className="h-9 text-xs" placeholder="https://..." />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-gray-500">{km ? "ដេប៉ាតឺម៉ង់" : "Department"}</Label>
-            <Input value={form.department} onChange={(e) => setForm((f) => ({ ...f, department: e.target.value }))} className="h-9 text-xs" />
-          </div>
-        </div>
-
-        {/* Attachment */}
-        <div className="space-y-1.5">
-          <Label className="text-xs text-gray-500">{km ? "តំណភ្ជាប់ឯកសារ" : "Attachment URL"}</Label>
-          <Input value={form.attachment_url} onChange={(e) => setForm((f) => ({ ...f, attachment_url: e.target.value }))} className="h-9 text-xs" placeholder="https://..." />
         </div>
       </div>
     </div>
@@ -491,11 +632,10 @@ export default function AdminCalendarPage() {
 
       {/* Calendar view */}
       {!showForm && viewMode === "calendar" && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm" style={{ height: "calc(100vh - 12rem)" }}>
           <CalendarView
             events={events.filter((e) => e.status === "published" || e.status === "draft")}
             admin
-            onCreateEvent={handleNew}
           />
         </div>
       )}
