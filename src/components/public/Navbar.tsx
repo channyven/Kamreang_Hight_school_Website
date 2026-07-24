@@ -58,7 +58,7 @@ export default function Navbar() {
         items: [
           { key: "report", href: `/${locale}/report` },
           { key: "document", href: `/${locale}/document` },
-          { key: "schedule", href: `/${locale}/schedule` },
+          { key: "calendar", href: `/${locale}/calendar` },
         ],
       },
     ],

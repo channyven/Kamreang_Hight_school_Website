@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { submitContactMessage } from '@/actions/contact'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { headers } from 'next/headers'
 
 // Mock next/headers
 vi.mock('next/headers', () => ({

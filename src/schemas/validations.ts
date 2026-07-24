@@ -172,6 +172,90 @@ export const createUserSchema = z.object({
 });
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
+// ─── Schedule ─────────────────────────────────────────────────
+
+export const scheduleSchema = z.object({
+  academic_year: z
+    .string()
+    .regex(/^\d{4}-\d{4}$/, "Format must be YYYY-YYYY (e.g. 2024-2025)"),
+  first_semester_km: z.string().max(100).optional(),
+  first_semester_en: z.string().max(100).optional(),
+  first_semester_dates: z.string().max(100).optional(),
+  second_semester_km: z.string().max(100).optional(),
+  second_semester_en: z.string().max(100).optional(),
+  second_semester_dates: z.string().max(100).optional(),
+  daily_schedule: z.array(z.object({
+    time: z.string(),
+    name_km: z.string().optional(),
+    name_en: z.string().optional(),
+    mon_km: z.string().optional(),
+    mon_en: z.string().optional(),
+    tue_km: z.string().optional(),
+    tue_en: z.string().optional(),
+    wed_km: z.string().optional(),
+    wed_en: z.string().optional(),
+    thu_km: z.string().optional(),
+    thu_en: z.string().optional(),
+    fri_km: z.string().optional(),
+    fri_en: z.string().optional(),
+    sat_km: z.string().optional(),
+    sat_en: z.string().optional(),
+    mon_holiday: z.boolean().optional(),
+    tue_holiday: z.boolean().optional(),
+    wed_holiday: z.boolean().optional(),
+    thu_holiday: z.boolean().optional(),
+    fri_holiday: z.boolean().optional(),
+    sat_holiday: z.boolean().optional(),
+  })).optional(),
+  important_dates: z.array(z.object({
+    title_km: z.string().max(200).default(""),
+    title_en: z.string().max(200).default(""),
+    date_km: z.string().max(100).default(""),
+    date_en: z.string().max(100).default(""),
+  })).default([]),
+  school_office_hours_km: z.string().max(100).optional(),
+  school_office_hours_en: z.string().max(100).optional(),
+  school_office_phone: z.string().max(50).optional(),
+  academic_office_hours_km: z.string().max(100).optional(),
+  academic_office_hours_en: z.string().max(100).optional(),
+  academic_office_phone: z.string().max(50).optional(),
+  contact_info_km: z.string().max(500).optional(),
+  contact_info_en: z.string().max(500).optional(),
+  is_current: z.boolean().default(false),
+  notes: z.string().max(1000).optional(),
+});
+export type ScheduleInput = z.infer<typeof scheduleSchema>;
+
+// ─── Calendar Event ──────────────────────────────────────────
+
+export const calendarEventSchema = z.object({
+  title: z.string().min(1, "Title is required").max(500),
+  description: z.string().max(2000).optional().or(z.literal("")),
+  category: z.enum([
+    "academic", "examination", "holiday", "school_event", "meeting",
+    "sports", "club_activity", "workshop", "seminar", "graduation",
+    "orientation", "parent_meeting", "field_trip", "announcement",
+    "maintenance", "emergency",
+  ]).default("school_event"),
+  location: z.string().max(300).optional().or(z.literal("")),
+  organizer: z.string().max(200).optional().or(z.literal("")),
+  start_date: z.string().min(1, "Start date is required").regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD"),
+  end_date: z.string().min(1, "End date is required").regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD"),
+  start_time: z.string().max(20).optional().or(z.literal("")),
+  end_time: z.string().max(20).optional().or(z.literal("")),
+  is_all_day: z.boolean().default(false),
+  is_recurring: z.boolean().default(false),
+  recurring_rule: z.record(z.any()).optional(),
+  visibility: z.enum(["public", "students", "teachers", "parents", "staff", "private"]).default("public"),
+  status: z.enum(["draft", "published", "cancelled", "archived"]).default("draft"),
+  color: z.string().max(20).optional().or(z.literal("")),
+  attachment_url: z.string().max(1000).optional().or(z.literal("")),
+  grade_level: z.coerce.number().int().min(7).max(12).optional(),
+  department: z.string().max(200).optional().or(z.literal("")),
+  is_featured: z.boolean().default(false),
+});
+export type CalendarEventInput = z.infer<typeof calendarEventSchema>;
+
 export const updateUserSchema = z.object({
   full_name: z.string().min(2).max(100),
   email: z.string().email().optional(),

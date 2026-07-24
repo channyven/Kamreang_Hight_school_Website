@@ -3,11 +3,10 @@
 import { createServerClient } from "@/lib/supabase";
 import type { AppDocument, DocumentCategory, ActionResult } from "@/types";
 import { documentSchema, type DocumentInput } from "@/schemas/validations";
-import { ensureDocumentCategory, CATEGORY_SLUG_MAP, SLUG_TO_CATEGORY_KEY } from "@/lib/document-helpers";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
 import { logError } from "@/lib/error-logger";
-import { REPORT_FILE_CATEGORIES, type ReportFileCategory } from "@/types";
+import { REPORT_FILE_CATEGORIES } from "@/types";
 
 /** A document category as returned to the client */
 export interface DocumentCategoryOption {
@@ -47,26 +46,26 @@ export async function getDocumentById(id: string): Promise<AppDocument | null> {
 
   const file = data;
   return {
-    id: file.id,
-    title_km: file.title_km,
-    title_en: file.title_en,
-    description_km: file.description_km,
-    description_en: file.description_en,
-    file_url: file.file_url,
-    file_name: file.file_name,
+    id: file.id as string,
+    title_km: file.title_km as string,
+    title_en: file.title_en as string,
+    description_km: file.description_km as string | null,
+    description_en: file.description_en as string | null,
+    file_url: file.file_url as string,
+    file_name: file.file_name as string,
     category: {
-      slug: file.category,
+      slug: file.category as string,
       name_km:
         REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
-          ?.labelKm ?? file.category,
+          ?.labelKm ?? (file.category as string),
       name_en:
         REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
-          ?.labelEn ?? file.category,
+          ?.labelEn ?? (file.category as string),
     },
-    is_active: file.is_active,
-    sort_order: file.sort_order,
-    created_at: file.created_at,
-    updated_at: file.updated_at,
+    is_active: file.is_active as boolean,
+    sort_order: file.sort_order as number,
+    created_at: file.created_at as string,
+    updated_at: file.updated_at as string,
   } as AppDocument;
 }
 
@@ -95,27 +94,27 @@ export async function getDocuments(params?: {
     return [];
   }
 
-  let documents = (data ?? []).map((file: any) => ({
-    id: file.id,
-    title_km: file.title_km,
-    title_en: file.title_en,
-    description_km: file.description_km,
-    description_en: file.description_en,
-    file_url: file.file_url,
-    file_name: file.file_name,
+  let documents = (data ?? []).map((file: Record<string, unknown>) => ({
+    id: file.id as string,
+    title_km: file.title_km as string,
+    title_en: file.title_en as string,
+    description_km: file.description_km as string | null,
+    description_en: file.description_en as string | null,
+    file_url: file.file_url as string,
+    file_name: file.file_name as string,
     category: {
-      slug: file.category,
+      slug: file.category as string,
       name_km:
         REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
-          ?.labelKm ?? file.category,
+          ?.labelKm ?? (file.category as string),
       name_en:
         REPORT_FILE_CATEGORIES.find((c) => c.key === file.category)
-          ?.labelEn ?? file.category,
+          ?.labelEn ?? (file.category as string),
     },
-    is_active: file.is_active,
-    sort_order: file.sort_order,
-    created_at: file.created_at,
-    updated_at: file.updated_at,
+    is_active: file.is_active as boolean,
+    sort_order: file.sort_order as number,
+    created_at: file.created_at as string,
+    updated_at: file.updated_at as string,
   })) as AppDocument[];
 
   if (params?.search) {

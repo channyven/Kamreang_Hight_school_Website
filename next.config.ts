@@ -29,6 +29,14 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2678400, // 31 days
     remotePatterns: [
       {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: '192.168.108.97',
+      },
+      {
         protocol: "https",
         hostname: "ui-avatars.com",
       },

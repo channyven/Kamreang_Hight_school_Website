@@ -183,6 +183,154 @@ export interface ReportFile {
   updated_at: string;
 }
 
+/** Academic schedule management interface */
+export interface Schedule {
+  id: string;
+  academic_year: string;
+  first_semester_km?: string;
+  first_semester_en?: string;
+  first_semester_dates?: string;
+  second_semester_km?: string;
+  second_semester_en?: string;
+  second_semester_dates?: string;
+  daily_schedule?: Record<string, unknown>;
+  important_dates?: Record<string, unknown>;
+  school_office_hours_km?: string;
+  school_office_hours_en?: string;
+  school_office_phone?: string;
+  academic_office_hours_km?: string;
+  academic_office_hours_en?: string;
+  academic_office_phone?: string;
+  contact_info_km?: string;
+  contact_info_en?: string;
+  is_current: boolean;
+  notes?: string;
+  created_by?: string;
+  updated_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Important date structure for schedule */
+export interface ImportantDate {
+  title_km: string;
+  title_en: string;
+  date_km: string;
+  date_en: string;
+}
+
+/** Daily schedule period structure with per-day subject support */
+export interface SchedulePeriod {
+  time: string;
+  name_km?: string;
+  name_en?: string;
+  mon_km?: string;
+  mon_en?: string;
+  tue_km?: string;
+  tue_en?: string;
+  wed_km?: string;
+  wed_en?: string;
+  thu_km?: string;
+  thu_en?: string;
+  fri_km?: string;
+  fri_en?: string;
+  sat_km?: string;
+  sat_en?: string;
+  mon_holiday?: boolean;
+  tue_holiday?: boolean;
+  wed_holiday?: boolean;
+  thu_holiday?: boolean;
+  fri_holiday?: boolean;
+  sat_holiday?: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Calendar Types
+// ─────────────────────────────────────────────────────────────
+
+export type EventCategory =
+  | "academic"
+  | "examination"
+  | "holiday"
+  | "school_event"
+  | "meeting"
+  | "sports"
+  | "club_activity"
+  | "workshop"
+  | "seminar"
+  | "graduation"
+  | "orientation"
+  | "parent_meeting"
+  | "field_trip"
+  | "announcement"
+  | "maintenance"
+  | "emergency";
+
+export type EventVisibility = "public" | "students" | "teachers" | "parents" | "staff" | "private";
+export type EventStatus = "draft" | "published" | "cancelled" | "archived";
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  category: EventCategory;
+  location?: string;
+  organizer?: string;
+  start_date: string;
+  end_date: string;
+  start_time?: string;
+  end_time?: string;
+  is_all_day: boolean;
+  is_recurring: boolean;
+  recurring_rule?: Record<string, unknown>;
+  visibility: EventVisibility;
+  status: EventStatus;
+  color?: string;
+  attachment_url?: string;
+  grade_level?: number;
+  department?: string;
+  is_featured: boolean;
+  created_by?: string;
+  updated_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const EVENT_CATEGORIES: { key: EventCategory; labelEn: string; labelKm: string; color: string }[] = [
+  { key: "academic", labelEn: "Academic", labelKm: "សិក្សា", color: "#2563eb" },
+  { key: "examination", labelEn: "Examination", labelKm: "ប្រលង", color: "#dc2626" },
+  { key: "holiday", labelEn: "Holiday", labelKm: "ថ្ងៃឈប់សម្រាក", color: "#f59e0b" },
+  { key: "school_event", labelEn: "School Event", labelKm: "ព្រឹត្តិការណ៍សាលា", color: "#16a34a" },
+  { key: "meeting", labelEn: "Meeting", labelKm: "កិច្ចប្រជុំ", color: "#8b5cf6" },
+  { key: "sports", labelEn: "Sports", labelKm: "កីឡា", color: "#06b6d4" },
+  { key: "club_activity", labelEn: "Club Activity", labelKm: "សកម្មភាពក្លឹប", color: "#e91e63" },
+  { key: "workshop", labelEn: "Workshop", labelKm: "សិក្ខាសាលា", color: "#f97316" },
+  { key: "seminar", labelEn: "Seminar", labelKm: "សិក្ខាសាលា", color: "#14b8a6" },
+  { key: "graduation", labelEn: "Graduation", labelKm: "បញ្ចប់ការសិក្សា", color: "#6366f1" },
+  { key: "orientation", labelEn: "Orientation", labelKm: "តម្រង់ទិស", color: "#a855f7" },
+  { key: "parent_meeting", labelEn: "Parent Meeting", labelKm: "កិច្ចប្រជុំមាតាបិតា", color: "#ec4899" },
+  { key: "field_trip", labelEn: "Field Trip", labelKm: "ដំណើរកម្សាន្ត", color: "#22c55e" },
+  { key: "announcement", labelEn: "Announcement", labelKm: "សេចក្ដីជូនដំណឹង", color: "#64748b" },
+  { key: "maintenance", labelEn: "Maintenance", labelKm: "ថែទាំ", color: "#94a3b8" },
+  { key: "emergency", labelEn: "Emergency", labelKm: "អាសន្ន", color: "#ef4444" },
+];
+
+export const EVENT_VISIBILITY_OPTIONS: { key: EventVisibility; labelEn: string; labelKm: string }[] = [
+  { key: "public", labelEn: "Public", labelKm: "សាធារណៈ" },
+  { key: "students", labelEn: "Students Only", labelKm: "សិស្សតែប៉ុណ្ណោះ" },
+  { key: "teachers", labelEn: "Teachers Only", labelKm: "គ្រូតែប៉ុណ្ណោះ" },
+  { key: "parents", labelEn: "Parents Only", labelKm: "មាតាបិតាតែប៉ុណ្ណោះ" },
+  { key: "staff", labelEn: "Staff Only", labelKm: "បុគ្គលិកតែប៉ុណ្ណោះ" },
+  { key: "private", labelEn: "Private", labelKm: "ឯកជន" },
+];
+
+export const EVENT_STATUS_OPTIONS: { key: EventStatus; labelEn: string; labelKm: string }[] = [
+  { key: "draft", labelEn: "Draft", labelKm: "សេចក្តីព្រាង" },
+  { key: "published", labelEn: "Published", labelKm: "បានផ្សព្វផ្សាយ" },
+  { key: "cancelled", labelEn: "Cancelled", labelKm: "បានបោះបង់" },
+  { key: "archived", labelEn: "Archived", labelKm: "បានរក្សាទុក" },
+];
+
 /** Shape of the editable annual Operations Report content (JSONB). */
 export interface OperationsReportContent {
   general?: {

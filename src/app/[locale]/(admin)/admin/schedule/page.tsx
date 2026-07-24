@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 
-export default async function SchedulePage() {
+export default async function AdminSchedulePage() {
   const locale = await getLocale();
-  redirect(`/${locale}/calendar`);
+  redirect(`/${locale}/admin/calendar`);
 }
