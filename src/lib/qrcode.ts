@@ -7,20 +7,17 @@
  */
 
 import QRCode from "qrcode";
+import { randomUUID } from "crypto";
 
 const DEFAULT_BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
 /**
- * Generate a short, unique QR token for a student.
+ * Generate a unique QR token for a student.
+ * Must be a valid UUID — the `students.qr_token` column is typed UUID.
  */
 export function generateQrToken(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 10; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+  return randomUUID();
 }
 
 /**
