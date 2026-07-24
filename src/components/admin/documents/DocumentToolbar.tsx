@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocale } from "next-intl";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DOCUMENT_CATEGORIES, type DocumentCategory } from "@/types";
+import { getDocumentCategories } from "@/actions/Document";
+import type { DocumentCategoryOption } from "@/actions/Document";
+import type { DocumentCategory } from "@/types";
 
 interface DocumentToolbarProps {
   /** Current search query value. */
@@ -18,8 +20,6 @@ interface DocumentToolbarProps {
   onCategoryChange: (category: DocumentCategory | "all") => void;
 }
 
-const ALL_CATEGORIES = ["all", ...DOCUMENT_CATEGORIES.map((c) => c.key)] as const;
-
 /**
  * Toolbar for the Documents Management page.
  * Contains a search input with icon and category filter buttons.
@@ -31,20 +31,21 @@ export default function DocumentToolbar({
   onCategoryChange,
 }: DocumentToolbarProps) {
   const locale = useLocale();
+  const [categories, setCategories] = useState<DocumentCategoryOption[]>([]);
+
+  useEffect(() => {
+    getDocumentCategories().then(setCategories);
+  }, []);
 
   // Build category labels with translations
   const categoryOptions = useMemo(() => {
-    return ALL_CATEGORIES.map((key) => {
-      if (key === "all") {
-        return { key, label: locale === "km" ? "ទាំងអស់" : "All" };
-      }
-      const cat = DOCUMENT_CATEGORIES.find((c) => c.key === key);
-      return {
-        key,
-        label: locale === "km" ? cat?.labelKm ?? key : cat?.labelEn ?? key,
-      };
-    });
-  }, [locale]);
+    const all = { key: "all", label: locale === "km" ? "ទាំងអស់" : "All" };
+    const rest = categories.map((cat) => ({
+      key: cat.key,
+      label: locale === "km" ? cat.labelKm : cat.labelEn,
+    }));
+    return [all, ...rest];
+  }, [locale, categories]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">

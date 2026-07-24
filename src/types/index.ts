@@ -156,6 +156,62 @@ export const DOCUMENT_CATEGORIES: { key: DocumentCategory; labelEn: string; labe
   { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
 ];
 
+export type ReportFileCategory = "report" | "result" | "form" | "policy" | "other";
+
+export const REPORT_FILE_CATEGORIES: { key: ReportFileCategory; labelEn: string; labelKm: string }[] = [
+  { key: "report", labelEn: "Report", labelKm: "របាយការណ៍" },
+  { key: "result", labelEn: "Result", labelKm: "លទ្ធផល" },
+  { key: "form", labelEn: "Form", labelKm: "បែបបទ" },
+  { key: "policy", labelEn: "Policy", labelKm: "គោលនយោបាយ" },
+  { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
+];
+
+/** A downloadable report file in the admin-managed library. */
+export interface ReportFile {
+  id: string;
+  title_km: string;
+  title_en: string;
+  description_km?: string | null;
+  description_en?: string | null;
+  file_url: string;
+  file_name: string;
+  category: ReportFileCategory;
+  academic_year?: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ─── Dynamic, admin-created report sections (report_custom_sections) ───────
+
+export type ReportBlock =
+  | { type: "keyvalue"; rows: { label_km: string; label_en: string; value: string }[] }
+  | { type: "table"; columns: { km: string; en: string }[]; rows: string[][]; note_km?: string; note_en?: string }
+  | { type: "list"; items: { km: string; en: string }[] }
+  | { type: "paragraph"; paragraphs: { km: string; en: string }[] };
+
+export interface ReportSubsection {
+  key: string;
+  title_km: string;
+  title_en: string;
+  blocks: ReportBlock[];
+}
+
+export interface ReportCustomSection {
+  id: string;
+  section_number: number;
+  title_km: string;
+  title_en: string;
+  is_active: boolean;
+  subsections: ReportSubsection[];
+  created_at: string;
+  updated_at: string;
+}
+
+
 export interface AuditLog {
   id: string;
   user_id?: string;

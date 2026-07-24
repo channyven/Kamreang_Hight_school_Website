@@ -411,7 +411,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* Khmer */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                  <span className="text-lg">🇰🇭</span> ភាសាខ្មែរ
+                  <FlagIcon locale="km" /> ភាសាខ្មែរ
                 </div>
                 <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="px-4 py-2.5 bg-gradient-to-r from-school-gold-50 to-school-gold-100/50 border-b border-gray-100">
@@ -440,7 +440,7 @@ export default function AdminAchievementViewPage({ params }: PageProps) {
               {/* English */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                  <span className="text-lg">🇺🇸</span> English
+                  <FlagIcon locale="en" /> English
                 </div>
                 <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                   <div className="px-4 py-2.5 bg-gradient-to-r from-school-blue-50 to-school-blue-100/50 border-b border-gray-100">
@@ -593,5 +593,19 @@ function InfoRow({
         <p className="text-sm font-medium text-gray-800 truncate">{value}</p>
       </div>
     </div>
+  );
+}
+
+function FlagIcon({ locale }: { locale: "km" | "en" }) {
+  return (
+    <span className="relative inline-block w-5 h-4 overflow-hidden rounded-sm shrink-0">
+      <Image
+        src={`/icons/flag-${locale}.svg`}
+        alt={locale === "km" ? "Khmer" : "English"}
+        fill
+        className="object-cover"
+        sizes="20px"
+      />
+    </span>
   );
 }

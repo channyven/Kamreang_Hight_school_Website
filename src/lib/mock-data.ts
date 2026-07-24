@@ -554,7 +554,7 @@ export const mockLeadership: Leadership[] = [
     bio_km: "លោកគ្រូ អ៊ុង កន្ធារា ជានាយកសាលា មានសញ្ញាបត្រអនុបណ្ឌិតផ្នែកប្រវត្តិវិទ្យា និងបង្រៀនមុខវិជ្ជាភាសាអង់គ្លេសថ្នាក់ទី ៨ ។",
     bio_en: "Mr. Ung Kanputheara serves as the School Principal. He holds a Master's Degree in History and currently teaches English Language to Grade 8 students.",
     phone: "095 85 85 45",
-    gender: "♂",
+    gender: "Male",
     photo_url: "/images/about/principal-ung-kanputheara.jpg",
     sort_order: 1,
     is_active: true,

@@ -17,6 +17,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,7 +193,7 @@ export default function AchievementFormPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <Input
                         {...register("title_km")}
@@ -205,7 +206,7 @@ export default function AchievementFormPage({ params }: PageProps) {
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <Input
                         {...register("title_en")}
@@ -248,7 +249,7 @@ export default function AchievementFormPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <textarea
                         {...register("description_km")}
@@ -259,7 +260,7 @@ export default function AchievementFormPage({ params }: PageProps) {
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <textarea
                         {...register("description_en")}
@@ -456,5 +457,19 @@ export default function AchievementFormPage({ params }: PageProps) {
         </div>
       </form>
     </div>
+  );
+}
+
+function FlagIcon({ locale }: { locale: "km" | "en" }) {
+  return (
+    <span className="relative inline-block w-4 h-3 overflow-hidden rounded-sm shrink-0">
+      <Image
+        src={`/icons/flag-${locale}.svg`}
+        alt={locale === "km" ? "Khmer" : "English"}
+        fill
+        className="object-cover"
+        sizes="16px"
+      />
+    </span>
   );
 }

@@ -3,9 +3,57 @@
 import { createServerClient } from "@/lib/supabase";
 import type { AppDocument, DocumentCategory, ActionResult } from "@/types";
 import { documentSchema, type DocumentInput } from "@/schemas/validations";
-import { ensureDocumentCategory, CATEGORY_SLUG_MAP } from "@/lib/document-helpers";
+import { ensureDocumentCategory, CATEGORY_SLUG_MAP, SLUG_TO_CATEGORY_KEY } from "@/lib/document-helpers";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth-guard";
+
+/** A document category as returned to the client */
+export interface DocumentCategoryOption {
+  key: string;
+  labelEn: string;
+  labelKm: string;
+}
+
+/**
+ * Fetch all document categories from the database.
+ * Falls back to the hardcoded list if the DB query fails.
+ */
+export async function getDocumentCategories(): Promise<DocumentCategoryOption[]> {
+  try {
+    await requireAdmin();
+  } catch {
+    return [];
+  }
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from("download_categories")
+    .select("slug, name_km, name_en")
+    .order("sort_order", { ascending: true });
+
+  if (error || !data) {
+    console.error("Failed to fetch document categories:", error);
+  }
+
+  if (data && data.length > 0) {
+    const seen = new Set<string>();
+    const options: DocumentCategoryOption[] = [];
+    for (const cat of data as { slug: string; name_km: string; name_en: string }[]) {
+      const key = SLUG_TO_CATEGORY_KEY[cat.slug] ?? cat.slug;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      options.push({ key, labelEn: cat.name_en, labelKm: cat.name_km });
+    }
+    return options;
+  }
+
+  return [
+    { key: "report", labelEn: "Report", labelKm: "របាយការណ៍" },
+    { key: "result", labelEn: "Result", labelKm: "លទ្ធផល" },
+    { key: "form", labelEn: "Form", labelKm: "បែបបទ" },
+    { key: "policy", labelEn: "Policy", labelKm: "គោលនយោបាយ" },
+    { key: "other", labelEn: "Other", labelKm: "ផ្សេងៗ" },
+  ];
+}
 
 /**
  * Fetch a single document by ID.
@@ -104,6 +152,7 @@ export async function createDocument(
     file_url: parsed.data.file_url,
     file_name: parsed.data.file_name,
     category_id: categoryId,
+    sort_order: parsed.data.sort_order,
     is_active: parsed.data.is_active,
   });
 

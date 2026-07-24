@@ -41,6 +41,7 @@ export default function Navbar() {
       { key: "news", href: `/${locale}/news` },
       { key: "achievements", href: `/${locale}/achievements` },
       { key: "document", href: `/${locale}/document` },
+      { key: "report", href: `/${locale}/report` },
       { key: "contact", href: `/${locale}/contact` },
     ],
     [locale]
@@ -57,8 +58,12 @@ export default function Navbar() {
 
   const isActive = useCallback(
     (href: string) => {
-      if (href === `/${locale}`) return pathname === `/${locale}`;
-      return pathname.startsWith(href);
+      if (href === `/${locale}`) {
+        return pathname === `/${locale}` || pathname === `/${locale}/`;
+      }
+      // Match the exact path or a proper sub-path (e.g., /en/news matches /en/news/article-1
+      // but not /en/news-foo or /en/report-extra matching /en/report)
+      return pathname === href || pathname.startsWith(href + "/");
     },
     [locale, pathname]
   );
@@ -87,8 +92,8 @@ export default function Navbar() {
             <div className="hidden sm:block">
               <p className={cn("text-sm font-bold leading-tight transition-colors", isTransparent ? "text-white" : "text-school-blue-800", "group-hover:text-school-gold-500")}>
                 {locale === "km"
-                  ? process.env.NEXT_PUBLIC_SCHOOL_NAME_KM
-                  : process.env.NEXT_PUBLIC_SCHOOL_NAME_EN}
+                  ? (process.env.NEXT_PUBLIC_SCHOOL_NAME_KM ?? "វិទ្យាល័យកំរៀង")
+                  : (process.env.NEXT_PUBLIC_SCHOOL_NAME_EN ?? "Kamrieng High School")}
               </p>
             </div>
           </Link>

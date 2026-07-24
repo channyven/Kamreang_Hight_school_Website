@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Link2 } from "lucide-react";
+import { Plus, Trash2, ImageIcon, AlertTriangle, ChevronUp, ChevronDown, Link2, Lightbulb } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { convertGoogleDriveUrl } from "@/utils";
@@ -84,10 +84,11 @@ export default function PhotoGallery({ images, onChange, locale = "en" }: PhotoG
         </Button>
       </div>
 
-      <p className="text-[10px] text-gray-400 leading-tight -mt-1.5">
+      <p className="text-[10px] text-gray-400 leading-tight -mt-1.5 flex items-start gap-1">
+        <Lightbulb className="w-3 h-3 shrink-0 mt-px" />
         {locale === "km"
-          ? "💡 បិទភ្ជាប់តំណ Google Drive ដោយផ្ទាល់ — វានឹងបម្លែងដោយស្វ័យប្រវត្តិ"
-          : "💡 Paste Google Drive links — they will be auto-converted"}
+          ? "បិទភ្ជាប់តំណ Google Drive ដោយផ្ទាល់ — វានឹងបម្លែងដោយស្វ័យប្រវត្តិ"
+          : "Paste Google Drive links — they will be auto-converted"}
       </p>
       {showError && (
         <p className="text-[11px] text-red-500 font-medium flex items-center gap-1 -mt-1">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocale } from "next-intl";
 
 export default function CopyButton({ value }: { value: string }) {
@@ -11,8 +11,17 @@ export default function CopyButton({ value }: { value: string }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
   };
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
 
   return (
     <button
@@ -22,7 +31,7 @@ export default function CopyButton({ value }: { value: string }) {
     >
       {copied
         ? <Check className="w-3.5 h-3.5 text-green-500" />
-        : <Copy className="w-3.5 h-3.5" style={{ color: "#737781" }} />
+        : <Copy className="w-3.5 h-3.5 text-gray-500" />
       }
     </button>
   );

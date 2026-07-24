@@ -306,7 +306,9 @@ export default function HeroSection({ slides }: HeroSectionProps) {
                   )}
                   style={{ borderColor: `${accent}50`, color: accent, background: `${accent}12` }}
                 >
-                  <span style={{ fontSize: "10px" }}>🇰🇭</span>
+                  <span className="relative inline-block w-3.5 h-2.5 overflow-hidden rounded-sm shrink-0">
+                    <Image src="/icons/flag-km.svg" alt="Cambodia" fill className="object-cover" sizes="14px" />
+                  </span>
                   {locale === "km" ? "ព្រះរាជាណាចក្រកម្ពុជា" : "Kingdom of Cambodia"}
                 </motion.div>
 

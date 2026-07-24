@@ -109,7 +109,6 @@ export default function AdminTeachersPage() {
                       <td className="px-4 py-3 hidden xl:table-cell">
                         {item.gender ? (
                           <Badge variant="outline" className="text-xs">
-                            {item.gender === "Male" ? "♂ " : "♀ "}
                             {item.gender}
                           </Badge>
                         ) : "—"}

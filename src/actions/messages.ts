@@ -8,22 +8,22 @@ export async function getMessages(params?: {
   status?: string;
 }): Promise<Message[]> {
   try {
-    const supabase = createServerClient();
-    let query = supabase
-      .from("messages")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (params?.status && params.status !== "all") {
-      query = query.eq("status", params.status);
-    }
-
-    const { data } = await query;
-    return (data ?? []) as Message[];
-  } catch (error) {
-    console.error("getMessages error:", error);
+    await requireAdmin();
+  } catch {
     return [];
   }
+  const supabase = createServerClient();
+  let query = supabase
+    .from("messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (params?.status && params.status !== "all") {
+    query = query.eq("status", params.status);
+  }
+
+  const { data } = await query;
+  return (data ?? []) as Message[];
 }
 
 export async function markMessageRead(id: string): Promise<ActionResult<void>> {

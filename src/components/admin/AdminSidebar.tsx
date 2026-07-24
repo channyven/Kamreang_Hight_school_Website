@@ -11,6 +11,7 @@ import {
   MessageSquare, Users, Settings, BarChart3,
   ChevronLeft, ChevronRight, LogOut, X, Plus,
   GraduationCap, Landmark, BookOpen, Heart, Image as ImageIcon, Phone,
+  FileBarChart,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthContext";
 import { cn, adminHref } from "@/utils";
@@ -39,7 +40,7 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   { labelKey: "nav_group_overview", keys: ["dashboard", "statistics"] },
-  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "governance", "news", "achievements", "documents", "contact", "donate"] },
+  { labelKey: "nav_group_content", keys: ["hero_slides", "about", "teachers", "students", "governance", "news", "achievements", "documents", "reports", "contact", "donate"] },
   { labelKey: "nav_group_inbox", keys: ["messages"] },
   { labelKey: "nav_group_system", keys: ["users", "settings"] },
 ];
@@ -65,6 +66,7 @@ export default function AdminSidebar() {
       { key: "news", href: adminHref(locale, "news"), icon: <Newspaper className="w-4 h-4" /> },
       { key: "achievements", href: adminHref(locale, "achievements"), icon: <Trophy className="w-4 h-4" /> },
       { key: "documents", href: adminHref(locale, "documents"), icon: <FileText className="w-4 h-4" /> },
+      { key: "reports", href: adminHref(locale, "reports"), icon: <FileBarChart className="w-4 h-4" /> },
       { key: "contact", href: adminHref(locale, "contact"), icon: <Phone className="w-4 h-4" /> },
       { key: "donate", href: adminHref(locale, "donate"), icon: <Heart className="w-4 h-4" /> },
       { key: "messages", href: adminHref(locale, "messages"), icon: <MessageSquare className="w-4 h-4" /> },

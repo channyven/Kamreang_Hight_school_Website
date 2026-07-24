@@ -1,18 +1,11 @@
 -- ============================================================
--- Add missing columns to the downloads table
--- The migration 010_create_documents_table.sql created a
--- separate `documents` table, but the application code uses the
--- `downloads` table with a `download_categories` join.
+-- NOTE: This migration is intentionally a no-op.
+--
+-- Originally it added missing columns to the `downloads` table.
+-- However, the `downloads` (and `download_categories`) tables were
+-- DROPPED in 004_drop_gallery_downloads.sql. The application now
+-- stores downloadable files in the `documents` table created by
+-- 010_create_documents_table.sql instead, so there is nothing to
+-- alter here. Keeping this file (rather than deleting it) preserves
+-- migration history / ordering for anyone who already applied it.
 -- ============================================================
-
--- Add file_size column if it does not exist
-ALTER TABLE downloads
-  ADD COLUMN IF NOT EXISTS file_size INTEGER;
-
--- Add sort_order column if it does not exist
-ALTER TABLE downloads
-  ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0;
-
--- Add an index for sort_order ordering
-CREATE INDEX IF NOT EXISTS idx_downloads_sort_order
-  ON downloads (sort_order ASC, created_at DESC);

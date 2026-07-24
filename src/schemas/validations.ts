@@ -20,7 +20,7 @@ export const contactSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z
     .string()
-    .regex(/^[\d\s+\-()]*$/, "Invalid phone number")
+    .regex(/^[\d\s+\-()]+$/, "Invalid phone number")
     .optional()
     .or(z.literal("")),
   subject: z.string().min(3, "Subject is required").max(200),
@@ -106,6 +106,33 @@ export const documentSchema = z.object({
   is_active: z.boolean().default(true),
 });
 export type DocumentInput = z.infer<typeof documentSchema>;
+
+// ─── Report File ──────────────────────────────────────────────
+
+export const reportFileSchema = z.object({
+  title_km: z.string().min(1, "Khmer title is required").max(500),
+  title_en: z.string().min(1, "English title is required").max(500),
+  description_km: z.string().max(1000).optional().or(z.literal("")),
+  description_en: z.string().max(1000).optional().or(z.literal("")),
+  file_url: z.string().url("Must be a valid URL").min(1, "File URL is required"),
+  file_name: z.string().min(1, "File name is required").max(300),
+  category: z.enum(["report", "result", "form", "policy", "other"]).default("report"),
+  academic_year: z.string().max(20).optional().or(z.literal("")),
+  sort_order: z.coerce.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+});
+export type ReportFileInput = z.infer<typeof reportFileSchema>;
+
+// ─── Custom Report Sections (dynamic, admin-created) ─────────
+
+export const reportCustomSectionSchema = z.object({
+  section_number: z.coerce.number().int().min(1).default(1),
+  title_km: z.string().min(1, "Khmer title is required").max(300),
+  title_en: z.string().min(1, "English title is required").max(300),
+  is_active: z.boolean().default(true),
+  subsections: z.array(z.record(z.any())).default([]),
+});
+export type ReportCustomSectionInput = z.infer<typeof reportCustomSectionSchema>;
 
 // ─── Student ──────────────────────────────────────────────────
 

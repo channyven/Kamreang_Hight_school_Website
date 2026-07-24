@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase";
-import type { Achievement, AppDocument, BankAccount, DonationPurpose, DonationQr, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, SchoolInfo, Statistics, Teacher } from "@/types";
+import type { Achievement, AppDocument, BankAccount, DonationPurpose, DonationQr, GovernanceItem, HeroSlide, Leadership, Milestone, News, NewsCategory, ReportCustomSection, SchoolInfo, Statistics, Teacher } from "@/types";
 import {
   mockSchoolInfo,
   mockLeadership,
@@ -294,4 +294,22 @@ export const getCurrentStatistics = unstable_cache(
   },
   ["current-statistics"],
   { tags: ["statistics"], revalidate: 60 }
+);
+
+export const getPublishedCustomReportSections = unstable_cache(
+  async (): Promise<ReportCustomSection[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data } = await supabase
+        .from("report_custom_sections")
+        .select("*")
+        .eq("is_active", true)
+        .order("section_number", { ascending: true });
+      return (data ?? []) as ReportCustomSection[];
+    } catch {
+      return [];
+    }
+  },
+  ["published-custom-report-sections"],
+  { tags: ["report_custom_sections"], revalidate: 300 }
 );

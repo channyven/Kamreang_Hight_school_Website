@@ -13,6 +13,19 @@ export const CATEGORY_SLUG_MAP: Record<DocumentCategory, string> = {
   other: "other-documents",
 };
 
+/** Reverse map: DB slug -> DocumentCategory key */
+export const SLUG_TO_CATEGORY_KEY: Record<string, DocumentCategory> = {
+  ...Object.fromEntries(
+    Object.entries(CATEGORY_SLUG_MAP).map(([key, slug]) => [slug, key as DocumentCategory])
+  ),
+  // Legacy slugs kept for backward compatibility when reading old records.
+  registration: "form",
+  policies: "policy",
+  calendar: "other",
+  official: "other",
+  exams: "result",
+};
+
 /** Map our string categories to download_category names (English). */
 const CATEGORY_NAME_MAP: Record<DocumentCategory, { name_km: string; name_en: string }> = {
   report: { name_km: "របាយការណ៍", name_en: "Reports" },

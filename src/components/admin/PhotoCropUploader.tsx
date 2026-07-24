@@ -449,8 +449,8 @@ export default function PhotoCropUploader({
                     can freely resize from any side. */}
                 <ReactCrop
                   crop={crop}
-                  onChange={(_, percentCrop) => setCrop(percentCrop)}
-                  onComplete={(c) => setCompletedCrop(c)}
+                  onChange={(_: Crop, percentCrop: Crop) => setCrop(percentCrop)}
+                  onComplete={(c: PixelCrop) => setCompletedCrop(c)}
                   keepSelection
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
