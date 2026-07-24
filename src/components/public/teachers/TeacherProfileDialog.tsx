@@ -122,7 +122,7 @@ export default function TeacherProfileDialog({
                 {teacher.name_km || teacher.name_en}
                 {teacher.gender && (
                   <span className="inline-block ml-1.5 text-sm font-semibold text-blue-300/80 align-middle">
-                    {teacher.gender === "Male" ? "♂" : "♀"}
+                    {teacher.gender === "Male" ? "M" : "F"}
                   </span>
                 )}
               </h3>

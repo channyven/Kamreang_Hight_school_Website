@@ -22,6 +22,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -282,7 +283,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* Khmer Title */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <div className="relative">
                         <Input
@@ -301,7 +302,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* English Title */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <div className="relative">
                         <Input
@@ -359,7 +360,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* Khmer Excerpt */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <div className="relative">
                         <textarea
@@ -376,7 +377,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* English Excerpt */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <div className="relative">
                         <textarea
@@ -408,7 +409,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* Khmer Content */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <textarea
                         {...register("content_km")}
@@ -420,7 +421,7 @@ export default function NewsFormPage({ params }: PageProps) {
                     {/* English Content */}
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <textarea
                         {...register("content_en")}
@@ -554,8 +555,9 @@ export default function NewsFormPage({ params }: PageProps) {
                   {locale === "km" ? "រូបភាពតំណាង" : "Featured Image"}
                 </h2>
                 {watch("featured_image") && (
-                  <span className="ml-auto text-[10px] text-emerald-500 font-medium">
-                    ✓ {locale === "km" ? "មាន" : "Set"}
+                  <span className="ml-auto inline-flex items-center gap-0.5 text-[10px] text-emerald-500 font-medium">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {locale === "km" ? "មាន" : "Set"}
                   </span>
                 )}
               </div>
@@ -715,5 +717,19 @@ export default function NewsFormPage({ params }: PageProps) {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function FlagIcon({ locale }: { locale: "km" | "en" }) {
+  return (
+    <span className="relative inline-block w-4 h-3 overflow-hidden rounded-sm shrink-0">
+      <Image
+        src={`/icons/flag-${locale}.svg`}
+        alt={locale === "km" ? "Khmer" : "English"}
+        fill
+        className="object-cover"
+        sizes="16px"
+      />
+    </span>
   );
 }

@@ -10,7 +10,6 @@ import {
   Wallet,
   AlertTriangle,
   Rocket,
-  ArrowUp,
   ClipboardCheck,
   Book,
   FileText,
@@ -73,20 +72,6 @@ export function SectionShell({
       </div>
       {children}
     </section>
-  );
-}
-
-// ─── Back to top ────────────────────────────────────────────
-
-export function BackToTop({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-school-blue-700 hover:text-school-gold-600 transition-colors"
-    >
-      <ArrowUp className="w-4 h-4" />
-      {label}
-    </button>
   );
 }
 

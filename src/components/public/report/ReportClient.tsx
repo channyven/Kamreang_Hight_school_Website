@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/utils";
@@ -10,7 +10,6 @@ import {
   SectionShell,
   getSectionIcon,
   CustomSection,
-  BackToTop,
 } from "./ReportSections";
 
 export default function ReportClient({
@@ -21,39 +20,22 @@ export default function ReportClient({
   customSections: ReportCustomSection[];
 }) {
   const t = useTranslations("report");
-  const firstId = customSections[0] ? `custom-${customSections[0].id}` : "";
-  const [active, setActive] = useState(firstId);
+  const [activeId, setActiveId] = useState(customSections[0]?.id ?? "");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const customSectionIds = customSections.map((cs) => `custom-${cs.id}`);
-
-  // Scrollspy: highlight the section currently in view.
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
-    );
-    customSectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, [customSectionIds]);
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const selectSection = (id: string) => {
+    setActiveId(id);
     setMobileNavOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const navItems = customSections.map((cs) => ({
-    id: `custom-${cs.id}`,
+    id: cs.id,
     label: locale === "km" ? cs.title_km : cs.title_en,
     icon: getSectionIcon("FileText"),
   }));
+
+  const activeSection = customSections.find((cs) => cs.id === activeId);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
@@ -66,11 +48,11 @@ export default function ReportClient({
           <nav className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = active === item.id;
+              const isActive = activeId === item.id;
               return (
                 <button
                   key={item.id}
-                  onClick={() => scrollTo(item.id)}
+                  onClick={() => selectSection(item.id)}
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left",
                     isActive
@@ -84,11 +66,6 @@ export default function ReportClient({
               );
             })}
           </nav>
-          {firstId && (
-            <div className="mt-4 px-3">
-              <BackToTop label={t("back_to_top")} onClick={() => scrollTo(firstId)} />
-            </div>
-          )}
         </div>
       </aside>
 
@@ -100,7 +77,7 @@ export default function ReportClient({
         >
           <span className="flex items-center gap-2">
             <Menu className="w-4 h-4" />
-            {t("jump_to")}: {navItems.find((n) => n.id === active)?.label}
+            {t("jump_to")}: {navItems.find((n) => n.id === activeId)?.label}
           </span>
           {mobileNavOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
@@ -108,11 +85,11 @@ export default function ReportClient({
           <nav className="mt-2 bg-white border border-gray-200 rounded-xl shadow-sm p-2 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = active === item.id;
+              const isActive = activeId === item.id;
               return (
                 <button
                   key={item.id}
-                  onClick={() => scrollTo(item.id)}
+                  onClick={() => selectSection(item.id)}
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left",
                     isActive
@@ -129,23 +106,17 @@ export default function ReportClient({
         )}
       </div>
 
-      {/* ─── Content ─── */}
+      {/* ─── Content: only the selected section ─── */}
       <div className="min-w-0">
-        {customSections.map((cs) => (
+        {activeSection && (
           <SectionShell
-            key={cs.id}
-            id={`custom-${cs.id}`}
-            title={locale === "km" ? cs.title_km : cs.title_en}
+            key={activeSection.id}
+            id={`custom-${activeSection.id}`}
+            title={locale === "km" ? activeSection.title_km : activeSection.title_en}
             icon={getSectionIcon("FileText")}
           >
-            <CustomSection subsections={cs.subsections} locale={locale} />
+            <CustomSection subsections={activeSection.subsections} locale={locale} />
           </SectionShell>
-        ))}
-
-        {firstId && (
-          <div className="pt-6 lg:hidden">
-            <BackToTop label={t("back_to_top")} onClick={() => scrollTo(firstId)} />
-          </div>
         )}
       </div>
     </div>

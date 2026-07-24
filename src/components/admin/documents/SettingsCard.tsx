@@ -16,6 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { getDocumentCategories } from "@/actions/Document";
 import type { DocumentCategoryOption } from "@/actions/Document";
+import { Settings } from "lucide-react";
 
 interface SettingsCardProps {
   control: Control<DocumentInput>;
@@ -52,7 +53,7 @@ export default function SettingsCard({ control, errors }: SettingsCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
       <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-        <span className="text-lg">⚙️</span> Settings
+        <Settings className="w-[18px] h-[18px] text-gray-500" /> Settings
       </h2>
 
       {/* Category */}

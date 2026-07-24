@@ -14,8 +14,11 @@ import {
   Palette,
   Eye,
   EyeOff,
+  AlertTriangle,
+  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -165,7 +168,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
     return (
       <div className="max-w-5xl mx-auto">
         <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-8 text-center">
-          <p className="text-4xl mb-4">⚠️</p>
+          <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-amber-800 mb-2">
             {locale === "km"
               ? "ឈានដល់ចំនួនកំណត់"
@@ -247,7 +250,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <Input
                         {...register("title_km")}
@@ -262,7 +265,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <Input
                         {...register("title_en")}
@@ -288,7 +291,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇰🇭</span> Khmer
+                        <FlagIcon locale="km" /> Khmer
                       </Label>
                       <Textarea
                         {...register("subtitle_km")}
@@ -299,7 +302,7 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                        <span className="text-base">🇺🇸</span> English
+                        <FlagIcon locale="en" /> English
                       </Label>
                       <Textarea
                         {...register("subtitle_en")}
@@ -459,8 +462,9 @@ export default function HeroSlideFormPage({ params }: PageProps) {
                   {locale === "km" ? "រូបភាព" : "Background Image"}
                 </h2>
                 {watchImageUrl && (
-                  <span className="ml-auto text-[10px] text-emerald-500 font-medium">
-                    ✓ {locale === "km" ? "មាន" : "Set"}
+                  <span className="ml-auto inline-flex items-center gap-0.5 text-[10px] text-emerald-500 font-medium">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {locale === "km" ? "មាន" : "Set"}
                   </span>
                 )}
               </div>
@@ -641,5 +645,19 @@ export default function HeroSlideFormPage({ params }: PageProps) {
         </div>
       </form>
     </div>
+  );
+}
+
+function FlagIcon({ locale }: { locale: "km" | "en" }) {
+  return (
+    <span className="relative inline-block w-4 h-3 overflow-hidden rounded-sm shrink-0">
+      <Image
+        src={`/icons/flag-${locale}.svg`}
+        alt={locale === "km" ? "Khmer" : "English"}
+        fill
+        className="object-cover"
+        sizes="16px"
+      />
+    </span>
   );
 }

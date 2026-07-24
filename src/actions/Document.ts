@@ -35,11 +35,15 @@ export async function getDocumentCategories(): Promise<DocumentCategoryOption[]>
   }
 
   if (data && data.length > 0) {
-    return data.map((cat: { slug: string; name_km: string; name_en: string }) => ({
-      key: SLUG_TO_CATEGORY_KEY[cat.slug] ?? cat.slug,
-      labelEn: cat.name_en,
-      labelKm: cat.name_km,
-    }));
+    const seen = new Set<string>();
+    const options: DocumentCategoryOption[] = [];
+    for (const cat of data as { slug: string; name_km: string; name_en: string }[]) {
+      const key = SLUG_TO_CATEGORY_KEY[cat.slug] ?? cat.slug;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      options.push({ key, labelEn: cat.name_en, labelKm: cat.name_km });
+    }
+    return options;
   }
 
   return [

@@ -293,7 +293,7 @@ function StaffCard({ teacher, km }: { teacher: Teacher; km: boolean }) {
           <span>{teacher.name_km || teacher.name_en}</span>
           {teacher.gender && (
             <span className="inline-block ml-0.5 text-[9px] opacity-50">
-              {teacher.gender === "Male" ? "♂" : "♀"}
+              {teacher.gender === "Male" ? "M" : "F"}
             </span>
           )}
         </h4>
