@@ -62,6 +62,15 @@ function DatePickerField({
   );
 }
 
+function FormField({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`space-y-1.5 ${className}`}>
+      <Label className="text-sm font-medium text-gray-700">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────
 
 export default function NewStudentPage() {
@@ -119,13 +128,6 @@ export default function NewStudentPage() {
       toast.error(result.error ?? "Failed to create student");
     }
   };
-
-  const FormField = ({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) => (
-    <div className={`space-y-1.5 ${className}`}>
-      <Label className="text-sm font-medium text-gray-700">{label}</Label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-12">

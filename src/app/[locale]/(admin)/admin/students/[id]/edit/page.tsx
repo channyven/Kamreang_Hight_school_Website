@@ -86,6 +86,15 @@ function DatePickerField({
   );
 }
 
+function FormField({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`space-y-1.5 ${className}`}>
+      <Label className="text-sm font-medium text-gray-700">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
 // ─── Loading skeleton ────────────────────────────────────────
 
 function FormSkeleton() {
@@ -181,13 +190,6 @@ export default function StudentEditPage({ params }: PageProps) {
   };
 
   if (loading) return <FormSkeleton />;
-
-  const FormField = ({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) => (
-    <div className={`space-y-1.5 ${className}`}>
-      <Label className="text-sm font-medium text-gray-700">{label}</Label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-12">
